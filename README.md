@@ -1,10 +1,10 @@
 # Space Cloner
 Sample script to help you clone a space.
 
-## This Script is provided as is!
+## This cloning process is provided as is!
 Please test it on an empty space before attempting to use it for any kind of production use.
 
-## Who uses this script?
+## Who uses this process?
 This script was developed by the Customer Success team at Octopus Deploy.  We use it to clone items for our [samples instance](https://samples.octopus.app).
 
 ## Will you fix my bug?  What about feature requests?
