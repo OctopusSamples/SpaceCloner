@@ -32,6 +32,28 @@ The script `CloneSpace.ps1` will clone the following:
     - Variables
 - Tenants (no tenant variables)
 
+It will not clone:
+- Tenant Variables
+- Deployments
+- Releases
+- Packages
+- Workers
+- Targets
+
+The assumption is you are using this script to clone a process to another instance for testing purposes.  You don't need the headache of deployments, releases and everything associated with it.
+
+Tenant variables were excluded mostly due to how they are returned from the API.  Honestly it looked like a bit of a maintenance nightmare.
+
+The script will also skip the following items if they already exist:
+- Accounts (match by name)
+- Feeds (match by name)
+- Tenants (match by name)
+- Sensitive variables
+- Community Step Templates
+- Worker Pools (match by name)
+- Process steps (match by name)
+- Channels
+
 ## How it works
 You provide the a source Octopus instance space and a destination Octopus instance space.  It will hit the API of both instances and copy items from the source space into the destination space.
 
@@ -55,7 +77,7 @@ However, this script was designed to be run multiple times.  It isn't useful if 
 ## Simple Relationship Management
 The process does not attempt to walk a tree of dependencies.  It loads up all the necessary data from the source and destination.  When it comes across an ID in the source space it will attempt to find the corresponding ID in the destination space.  If it cannot find a matching item it removes that binding.  
 
-If that binding is required the script will fail.  
+If that binding on a specific object is required the script will fail.  
 
 Let's use environment scoping as the example.  In my source I have a variable set called `Global`.  That variable set has an environment scoped to environments.
 
@@ -132,14 +154,20 @@ All these examples are for the [Target - SQL Server Space](https://samples.octop
 ### Clone Everything
 Set everything to all.  All is a keyword the script sees.
 
+```
 CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" -SourceOctopusApiKey "SOME KEY" -SourceSpaceName "Target - SQL Server" DestinationOctopusUrl "https://myinstance.octopus" -DestinationOctopusApiKey "My Key" -Destination Space Name "Demo Clone" -EnvironmentsToClone "all" -WorkerPoolsToClone "all" -ProjectGroupsToClone "all" -TenantTagsToClone "all" -ExternalFeedsToClone "all" -StepTemplatesToClone "all" -InfrastructureAccountsToClone "all" -LibraryVariableSetsToClone "all" -LifeCyclesToClone "all" -ProjectsToClone "all" -TenantsToClone "all" -OverwriteExistingVariables "True" -OneInstanceOfVariableAllowedOnDestination "False" -OverwriteExistingCustomStepTemplates "True" -OverwriteExistingLifecycles "True"
+```
 
 ### Clone project and associated dependencies
 You have to know the dependencies of the project, the script won't do the work for you.  This script can be run multiple times and it will only copy over differences it finds.
 
+```
 CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" -SourceOctopusApiKey "SOME KEY" -SourceSpaceName "Target - SQL Server" DestinationOctopusUrl "https://myinstance.octopus" -DestinationOctopusApiKey "My Key" -Destination Space Name "Demo Clone" -EnvironmentsToClone "test,staging,production" -WorkerPoolsToClone "AWS*" -ProjectGroupsToClone "all" -TenantTagsToClone "all" -ExternalFeedsToClone "all" -StepTemplatesToClone "all" -InfrastructureAccountsToClone "AWS*" -LibraryVariableSetsToClone "AWS*,Global,Notification,SQL Server" -LifeCyclesToClone "AWS*" -ProjectsToClone "Redgate - Feature Branch Example" -TenantsToClone "all" -OverwriteExistingVariables "false" -OneInstanceOfVariableAllowedOnDestination "False" -OverwriteExistingCustomStepTemplates "false" -OverwriteExistingLifecycles "false"
+```
 
 ### Clone specific project(s)
 If all you want to do is clone a specific project without worrying about dependencies you could do this.  It will ensure all the steps and variables and channels from the source project appear in the destination project.  It won't overwrite existing values.
 
+```
 CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" -SourceOctopusApiKey "SOME KEY" -SourceSpaceName "Target - SQL Server" DestinationOctopusUrl "https://myinstance.octopus" -DestinationOctopusApiKey "My Key" -Destination Space Name "Demo Clone" -ProjectsToClone "Redgate - Feature Branch Example,Redgate - Simple Deployment"
+```
