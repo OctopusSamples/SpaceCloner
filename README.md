@@ -2,7 +2,7 @@
 Sample script to help you clone a space.
 
 ## This cloning process is provided as is!
-Please test it on an empty space before attempting to use it for any kind of production use.
+Please test it on an empty space before attempting to use it for any kind of real-world use.  Please clone this repo and modify the script to meet your needs.  This script should be a starting point for your process.
 
 ## Who uses this process?
 This script was developed by the Customer Success team at Octopus Deploy.  We use it to clone items for our [samples instance](https://samples.octopus.app).
@@ -39,6 +39,11 @@ It will not clone:
 - Packages
 - Workers
 - Targets
+- Users
+- Teams
+- Roles
+- External Auth Providers (or groups)
+- Server settings like folders
 
 The assumption is you are using this script to clone a process to another instance for testing purposes.  You don't need the headache of deployments, releases and everything associated with it.
 
@@ -57,7 +62,10 @@ The script will also skip the following items if they already exist:
 ## How it works
 You provide the a source Octopus instance space and a destination Octopus instance space.  It will hit the API of both instances and copy items from the source space into the destination space.
 
-This script was designed to be run multiple times.  
+This script was designed to be run multiple times. 
+
+## The Space Has to Exist
+The space on the source and destination must exist prior to running the script.  It doesn't create those for you.
 
 ## Limitations
 Because this is hitting the Octopus API (and not the database) it cannot decrypt items from the Octopus Database.  It also cannot download packages for you.
