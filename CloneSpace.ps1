@@ -1065,6 +1065,11 @@ function Copy-ProcessStepAction
         $action.Properties.'Octopus.Action.Manual.ResponsibleTeamIds' = "team-managers"
     }
 
+    if ([bool]($action.PSobject.Properties.Value -like "*Octopus.Action.Package.FeedId*"))
+    {
+        $action.Properties.'Octopus.Action.Package.FeedId' = Convert-SourceIdToDestinationId -SourceList $sourceData.FeedList -DestinationList $destinationData.FeedList -IdValue $action.Properties.'Octopus.Action.Package.FeedId'
+    }
+
     if ($action.Packages.Length -gt 0)
     {
         Write-YellowOutput "$($action.Name) has package references, I have to nuke them on the initial copy, please recreate them.  This information is logged in the clean-up log."
