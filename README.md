@@ -13,7 +13,21 @@ Honestly, probably not.  Unless it is something we (Customer Success) needs, we 
 ## Do you accept pull requests?
 Yes!  If you want to improve this script please submit a pull request!
 
-# What it will do
+# Use Cases
+This script was written to solve the following use cases.
+
+- As a user I want to split my one massive default space into multiple spaces on the same instance.
+- As a user I have two Octopus Deploy instances.  One for dev/test deployments.  Another for staging/prod deployments.  I have the same set of projects I want to keep in sync.
+- As a user I want to clone a set of projects to a test instance to experiment with some new options.
+- As a user I want to merge multiple Octopus Deploy instances into the one space on one instance (we wouldn't recommend this, but it is possible).
+
+## Upcoming Use Cases
+
+- As a user I have a set of "master" projects.  I clone from that project when I need to create a new project.  However, when the process on the "master" project is updated I would like to update the existing projects.
+
+# How it works
+You provide the a source Octopus instance space and a destination Octopus instance space.  It will hit the API of both instances and copy items from the source space into the destination space.
+
 The script `CloneSpace.ps1` will clone the following:
 
 - Environments
@@ -50,45 +64,6 @@ The assumption is you are using this script to clone a process to another instan
 
 Tenant variables were excluded mostly due to how they are returned from the API.  Honestly it looked like a bit of a maintenance nightmare.
 
-The script will also skip the following items if they already exist:
-- Accounts (match by name)
-- Feeds (match by name)
-- Tenants (match by name)
-- Sensitive variables
-- Community Step Templates
-- Worker Pools (match by name)
-- Process steps (match by name)
-- Channels
-
-## Use Cases
-
-This script was written to solve the following use cases.
-
-- As a user I want to split my one massive default space into multiple spaces on the same instance.
-- As a user I have two Octopus Deploy instances.  One for dev/test deployments.  Another for staging/prod deployments.  I have the same set of projects I want to keep in sync.
-- As a user I want to clone a set of projects to a test instance to experiment with some new options.
-- As a user I want to merge multiple Octopus Deploy instances into the one space on one instance (we wouldn't recommend this, but it is possible).
-
-### Upcoming Use Cases
-
-- As a user I have a set of "master" projects.  I clone from that project when I need to create a new project.  However, when the process on the "master" project is updated I would like to update the existing projects.
-
-## How it works
-You provide the a source Octopus instance space and a destination Octopus instance space.  It will hit the API of both instances and copy items from the source space into the destination space.
-
-This script was designed to be run multiple times. 
-
-## The Space Has to Exist
-The space on the source and destination must exist prior to running the script.  The script will fail if the destination space doesn't exist.  It doesn't create a space for you.
-
-## Limitations
-Because this is hitting the Octopus API (and not the database) it cannot decrypt items from the Octopus Database.  It also cannot download packages for you.
-
-- All Sensitive Variables cloned will be set to 'Dummy Value'.
-- All Accounts cloned will have dummy values for keys and ids.
-- All External Feeds will have their login credentials set to `null`.
-- All package references in "script steps" (AWS CLI, Run a Script, Azure CLI) in deployment process or runbook process steps will be removed.  All deployment steps with package references will remain as is.
-
 ## Multiple Runs Encouraged
 This script was designed to be run multiple times.  It isn't useful if the script is constantly overwriting / removing values each time you run it.  It will not overwrite the following:
 
@@ -100,6 +75,26 @@ This script was designed to be run multiple times.  It isn't useful if the scrip
 - Worker Pools (match by name)
 - Process steps (match by name)
 - Channels (match by name)
+
+## Limitations
+Because this is hitting the Octopus API (and not the database) it cannot decrypt items from the Octopus Database.  It also cannot download packages for you.
+
+- All Sensitive Variables cloned will be set to 'Dummy Value'.
+- All Accounts cloned will have dummy values for keys and ids.
+- All External Feeds will have their login credentials set to `null`.
+- All package references in "script steps" (AWS CLI, Run a Script, Azure CLI) in deployment process or runbook process steps will be removed.  All deployment steps with package references will remain as is.
+
+### The Space Has to Exist
+The space on the source and destination must exist prior to running the script.  The script will fail if the destination space doesn't exist.  It doesn't create a space for you.
+
+### No targets or workers
+The majority of the use cases this script was designed for involved moving between Octopus Deploy instances.  This made targets almost impossible to bring over.
+
+- The thumbprint on the server will be different than the tentacle is expecting.
+- Polling tentacles are configured to point to a specific instance, bring over the registration won't work.
+- Several targets rely on accounts (Azure Targets and K8s specifically).  The script has to enter default values for those items, meaning they won't connect.
+
+Chances are you will want different targets per instance.  
 
 ## Simple Relationship Management
 The process does not attempt to walk a tree of dependencies.  It loads up all the necessary data from the source and destination.  When it comes across an ID in the source space it will attempt to find the corresponding ID in the destination space.  If it cannot find a matching item it removes that binding.  
