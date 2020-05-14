@@ -392,10 +392,16 @@ Function Get-OctopusWorkerPoolList
     param(
         $SpaceId,
         $OctopusServerUrl,
-        $ApiKey
+        $ApiKey,
+        $HasWorkers
     )
 
-    return Get-OctopusApiItemList -EndPoint "workerpools?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
+    if ($null -eq $HasWorkers -or $HasWorkers -eq $true)
+    {
+        return Get-OctopusApiItemList -EndPoint "workerpools?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
+    }
+    
+    return @()
 }
 
 Function Get-OctopusFeedList
@@ -628,6 +634,12 @@ function Copy-OctopusWorkerPools
         $cloneScriptOptions
     )
     
+    if ($sourceData.HasWorkers -eq $false -or $destinationData.HasWorkers -eq $false)
+    {
+        Write-YellowOutput "The source or destination Octopus instance doesn't have workers, skipping cloning workers"
+        return
+    }
+
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.WorkerPoolList -itemType "Worker Pool List" -filters $cloneScriptOptions.WorkerPoolsToClone
     
     Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.WorkerPoolList -DestinationSpaceId $destinationData.SpaceId -ApiKey $destinationData.OctopusApiKey -EndPoint "WorkerPools" -ItemTypeName "Worker Pools" -DestinationCanBeOverwritten $false -DestinationOctopusUrl $DestinationData.OctopusUrl
@@ -1256,6 +1268,12 @@ function Copy-OctopusProjectRunbooks
         $destinationData
     )
 
+    if ($sourceData.HasRunbooks -eq $false -or $destinationData.HasRunbooks -eq $false)
+    {
+        Write-YellowOutput "The source or destination do not have runbooks, skipping the runbook clone process"
+        return
+    }
+
     $sourceRunbooks = Get-OctopusApiItemList -EndPoint "projects/$($sourceProject.Id)/runbooks" -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $sourceData.SpaceId
     $destinationRunbooks = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
 
@@ -1310,13 +1328,24 @@ function Copy-OctopusProjectVariables
 
         $SourceProjectData = @{
             ChannelList = $sourceChannelList;
-            RunbookList = Get-OctopusApiItemList -EndPoint "projects/$($sourceProject.Id)/runbooks" -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $sourceData.SpaceId;
+            RunbookList = @()
             Project = $sourceProject    
         }
+
+        if ($sourceData.HasRunBooks -eq $true)
+        {
+            $SourceProjectData.RunbookList = Get-OctopusApiItemList -EndPoint "projects/$($sourceProject.Id)/runbooks" -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $sourceData.SpaceId;
+        }
+
         $DestinationProjectData = @{
             ChannelList = $destinationChannelList;
-            RunbookList = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId;
+            RunbookList = @();
             Project = $destinationProject
+        }
+
+        if ($destinationData.HasRunBooks -eq $true)
+        {
+            $DestinationProjectData.RunbookList = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId;
         }
 
         Write-CleanUpOutput "Cloning variables for project $($destinationProject.Name)"
@@ -1402,6 +1431,33 @@ function Copy-OctopusTenants
     }
 }
 
+function Get-OctopusSpaceId
+{
+    param(
+        $octopusUrl,
+        $octopusApiKey,
+        $hasSpaces
+    )
+
+    if ($hasSpaces -eq $true)
+    {                
+        Write-GreenOutput "Getting Space Information from $octopusUrl"
+        $SpaceList = Get-OctopusSpaceList -OctopusServerUrl $octopusUrl -ApiKey $octopusApiKey
+        $Space = Get-OctopusItemByName -ItemList $SpaceList -ItemName $spaceName
+
+        if ($null -eq $Space)
+        {
+            Throw "Unable to find space $spaceName on $octopusUrl please confirm it exists and try again."
+        }
+
+        return $Space.Id        
+    }
+    else
+    {
+        return $null
+    }
+}
+
 function Get-OctopusData
 {
     param(
@@ -1415,21 +1471,26 @@ function Get-OctopusData
         OctopusApiKey = $octopusApiKey
     }
 
-    Write-GreenOutput "Getting Space Information from $octopusUrl"
-    $octopusData.SpaceList = Get-OctopusSpaceList -OctopusServerUrl $octopusUrl -ApiKey $octopusApiKey
-    $octopusData.Space = Get-OctopusItemByName -ItemList $octopusData.SpaceList -ItemName $spaceName
-    $octopusData.SpaceId = $octopusData.Space.Id
+    $octopusData.ApiInformation = Get-OctopusApi -OctopusUrl $octopusUrl -SpaceId $null -EndPoint "/api" -ApiKey $octopusApiKey
+    Write-GreenOutput "The version of $octopusUrl is $($octopusData.ApiInformation.Version)"
 
-    if ($null -eq $octopusData.Space)
-    {
-        Throw "Unable to find space $spaceName on $octopusUrl please confirm it exists and try again."
-    }
+    $splitVersion = $octopusData.ApiInformation.Version -split "\."
+    $octopusData.HasSpaces = [int]$splitVersion[0] -ge 2019
+    Write-GreenOutput "This version of Octopus has spaces $($octopusData.HasSpaces)"
+    
+    $octopusData.HasWorkers = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 7) -or [int]$splitVersion[0] -ge 2019
+    Write-GreenOutput "This version of Octopus has workers $($octopusData.HasWorkers)"
+
+    $octopusData.HasRunbooks = ([int]$splitVersion[0] -ge 2019 -and [int]$splitVersion[1] -ge 10) -or [int]$splitVersion[0] -ge 2020
+    Write-GreenOutput "This version of Octopus has runbooks $($octopusData.HasRunBooks)"
+
+    $octopusData.SpaceId = Get-OctopusSpaceId -octopusUrl $octopusUrl -octopusApiKey $octopusApiKey -hasSpaces $OctopusData.HasSpaces    
 
     Write-GreenOutput "Getting Environments for $spaceName in $octopusUrl"
-    $octopusData.EnvironmentList = Get-OctopusEnvironmentList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
-
+    $octopusData.EnvironmentList = Get-OctopusEnvironmentList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId    
+    
     Write-GreenOutput "Getting Worker Pools for $spaceName in $octopusUrl"
-    $octopusData.WorkerPoolList = Get-OctopusWorkerPoolList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+    $octopusData.WorkerPoolList = Get-OctopusWorkerPoolList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId -HasWorkers $octopusData.HasWorkers
 
     Write-GreenOutput "Getting Tenant Tags for $spaceName in $octopusUrl"
     $octopusData.TenantTagList = Get-OctopusTenantTagSet -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
