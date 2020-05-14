@@ -28,6 +28,7 @@ This script was written to solve the following use cases.
 # How it works
 You provide the a source Octopus instance space and a destination Octopus instance space.  It will hit the API of both instances and copy items from the source space into the destination space.
 
+## What will it clone
 The script `CloneSpace.ps1` will clone the following:
 
 - Environments
@@ -46,7 +47,8 @@ The script `CloneSpace.ps1` will clone the following:
     - Variables
 - Tenants (no tenant variables)
 
-It will not clone:
+## What won't it clone
+The script `CloneSpace.ps1` will not clone the following items:
 - Tenant Variables
 - Script Modules (yet)
 - Deployments
@@ -59,13 +61,26 @@ It will not clone:
 - Roles
 - External Auth Providers (or groups)
 - Server settings like folders
+- Spaces
 
 The assumption is you are using this script to clone a process to another instance for testing purposes.  You don't need the headache of deployments, releases and everything associated with it.
 
 Tenant variables were excluded mostly due to how they are returned from the API.  Honestly it looked like a bit of a maintenance nightmare.
 
-## Multiple Runs Encouraged
-This script was designed to be run multiple times.  It isn't useful if the script is constantly overwriting / removing values each time you run it.  It will not overwrite the following:
+### No targets or workers
+The majority of the use cases this script was designed for involved moving between Octopus Deploy instances.  This made targets almost impossible to bring over.
+
+- The thumbprint on the server will be different than the tentacle is expecting.
+- Polling tentacles are configured to point to a specific instance, bring over the registration won't work.
+- Several targets rely on accounts (Azure Targets and K8s specifically).  The script has to enter default values for those items, meaning they won't connect.
+
+Chances are you will want different targets per instance.  
+
+## The Space Has to Exist
+The space on the source and destination must exist prior to running the script.  The script will fail if the destination space doesn't exist.  It doesn't create a space for you.
+
+## What it won't overwrite
+This script was designed to be run multiple times with the same parameters.  It isn't useful if the script is constantly overwriting / removing values each time you run it.  It will not overwrite the following:
 
 - Accounts (match by name)
 - Feeds (match by name)
@@ -83,18 +98,6 @@ Because this is hitting the Octopus API (and not the database) it cannot decrypt
 - All Accounts cloned will have dummy values for keys and ids.
 - All External Feeds will have their login credentials set to `null`.
 - All package references in "script steps" (AWS CLI, Run a Script, Azure CLI) in deployment process or runbook process steps will be removed.  All deployment steps with package references will remain as is.
-
-### The Space Has to Exist
-The space on the source and destination must exist prior to running the script.  The script will fail if the destination space doesn't exist.  It doesn't create a space for you.
-
-### No targets or workers
-The majority of the use cases this script was designed for involved moving between Octopus Deploy instances.  This made targets almost impossible to bring over.
-
-- The thumbprint on the server will be different than the tentacle is expecting.
-- Polling tentacles are configured to point to a specific instance, bring over the registration won't work.
-- Several targets rely on accounts (Azure Targets and K8s specifically).  The script has to enter default values for those items, meaning they won't connect.
-
-Chances are you will want different targets per instance.  
 
 ## Simple Relationship Management
 The process does not attempt to walk a tree of dependencies.  It loads up all the necessary data from the source and destination.  When it comes across an ID in the source space it will attempt to find the corresponding ID in the destination space.  If it cannot find a matching item it removes that binding.  

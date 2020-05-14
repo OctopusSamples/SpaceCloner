@@ -99,38 +99,43 @@ function Write-CleanUpOutput
     Add-Content -Value $message -Path $cleanupLogPath
 }
 
-function Get-UserCloneDecision
+function Get-OctopusUrl
 {
-    param($message)
+    param (
+        $EndPoint,        
+        $SpaceId,
+        $OctopusUrl
+    )  
 
-    Write-YellowOutput $message
-
-    $proceed = $false
-    if ((Read-Host).ToLower() -eq "y")
-    {
-        Write-GreenOutput "You have entered Y, I will proceed"
-        $proceed = $true
+    if ($EndPoint -match "/api")
+    {        
+        return "$OctopusUrl/$endPoint"
     }
-    else
+    
+    if ([string]::IsNullOrWhiteSpace($SpaceId))
     {
-        Write-YellowOutput "You have selected no, I will skip"
+        return "$OctopusUrl/api/$EndPoint"
     }
-
-    return $proceed
+    
+    return "$OctopusUrl/api/$spaceId/$EndPoint"
 }
 
 Function Get-OctopusApiItemList
 {
     param (
         $EndPoint,
-        $ApiKey
-    )
+        $ApiKey,
+        $SpaceId,
+        $OctopusUrl
+    )    
 
-    Write-VerboseOutput "Invoking $EndPoint"
+    $url = Get-OctopusUrl -EndPoint $EndPoint -SpaceId $SpaceId -OctopusUrl $OctopusUrl
 
-    $results = Invoke-RestMethod -Method Get -Uri $EndPoint -Headers @{"X-Octopus-ApiKey"="$ApiKey"}   
+    Write-VerboseOutput "Invoking $url"
+
+    $results = Invoke-RestMethod -Method Get -Uri $url -Headers @{"X-Octopus-ApiKey"="$ApiKey"}   
     
-    Write-VerboseOutput "$endPoint returned a list with $($results.Items.Length) item(s)" 
+    Write-VerboseOutput "$url returned a list with $($results.Items.Length) item(s)" 
 
     return $results.Items
 }
@@ -139,12 +144,16 @@ Function Get-OctopusApi
 {
     param (
         $EndPoint,
-        $ApiKey
-    )
+        $ApiKey,
+        $SpaceId,
+        $OctopusUrl
+    )    
 
-    Write-VerboseOutput "Invoking GET $EndPoint"
+    $url = Get-OctopusUrl -EndPoint $EndPoint -SpaceId $SpaceId -OctopusUrl $OctopusUrl
 
-    $results = Invoke-RestMethod -Method Get -Uri $EndPoint -Headers @{"X-Octopus-ApiKey"="$ApiKey"}    
+    Write-VerboseOutput "Invoking GET $url"
+
+    $results = Invoke-RestMethod -Method Get -Uri $url -Headers @{"X-Octopus-ApiKey"="$ApiKey"}    
 
     return $results
 }
@@ -155,22 +164,26 @@ Function Save-OctopusApi
         $EndPoint,
         $ApiKey,
         $Method,
-        $Item
+        $Item,
+        $SpaceId,
+        $OctopusUrl
     )
 
-    Write-VerboseOutput "Invoking $Method $EndPoint"
+    $url = Get-OctopusUrl -EndPoint $EndPoint -SpaceId $SpaceId -OctopusUrl $OctopusUrl
+
+    Write-VerboseOutput "Invoking $Method $url"
 
     if ($null -eq $item)
     {
-        $results = Invoke-RestMethod -Method $Method -Uri $EndPoint -Headers @{"X-Octopus-ApiKey"="$ApiKey"}
+        $results = Invoke-RestMethod -Method $Method -Uri $url -Headers @{"X-Octopus-ApiKey"="$ApiKey"}
     }
     else
     {
         $bodyAsJson = ConvertTo-Json $Item -Depth 10
-        Write-VerboseOutput "Going to invoke $Method $EndPoint with the following body"
+        Write-VerboseOutput "Going to invoke $Method $url with the following body"
         Write-VerboseOutput $bodyAsJson
 
-        $results = Invoke-RestMethod -Method $Method -Uri $EndPoint -Headers @{"X-Octopus-ApiKey"="$ApiKey"} -Body $bodyAsJson
+        $results = Invoke-RestMethod -Method $Method -Uri $url -Headers @{"X-Octopus-ApiKey"="$ApiKey"} -Body $bodyAsJson
     }
 
     return $results
@@ -181,8 +194,10 @@ function Save-OctopusApiItem
     param(
         $Item,
         $Endpoint,
-        $ApiKey
-    )
+        $ApiKey,
+        $SpaceId,
+        $OctopusUrl
+    )    
 
     $method = "POST"
 
@@ -192,8 +207,8 @@ function Save-OctopusApiItem
         $method = "Put"
         $endPoint = "$endPoint/$($Item.Id)"
     }
-
-    $results = Save-OctopusApi -EndPoint $Endpoint $method $method -Item $Item -ApiKey $ApiKey
+    
+    $results = Save-OctopusApi -EndPoint $Endpoint $method $method -Item $Item -ApiKey $ApiKey -OctopusUrl $OctopusUrl -SpaceId $SpaceId
 
     Write-VerboseOutput $results
 
@@ -289,7 +304,7 @@ function Get-OctopusSpaceList
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/spaces?skip=0&take=1000" -ApiKey $ApiKey 
+    return Get-OctopusApiItemList -EndPoint "spaces?skip=0&take=1000" -ApiKey $ApiKey -SpaceId $null -OctopusUrl $OctopusServerUrl
 }
 
 Function Get-OctopusProjectList
@@ -300,7 +315,7 @@ Function Get-OctopusProjectList
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/Projects?skip=0&take=1000" -ApiKey $ApiKey 
+    return Get-OctopusApiItemList -EndPoint "Projects?skip=0&take=1000" -ApiKey $ApiKey  -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-OctopusEnvironmentList
@@ -311,7 +326,7 @@ Function Get-OctopusEnvironmentList
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/Environments?skip=0&take=1000" -ApiKey $ApiKey 
+    return Get-OctopusApiItemList -EndPoint "Environments?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-OctopusLibrarySetList
@@ -322,7 +337,7 @@ Function Get-OctopusLibrarySetList
         $ApiKey
     )
     
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/libraryvariablesets?skip=0&take=1000&contentType=Variables" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "libraryvariablesets?skip=0&take=1000&contentType=Variables" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-OctopusLibrarySetVariables
@@ -334,7 +349,7 @@ Function Get-OctopusLibrarySetVariables
         $ApiKey
     )
     
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$($SpaceId)/variables/$VariableSetId" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "variables/$VariableSetId" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-OctopusStepTemplateList
@@ -345,7 +360,7 @@ Function Get-OctopusStepTemplateList
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/actiontemplates?skip=0&take=1000" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "actiontemplates?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-OctopusProjectRunBooks
@@ -357,7 +372,7 @@ Function Get-OctopusProjectRunBooks
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/projects/$ProjectId/runbooks?skip=0&take=1000" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "projects/$ProjectId/runbooks?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-OctopusRunbookProcess
@@ -369,7 +384,7 @@ Function Get-OctopusRunbookProcess
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/runbookProcesses/$RunbookProcessId" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "runbookProcesses/$RunbookProcessId" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-OctopusWorkerPoolList
@@ -380,7 +395,7 @@ Function Get-OctopusWorkerPoolList
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/workerpools?skip=0&take=1000" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "workerpools?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-OctopusFeedList
@@ -391,7 +406,7 @@ Function Get-OctopusFeedList
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/feeds?skip=0&take=1000" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "feeds?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-OctopusInfrastructureAccounts
@@ -402,7 +417,7 @@ Function Get-OctopusInfrastructureAccounts
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/accounts?skip=0&take=1000" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "accounts?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 function Get-OctopusCommunityActionTemplates
@@ -412,7 +427,7 @@ function Get-OctopusCommunityActionTemplates
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/communityactiontemplates?skip=0&take=1000" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "communityactiontemplates?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $null
 }
 
 Function Get-OctopusTenantTagSet
@@ -423,7 +438,7 @@ Function Get-OctopusTenantTagSet
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/tagsets?skip=0&take=1000" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "tagsets?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-OctopusLifeCycles
@@ -434,7 +449,7 @@ Function Get-OctopusLifeCycles
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/lifecycles?skip=0&take=1000" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "lifecycles?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 Function Get-ProjectGroups
@@ -445,7 +460,7 @@ Function Get-ProjectGroups
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/projectgroups?skip=0&take=1000" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "projectgroups?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 function Copy-OctopusObject
@@ -468,7 +483,7 @@ Function Get-OctopusTenants
         $ApiKey
     )
 
-    return Get-OctopusApiItemList -EndPoint "$OctopusServerUrl/api/$SpaceId/tenants?skip=0&take=10000" -ApiKey $ApiKey
+    return Get-OctopusApiItemList -EndPoint "tenants?skip=0&take=10000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
 function Get-OctopusFilteredList
@@ -539,12 +554,13 @@ function Copy-OctopusSimpleItems
         $ApiKey,
         $EndPoint,
         $ItemTypeName,
-        $DestinationCanBeOverwritten
+        $DestinationCanBeOverwritten,
+        $DestinationOctopusUrl
     )
 
     foreach ($clonedItem in $SourceItemList)
     {
-        Copy-OctopusItem -ClonedItem $clonedItem -DestinationSpaceId $DestinationSpaceId -ApiKey $ApiKey -EndPoint $EndPoint -DestinationItemList $DestinationItemList -ItemTypeName $ItemTypeName -DestinationCanBeOverwritten $DestinationCanBeOverwritten
+        Copy-OctopusItem -ClonedItem $clonedItem -DestinationSpaceId $DestinationSpaceId -ApiKey $ApiKey -EndPoint $EndPoint -DestinationItemList $DestinationItemList -ItemTypeName $ItemTypeName -DestinationCanBeOverwritten $DestinationCanBeOverwritten -DestinationOctopusUrl $DestinationOctopusUrl
     }
 }
 
@@ -554,11 +570,12 @@ function Copy-OctopusItem
     (
         $ClonedItem,
         $DestinationItemList,
-        $DestinationSpaceId,
+        $DestinationSpaceId,        
         $ApiKey,
         $EndPoint,
         $ItemTypeName,
-        $DestinationCanBeOverwritten
+        $DestinationCanBeOverwritten,
+        $DestinationOctopusUrl
     )
 
     Write-VerboseOutput "Cloning $ItemTypeName $($clonedItem.Name)"
@@ -573,22 +590,18 @@ function Copy-OctopusItem
     {
         Write-GreenOutput "$ItemTypeName $($clonedItem.Name) was not found in destination, creating new record."        
         $copyOfItemToClone.Id = $null                        
-        Save-OctopusApiItem -Item $copyOfItemToClone -Endpoint $EndPoint -ApiKey $ApiKey
+        Save-OctopusApiItem -Item $copyOfItemToClone -Endpoint $EndPoint -ApiKey $ApiKey -SpaceId $DestinationSpaceId -OctopusUrl $DestinationOctopusUrl
     }
     elseif ($DestinationCanBeOverwritten -eq $false)
     {
         Write-GreenOutput "The $ItemTypeName $($ClonedItem.Name) already exists. Skipping."
     }
-    elseif ((Get-UserCloneDecision -message "Matching $ItemTypeName found $($matchingItem.Name).  Do you wish to overwrite it? Y/N"))
+    else
     {        
         Write-VerboseOutput "Overwriting $ItemTypeName $($clonedItem.Name) with data from source."
         $copyOfItemToClone.Id = $matchingItem.Id
-        Save-OctopusApiItem -Item $copyOfItemToClone -Endpoint $EndPoint -ApiKey $ApiKey
-    }
-    else
-    {
-        Write-GreenOutput "Cloning of $ItemTypeName $($clonedItem.Name) has been skipped."
-    }                
+        Save-OctopusApiItem -Item $copyOfItemToClone -Endpoint $EndPoint -ApiKey $ApiKey -SpaceId $DestinationSpaceId -OctopusUrl $DestinationOctopusUrl
+    }    
 }
 
 function Copy-OctopusEnvironments
@@ -601,7 +614,7 @@ function Copy-OctopusEnvironments
     
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.EnvironmentList -itemType "Environment" -filters $cloneScriptOptions.EnvironmentsToClone        
     
-    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.EnvironmentList -DestinationSpaceId $destinationData.SpaceId -ApiKey $destinationData.OctopusApiKey -EndPoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/Environments" -ItemTypeName "Environment" -DestinationCanBeOverwritten $false
+    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.EnvironmentList -DestinationSpaceId $destinationData.SpaceId -ApiKey $destinationData.OctopusApiKey -EndPoint "Environments" -ItemTypeName "Environment" -DestinationCanBeOverwritten $false -DestinationOctopusUrl $destinationData.OctopusUrl
 
     Write-GreenOutput "Reloading destination environment list"    
     $destinationData.EnvironmentList = Get-OctopusEnvironmentList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
@@ -617,7 +630,7 @@ function Copy-OctopusWorkerPools
     
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.WorkerPoolList -itemType "Worker Pool List" -filters $cloneScriptOptions.WorkerPoolsToClone
     
-    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.WorkerPoolList -DestinationSpaceId $destinationData.SpaceId -ApiKey $destinationData.OctopusApiKey -EndPoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/WorkerPools" -ItemTypeName "Worker Pools" -DestinationCanBeOverwritten $false
+    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.WorkerPoolList -DestinationSpaceId $destinationData.SpaceId -ApiKey $destinationData.OctopusApiKey -EndPoint "WorkerPools" -ItemTypeName "Worker Pools" -DestinationCanBeOverwritten $false -DestinationOctopusUrl $DestinationData.OctopusUrl
 
     Write-GreenOutput "Reloading destination worker pool list"
     $destinationData.WorkerPoolList = Get-OctopusWorkerPoolList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
@@ -633,7 +646,7 @@ function Copy-OctopusProjectGroups
     
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.ProjectGroupList -itemType "Project Groups" -filters $cloneScriptOptions.ProjectGroupsToClone
     
-    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.ProjectGroupList -EndPoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/projectgroups" -ApiKey $($destinationData.OctopusApiKey) -destinationSpaceId $($destinationData.SpaceId) -ItemTypeName "Project Groups" -DestinationCanBeOverwritten $false
+    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.ProjectGroupList -EndPoint "projectgroups" -ApiKey $($destinationData.OctopusApiKey) -destinationSpaceId $destinationData.SpaceId -ItemTypeName "Project Groups" -DestinationCanBeOverwritten $false -DestinationOctopusUrl $destinationData.OctopusUrl
 
     Write-GreenOutput "Reloading destination project groups"
         
@@ -650,7 +663,7 @@ function Copy-OctopusTenantTags
     
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.TenantTagList -itemType "Tenant Tags" -filters $cloneScriptOptions.TenantTagsToClone
     
-    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.TenantTagList -EndPoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/TagSets" -ApiKey $($destinationData.OctopusApiKey) -destinationSpaceId $($destinationData.SpaceId) -ItemTypeName "Tenant Tag Set" -DestinationCanBeOverwritten $true
+    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.TenantTagList -EndPoint "TagSets" -ApiKey $($destinationData.OctopusApiKey) -destinationSpaceId $($destinationData.SpaceId) -ItemTypeName "Tenant Tag Set" -DestinationCanBeOverwritten $true -DestinationOctopusUrl $destinationData.OctopusUrl
 
     Write-GreenOutput "Reloading destination Tenant Tag Set"
     
@@ -667,7 +680,7 @@ function Copy-OctopusExternalFeeds
     
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.FeedList -itemType "Feeds" -filters $cloneScriptOptions.ExternalFeedsToClone
     
-    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.FeedList -EndPoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/Feeds" -ApiKey $($destinationData.OctopusApiKey) -destinationSpaceId $($destinationData.SpaceId) -ItemTypeName "Feed" -DestinationCanBeOverwritten $false
+    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.FeedList -EndPoint "Feeds" -ApiKey $($destinationData.OctopusApiKey) -destinationSpaceId $($destinationData.SpaceId) -ItemTypeName "Feed" -DestinationCanBeOverwritten $false -DestinationOctopusUrl $destinationData.OctopusUrl
 
     Write-GreenOutput "Reloading destination feed list"
     
@@ -695,12 +708,12 @@ function Copy-OctopusStepTemplates
             Write-GreenOutput "This is a step template which hasn't been install yet, pulling down from the interwebs"
             $destinationTemplate = Get-OctopusItemByName -ItemList $destinationData.CommunityActionTemplates -ItemName $clonedItem.Name            
 
-            Save-OctopusApi -EndPoint "$($destinationData.OctopusUrl)/api/communityactiontemplates/$($destinationTemplate.Id)/installation/$($destinationData.SpaceId)" -ApiKey $destinationData.OctopusApiKey -Method POST
+            Save-OctopusApi -OctopusUrl $destinationData.OctopusUrl -SpaceId $null -EndPoint "/communityactiontemplates/$($destinationTemplate.Id)/installation/$($destinationData.SpaceId)" -ApiKey $destinationData.OctopusApiKey -Method POST
         }        
         elseif ($null -eq $clonedItem.CommunityActionTemplateId)
         {
             Write-GreenOutput "This is a custom step template following normal cloning logic"
-            Copy-OctopusItem -ClonedItem $clonedItem -DestinationItemList $destinationData.StepTemplates -DestinationSpaceId $destinationData.SpaceId -ApiKey $destinationData.OctopusApiKey -EndPoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/actiontemplates" -ItemTypeName "Custom Step Template" -DestinationCanBeOverwritten $cloneScriptOptions.OverwriteExistingCustomStepTemplates
+            Copy-OctopusItem -ClonedItem $clonedItem -DestinationItemList $destinationData.StepTemplates -DestinationSpaceId $destinationData.SpaceId -ApiKey $destinationData.OctopusApiKey -EndPoint "actiontemplates" -ItemTypeName "Custom Step Template" -DestinationCanBeOverwritten $cloneScriptOptions.OverwriteExistingCustomStepTemplates -DestinationOctopusUrl $destinationData.OctopusUrl
         }                
     }
 
@@ -760,7 +773,7 @@ function Copy-OctopusInfrastructureAccounts
                 $accountClone.TenantedDeploymentParticipation = "Untenanted"
             }            
 
-            Save-OctopusApiItem -Item $accountClone -Endpoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/accounts" -ApiKey $DestinationData.OctopusApiKey
+            Save-OctopusApiItem -Item $accountClone -Endpoint "accounts" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $DestinationData.OctopusUrl -SpaceId $DestinationData.SpaceId
             Write-YellowOutput "Account successfully cloned.  WARNING WARNING WARNING account values have dummy values."
             Write-CleanUpOutput "Account $($account.Name) was created with dummy values."
         }
@@ -885,7 +898,7 @@ function Copy-OctopusVariableSetValues
         {
             Write-GreenOutput "The variable $variableName at value index $($variableTracker[$trackingName]) is sensitive, leaving as is on the destination."
         }
-        elseif ($foundIndex -gt -1 -and (Get-UserCloneDecision -message "The variable $variableName at value index $($variableTracker[$trackingName]) already exists. Would you like to overwrite the value? Y/N"))
+        elseif ($foundIndex -gt -1)
         {
             $DestinationVariableSetVariables.Variables[$i].Value = $octopusVariable.Value
             if ($octopusVariable.Value -eq "Dummy Value")         
@@ -896,7 +909,7 @@ function Copy-OctopusVariableSetValues
         }        
     }
 
-    Save-OctopusApi -EndPoint "$($destinationData.OctopusUrl)/$($DestinationVariableSetVariables.Links.Self)" -ApiKey $DestinationData.OctopusApiKey -Method "PUT" -Item $DestinationVariableSetVariables
+    Save-OctopusApi -OctopusUrl $DestinationData.OctopusUrl -SpaceId $null -EndPoint $DestinationVariableSetVariables.Links.Self -ApiKey $DestinationData.OctopusApiKey -Method "PUT" -Item $DestinationVariableSetVariables
     Write-GreenOutput "Variables successfully cloned."
 }
 
@@ -926,7 +939,7 @@ function Copy-OctopusLibraryVariableSets
             $copySourceVariableSet.VariableSetId = $null
             $copySourceVariableSet.Id = $null
 
-            $destinationVariableSet = Save-OctopusApi -EndPoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/libraryvariablesets" -ApiKey $($destinationData.OctopusApiKey) -Method POST -Item $copySourceVariableSet
+            $destinationVariableSet = Save-OctopusApi -EndPoint "libraryvariablesets" -ApiKey $($destinationData.OctopusApiKey) -Method POST -Item $copySourceVariableSet -OctopusUrl $DestinationData.OctopusUrl -SpaceId $DestinationData.SpaceId
         }
         else
         {
@@ -935,8 +948,8 @@ function Copy-OctopusLibraryVariableSets
 
         Write-VerboseOutput "The variable set has been created, time to copy over the variables themselves"
 
-        $sourceVariableSetVariables = Get-OctopusApi -EndPoint "$($sourceData.OctopusUrl)/$($sourceVariableSet.Links.Variables)" -ApiKey $sourceData.OctopusApiKey 
-        $destinationVariableSetVariables = Get-OctopusApi -EndPoint "$($destinationData.OctopusUrl)/$($destinationVariableSet.Links.Variables)" -ApiKey $destinationData.OctopusApiKey
+        $sourceVariableSetVariables = Get-OctopusApi -EndPoint $sourceVariableSet.Links.Variables -ApiKey $sourceData.OctopusApiKey -SpaceId $null -OctopusUrl $SourceData.OctopusUrl 
+        $destinationVariableSetVariables = Get-OctopusApi -EndPoint $destinationVariableSet.Links.Variables -ApiKey $destinationData.OctopusApiKey -SpaceId $null -OctopusUrl $DestinationData.OctopusUrl
 
         Write-CleanUpOutput "Starting clone of $($sourceVariableSet.Name)"
         Copy-OctopusVariableSetValues -SourceVariableSetVariables $sourceVariableSetVariables -DestinationVariableSetVariables $destinationVariableSetVariables -SourceData $SourceData -DestinationData $DestinationData -SourceProjectData @{} -DestinationProjectData @{} -CloneScriptOptions $cloneScriptOptions
@@ -971,7 +984,7 @@ function Copy-OctopusLifecycles
             $phase.AutomaticDeploymentTargets = @($NewEnvironmentIds)
         }
 
-        Copy-OctopusItem -ClonedItem $lifeCycleToClone -DestinationItemList $DestinationData.LifeCycleList -DestinationSpaceId $DestinationData.SpaceId -ApiKey $DestinationData.OctopusApiKey -EndPoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/lifecycles" -ItemTypeName "Lifecycle" -DestinationCanBeOverwritten $CloneScriptOptions.OverwriteExistingLifecyclesPhases
+        Copy-OctopusItem -ClonedItem $lifeCycleToClone -DestinationItemList $DestinationData.LifeCycleList -DestinationSpaceId $DestinationData.SpaceId -ApiKey $DestinationData.OctopusApiKey -EndPoint "lifecycles" -ItemTypeName "Lifecycle" -DestinationCanBeOverwritten $CloneScriptOptions.OverwriteExistingLifecyclesPhases -DestinationOctopusUrl $DestinationData.OctopusUrl
     }
 
     Write-GreenOutput "Reloading destination lifecycles"
@@ -1006,7 +1019,7 @@ function Copy-OctopusProjectChannels
             $cloneChannel.Rules = @()
 
             Write-GreenOutput "The channel $($channel.Name) does not exist for the project $($destinationProject.Name), creating one now.  Please note, I cannot create version rules, so those will be emptied out"
-            Save-OctopusApiItem -Item $cloneChannel -Endpoint "$($DestinationData.OctopusUrl)/api/$($destinationData.SpaceId)/channels" -ApiKey $DestinationData.OctopusApiKey
+            Save-OctopusApiItem -Item $cloneChannel -Endpoint "channels" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
         }        
         else
         {
@@ -1176,12 +1189,12 @@ function Copy-OctopusProjectDeploymentProcess
     )
 
     Write-GreenOutput "Syncing deployment process for $($destinationProject.Name)"
-    $sourceDeploymentProcess = Get-OctopusApi -EndPoint "$($SourceData.OctopusUrl)/$($project.Links.DeploymentProcess)" -ApiKey $SourceData.OctopusApiKey
-    $destinationDeploymentProcess = Get-OctopusApi -EndPoint "$($destinationData.OctopusUrl)/$($destinationProject.Links.DeploymentProcess)" -ApiKey $destinationData.OctopusApiKey
+    $sourceDeploymentProcess = Get-OctopusApi -EndPoint $project.Links.DeploymentProcess -ApiKey $SourceData.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $null
+    $destinationDeploymentProcess = Get-OctopusApi -EndPoint $destinationProject.Links.DeploymentProcess -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $null
     
     $destinationDeploymentProcess.Steps = Copy-OctopusDeploymentProcess -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData -sourceDeploymentProcessSteps $sourceDeploymentProcess.Steps -destinationDeploymentProcessSteps $destinationDeploymentProcess.Steps
 
-    Save-OctopusApiItem -Item $destinationDeploymentProcess -Endpoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/deploymentprocesses" -ApiKey $destinationData.OctopusApiKey           
+    Save-OctopusApiItem -Item $destinationDeploymentProcess -Endpoint "deploymentprocesses" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
 }
 
 function Copy-OctopusProject
@@ -1214,7 +1227,7 @@ function Copy-OctopusProject
         $copyOfProject.ProjectGroupId = Convert-SourceIdToDestinationId -SourceList $SourceData.ProjectGroupList -DestinationList $DestinationData.ProjectGroupList -IdValue $copyOfProject.ProjectGroupId
         $copyOfProject.LifeCycleId = Convert-SourceIdToDestinationId -SourceList $SourceData.LifeCycleList -DestinationList $DestinationData.LifeCycleList -IdValue $copyOfProject.LifeCycleId        
 
-        Save-OctopusApiItem -Item $copyOfProject -Endpoint "$($DestinationData.OctopusUrl)/api/$($DestinationData.SpaceId)/projects" -ApiKey $DestinationData.OctopusApiKey                    
+        Save-OctopusApiItem -Item $copyOfProject -Endpoint "projects" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId                 
 
         return $true
     }
@@ -1226,7 +1239,7 @@ function Copy-OctopusProject
         $matchingProject.DeploymentChangesTemplate = $sourceProject.DeploymentChangesTemplate
         $matchingProject.Description = $sourceProject.Description                   
 
-        Save-OctopusApiItem -Item $matchingProject -Endpoint "$($DestinationData.OctopusUrl)/api/$($DestinationData.SpaceId)/projects" -ApiKey $DestinationData.OctopusApiKey        
+        Save-OctopusApiItem -Item $matchingProject -Endpoint "projects" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
 
         return $false
     }    
@@ -1243,8 +1256,8 @@ function Copy-OctopusProjectRunbooks
         $destinationData
     )
 
-    $sourceRunbooks = Get-OctopusApiItemList -EndPoint "$($SourceData.OctopusUrl)/api/$($sourceData.SpaceId)/projects/$($sourceProject.Id)/runbooks" -ApiKey $sourcedata.OctopusApiKey
-    $destinationRunbooks = Get-OctopusApiItemList -EndPoint "$($DestinationData.OctopusUrl)/api/$($DestinationData.SpaceId)/projects/$($destinationProject.Id)/runbooks" -ApiKey $destinationData.OctopusApiKey
+    $sourceRunbooks = Get-OctopusApiItemList -EndPoint "projects/$($sourceProject.Id)/runbooks" -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $sourceData.SpaceId
+    $destinationRunbooks = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
 
     foreach ($runbook in $sourceRunbooks)
     {
@@ -1262,18 +1275,18 @@ function Copy-OctopusProjectRunbooks
             $runbookToClone.SpaceId = $destinationData.SpaceId
 
             Write-GreenOutput "The runbook $($runbook.Name) for $($destinationProject.Name) doesn't exist, creating it now"
-            $destinationRunbook = Save-OctopusApiItem -Item $runbookToClone -Endpoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/runbooks" -ApiKey $destinationData.OctopusApiKey    
+            $destinationRunbook = Save-OctopusApiItem -Item $runbookToClone -Endpoint "runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
             $canProceed = $true
         }
         
-        $sourceRunbookProcess = Get-OctopusApi -EndPoint "$($SourceData.OctopusUrl)/$($runbook.Links.RunbookProcesses)" -ApiKey $sourcedata.OctopusApiKey
-        $destinationRunbookProcess = Get-OctopusApi -EndPoint "$($destinationData.OctopusUrl)/$($destinationRunbook.Links.RunbookProcesses)" -ApiKey $destinationData.OctopusApiKey
+        $sourceRunbookProcess = Get-OctopusApi -EndPoint $runbook.Links.RunbookProcesses -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $null
+        $destinationRunbookProcess = Get-OctopusApi -EndPoint $destinationRunbook.Links.RunbookProcesses -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $null
 
         Write-CleanUpOutput "Syncing deployment process for $($runbook.Name)"
         Write-GreenOutput "Syncing deployment process for $($runbook.Name)"
         $destinationRunbookProcess.Steps = Copy-OctopusDeploymentProcess -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData -sourceDeploymentProcessSteps $sourceRunbookProcess.Steps -destinationDeploymentProcessSteps $destinationRunbookProcess.Steps
             
-        Save-OctopusApiItem -Item $destinationRunbookProcess -Endpoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/runbookProcesses" -ApiKey $destinationData.OctopusApiKey    
+        Save-OctopusApiItem -Item $destinationRunbookProcess -Endpoint "runbookProcesses" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
     }
 }
 
@@ -1288,27 +1301,21 @@ function Copy-OctopusProjectVariables
         $destinationData,
         $cloneScriptOptions,
         $createdNewProject
-    )
-    
-    $canProceed = $createdNewProject
-    if ($canProceed -eq $false)
-    {
-        $canProceed = Get-UserCloneDecision -message "This is an existing project.  Would you like me to clone the project $($destinationProject.Name) variables? Y/N"
-    }
+    )    
 
-    if ($canProceed)
+    if ($createdNewProject -eq $true -or $cloneScriptOptions.OverwriteExistingVariables -eq $true)
     {
-        $sourceVariableSetVariables = Get-OctopusApi -EndPoint "$($sourceData.OctopusUrl)/$($sourceProject.Links.Variables)" -ApiKey $sourceData.OctopusApiKey 
-        $destinationVariableSetVariables = Get-OctopusApi -EndPoint "$($destinationData.OctopusUrl)/$($destinationProject.Links.Variables)" -ApiKey $destinationData.OctopusApiKey
+        $sourceVariableSetVariables = Get-OctopusApi -EndPoint $sourceProject.Links.Variables -ApiKey $sourceData.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $null
+        $destinationVariableSetVariables = Get-OctopusApi -EndPoint $destinationProject.Links.Variables -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $null
 
         $SourceProjectData = @{
             ChannelList = $sourceChannelList;
-            RunbookList = Get-OctopusApiItemList -EndPoint "$($SourceData.OctopusUrl)/api/$($sourceData.SpaceId)/projects/$($sourceProject.Id)/runbooks" -ApiKey $sourcedata.OctopusApiKey;
+            RunbookList = Get-OctopusApiItemList -EndPoint "projects/$($sourceProject.Id)/runbooks" -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $sourceData.SpaceId;
             Project = $sourceProject    
         }
         $DestinationProjectData = @{
             ChannelList = $destinationChannelList;
-            RunbookList = Get-OctopusApiItemList -EndPoint "$($DestinationData.OctopusUrl)/api/$($DestinationData.SpaceId)/projects/$($destinationProject.Id)/runbooks" -ApiKey $destinationData.OctopusApiKey
+            RunbookList = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId;
             Project = $destinationProject
         }
 
@@ -1338,20 +1345,13 @@ function Copy-OctopusProjects
 
         $destinationProject = Get-OctopusItemByName -ItemList $DestinationData.ProjectList -ItemName $project.Name
 
-        if ($null -ne $destinationProject)
-        {
-            $sourceChannels = Get-OctopusApiItemList -EndPoint "$($SourceData.OctopusUrl)/api/$($SourceData.SpaceId)/projects/$($project.Id)/channels" -ApiKey $SourceData.OctopusApiKey
-            $destinationChannels = Get-OctopusApiItemList -EndPoint "$($DestinationData.OctopusUrl)/api/$($DestinationData.SpaceId)/projects/$($destinationProject.Id)/channels" -ApiKey $DestinationData.OctopusApiKey
+        $sourceChannels = Get-OctopusApiItemList -EndPoint "projects/$($project.Id)/channels" -ApiKey $SourceData.OctopusApiKey -OctopusUrl $SourceData.OctopusUrl -SpaceId $SourceData.SpaceId
+        $destinationChannels = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/channels" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
 
-            Copy-OctopusProjectChannels -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData
-            Copy-OctopusProjectDeploymentProcess -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData 
-            Copy-OctopusProjectRunbooks -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceProject $project -destinationData $DestinationData -sourceData $SourceData            
-            Copy-OctopusProjectVariables -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceProject $project -destinationData $DestinationData -sourceData $SourceData -cloneScriptOptions $CloneScriptOptions -createdNewProject $createdNewProject
-        }
-        else
-        {
-            Write-YellowOutput "I could not find the project $($project.Name) in the destination.  Most likely you opted to skip it.  No worries, I'm moving onto the next project"
-        }
+        Copy-OctopusProjectChannels -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData
+        Copy-OctopusProjectDeploymentProcess -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData 
+        Copy-OctopusProjectRunbooks -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceProject $project -destinationData $DestinationData -sourceData $SourceData            
+        Copy-OctopusProjectVariables -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceProject $project -destinationData $DestinationData -sourceData $SourceData -cloneScriptOptions $CloneScriptOptions -createdNewProject $createdNewProject        
     }
 }
 
@@ -1393,7 +1393,7 @@ function Copy-OctopusTenants
                 }
             }
 
-            Save-OctopusApiItem -Item $tenantToAdd -Endpoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/tenants" -ApiKey $destinationData.OctopusApiKey
+            Save-OctopusApiItem -Item $tenantToAdd -Endpoint "tenants" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
         }
         else
         {
