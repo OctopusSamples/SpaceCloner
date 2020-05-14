@@ -34,6 +34,7 @@ The script `CloneSpace.ps1` will clone the following:
 
 It will not clone:
 - Tenant Variables
+- Script Modules (yet)
 - Deployments
 - Releases
 - Packages
@@ -59,13 +60,26 @@ The script will also skip the following items if they already exist:
 - Process steps (match by name)
 - Channels
 
+## Use Cases
+
+This script was written to solve the following use cases.
+
+- As a user I want to split my one massive default space into multiple spaces on the same instance.
+- As a user I have two Octopus Deploy instances.  One for dev/test deployments.  Another for staging/prod deployments.  I have the same set of projects I want to keep in sync.
+- As a user I want to clone a set of projects to a test instance to experiment with some new options.
+- As a user I want to merge multiple Octopus Deploy instances into the one space on one instance (we wouldn't recommend this, but it is possible).
+
+### Upcoming Use Cases
+
+- As a user I have a set of "master" projects.  I clone from that project when I need to create a new project.  However, when the process on the "master" project is updated I would like to update the existing projects.
+
 ## How it works
 You provide the a source Octopus instance space and a destination Octopus instance space.  It will hit the API of both instances and copy items from the source space into the destination space.
 
 This script was designed to be run multiple times. 
 
 ## The Space Has to Exist
-The space on the source and destination must exist prior to running the script.  It doesn't create those for you.
+The space on the source and destination must exist prior to running the script.  The script will fail if the destination space doesn't exist.  It doesn't create a space for you.
 
 ## Limitations
 Because this is hitting the Octopus API (and not the database) it cannot decrypt items from the Octopus Database.  It also cannot download packages for you.
@@ -73,14 +87,19 @@ Because this is hitting the Octopus API (and not the database) it cannot decrypt
 - All Sensitive Variables cloned will be set to 'Dummy Value'.
 - All Accounts cloned will have dummy values for keys and ids.
 - All External Feeds will have their login credentials set to `null`.
-- All package references in deployment process or runbook process steps will be removed.
+- All package references in "script steps" (AWS CLI, Run a Script, Azure CLI) in deployment process or runbook process steps will be removed.  All deployment steps with package references will remain as is.
 
-However, this script was designed to be run multiple times.  It isn't useful if the script is constantly overwriting / removing values each time you run it.  It has the following rules built-in.
+## Multiple Runs Encouraged
+This script was designed to be run multiple times.  It isn't useful if the script is constantly overwriting / removing values each time you run it.  It will not overwrite the following:
 
-- It will not update any sensitive values it finds, it only creates new values
-- It will not update any accounts, it only creates new accounts
-- It will not update any external feeds, it only creates new feeds
-- It will not update existing matching steps in deployment process or runbook proccesses.
+- Accounts (match by name)
+- Feeds (match by name)
+- Tenants (match by name)
+- Sensitive variables (match by name)
+- Community Step Templates (match by name)
+- Worker Pools (match by name)
+- Process steps (match by name)
+- Channels (match by name)
 
 ## Simple Relationship Management
 The process does not attempt to walk a tree of dependencies.  It loads up all the necessary data from the source and destination.  When it comes across an ID in the source space it will attempt to find the corresponding ID in the destination space.  If it cannot find a matching item it removes that binding.  
@@ -138,39 +157,52 @@ The script accepts the following parameters.
 - DestinationOctopusApiKey - the API key to access the destination Octopus Server, the user must have edit permissions
 - DestinationSpaceName - the name of the space you wish to copy to.
 
-- EnvironmentsToClone - Comma separated list of environments to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all environments.  Examples: "test,staging,production" or "all" or "prod*".  If this is not supplied it will not clone anything.
-- WorkerPoolsToClone - Comma separated list of worker pools to clone.  It will not clone workers.  Uses Regular expression matching.  If you supply the word "all" it will clone all worker pools.  Examples: "AWS*,development worker pool" or "all" or "AWS*".  If this is not supplied it will not clone anything.
-- ProjectGroupsToClone - Comma separated list of project groups to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all project groups.  Examples: "AWS*,default project group" or "all" or "AWS*".  If this is not supplied it will not clone anything.
-- TenantTagsToClone - Comma separated list of tenant tags to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all tenant tags.  Examples: "AWS*,my tag" or "all" or "AWS*".  If this is not supplied it will not clone anything.
-- ExternalFeedsToClone - Comma separated list of external feeds to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all external feeds.  Examples: "AWS*,docker hub" or "all" or "AWS*".  If this is not supplied it will not clone anything.
-- StepTemplatesToClone - Comma separated list of step templates to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all step templates.  Examples: "AWS*,SQL Server*" or "all" or "AWS*".  If this is not supplied it will not clone anything.
-- InfrastructureAccountsToClone - Comma separated list of accounts feeds to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all accounts.  Examples: "AWS*,Azure*" or "all" or "AWS*".  If this is not supplied it will not clone anything.
-- LibraryVariableSetsToClone - Comma separated list of library variable sets to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all variable sets.  Examples: "AWS*,Global" or "all" or "AWS*".  If this is not supplied it will not clone anything.
-- LifeCyclesToClone - Comma separated list of lifecycles to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all lifecycles.  Examples: "AWS*,Default" or "all" or "AWS*".  If this is not supplied it will not clone anything.
-- ProjectsToClone - Comma separated list of projects to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all projects.  Examples: "AWS*,SQL Server" or "all" or "AWS*".  If this is not supplied it will not clone anything.  This will not clone releases or deployments.
-- TenantsToClone - Comma separated list of tenants to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all tenants.  Examples: "AWS*,internal" or "all" or "AWS*".  If this is not supplied it will not clone anything.
+- EnvironmentsToClone - Comma separated list of environments to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all environments.  Examples: "test,staging,production" or "all" or "prod*".  Default value is `null` indicating nothing will be cloned.
+- WorkerPoolsToClone - Comma separated list of worker pools to clone.  It will not clone workers.  Uses Regular expression matching.  If you supply the word "all" it will clone all worker pools.  Examples: "AWS*,development worker pool" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
+- ProjectGroupsToClone - Comma separated list of project groups to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all project groups.  Examples: "AWS*,default project group" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
+- TenantTagsToClone - Comma separated list of tenant tags to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all tenant tags.  Examples: "AWS*,my tag" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
+- ExternalFeedsToClone - Comma separated list of external feeds to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all external feeds.  Examples: "AWS*,docker hub" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
+- StepTemplatesToClone - Comma separated list of step templates to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all step templates.  Examples: "AWS*,SQL Server*" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
+- InfrastructureAccountsToClone - Comma separated list of accounts feeds to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all accounts.  Examples: "AWS*,Azure*" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
+- LibraryVariableSetsToClone - Comma separated list of library variable sets to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all variable sets.  Examples: "AWS*,Global" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
+- LifeCyclesToClone - Comma separated list of lifecycles to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all lifecycles.  Examples: "AWS*,Default" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
+- ProjectsToClone - Comma separated list of projects to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all projects.  Examples: "AWS*,SQL Server" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.  This will not clone releases or deployments.
+- TenantsToClone - Comma separated list of tenants to clone.  Uses Regular expression matching.  If you supply the word "all" it will clone all tenants.  Examples: "AWS*,internal" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
+- OverwriteExistingCustomStepTemplates - Indicates if existing custom step templates (not community step templates) should be overwritten.  Useful when you make a change to a step template you want to move over to another instance.  Possible values are `true` or `false`.  Defaults to `false`.
+- OverwriteExistingLifecyclesPhases - Indicates you want to overwrite the phases on existing lifecycles.  This is useful when you have an updated lifecycle you want applied to applied to another space/instance.  You would want to leave this to false if the destination lifecycle has different phases.  Possible values are `true` or `false`.  Defaults to `false`.
+- OverwriteExistingVariables - Indicates if all existing variables (except sensitive variables) should be overwritten.  Possible values are `true` or `false`.  Defaults to `false`.
+- AddAdditionalVariableValuesOnExistingVariableSets - Indicates a variable on the destination should only have one value.  You would have multiple values if you were scoping variables.  Possible values are `true` or `false`.  Defaults to `false`.
 
-- OverwriteExistingVariables - Indicates if all existing variables (except sensitive variables) should be overwritten.  Possible values are true or false.  Defaults to false.
-- OneInstanceOfVariableAllowedOnDestination - Indicates a variable on the destination should only have one value.  You would have multiple values if you were scoping variables.  Possible values are true or false.  Default to false.
-- OverwriteExistingCustomStepTemplates - Indicates if existing custom step templates (not community step templates) should be overwritten.  Useful when you make a change to a step template you want to move over to another instance.  Possible values are true or false.  Defaults to false.
-- OverwriteExistingLifecycles - Indicates you want to overwrite existing lifecycles.  This is useful when you have an updated lifecycle you want applied to a new space.  You would want to leave this to false if the destination lifecycle has a different process.  Possible values are true or false.  Defaults to false.
+## AddAdditionalVariableValuesOnExistingVariableSets further detail
+
+On your source you have a variable set with the following values:
+
+![](img/source-space-more-values.png)
+
+On your destination space you have the same variable set with the following values:
+
+![](img/destination-less-values.png)
+
+When the variable `AddAdditionalVariableValuesOnExistingVariableSets` is set to `True` it will add that missing value.
+
+When the variable `AddAdditionalVariableValuesOnExistingVariableSets` is set to `False` it will not add that missing value.
 
 ## Examples
 
 All these examples are for the [Target - SQL Server Space](https://samples.octopus.app/app#/Spaces-106) on the samples instance.
 
 ### Clone Everything
-Set everything to all.  All is a keyword the script sees.
+Set everything to all.  `All` is special keyword for the script.  When it sees that it will grab everything.
 
 ```
-CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" -SourceOctopusApiKey "SOME KEY" -SourceSpaceName "Target - SQL Server" -DestinationOctopusUrl "https://myinstance.octopus" -DestinationOctopusApiKey "My Key" -DestinationSpace Name "Demo Clone" -EnvironmentsToClone "all" -WorkerPoolsToClone "all" -ProjectGroupsToClone "all" -TenantTagsToClone "all" -ExternalFeedsToClone "all" -StepTemplatesToClone "all" -InfrastructureAccountsToClone "all" -LibraryVariableSetsToClone "all" -LifeCyclesToClone "all" -ProjectsToClone "all" -TenantsToClone "all" -OverwriteExistingVariables "True" -OneInstanceOfVariableAllowedOnDestination "False" -OverwriteExistingCustomStepTemplates "True" -OverwriteExistingLifecycles "True"
+CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" -SourceOctopusApiKey "SOME KEY" -SourceSpaceName "Target - SQL Server" -DestinationOctopusUrl "https://myinstance.octopus" -DestinationOctopusApiKey "My Key" -DestinationSpace Name "Demo Clone" -EnvironmentsToClone "all" -WorkerPoolsToClone "all" -ProjectGroupsToClone "all" -TenantTagsToClone "all" -ExternalFeedsToClone "all" -StepTemplatesToClone "all" -InfrastructureAccountsToClone "all" -LibraryVariableSetsToClone "all" -LifeCyclesToClone "all" -ProjectsToClone "all" -TenantsToClone "all" -OverwriteExistingVariables "True" -OneInstanceOfVariableAllowedOnDestination "False" -OverwriteExistingCustomStepTemplates "True" -OverwriteExistingLifecyclesPhases "True"
 ```
 
 ### Clone project and associated dependencies
 You have to know the dependencies of the project, the script won't do the work for you.  This script can be run multiple times and it will only copy over differences it finds.
 
 ```
-CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" -SourceOctopusApiKey "SOME KEY" -SourceSpaceName "Target - SQL Server" -DestinationOctopusUrl "https://myinstance.octopus" -DestinationOctopusApiKey "My Key" -DestinationSpace Name "Demo Clone" -EnvironmentsToClone "test,staging,production" -WorkerPoolsToClone "AWS*" -ProjectGroupsToClone "all" -TenantTagsToClone "all" -ExternalFeedsToClone "all" -StepTemplatesToClone "all" -InfrastructureAccountsToClone "AWS*" -LibraryVariableSetsToClone "AWS*,Global,Notification,SQL Server" -LifeCyclesToClone "AWS*" -ProjectsToClone "Redgate - Feature Branch Example" -TenantsToClone "all" -OverwriteExistingVariables "false" -OneInstanceOfVariableAllowedOnDestination "False" -OverwriteExistingCustomStepTemplates "false" -OverwriteExistingLifecycles "false"
+CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" -SourceOctopusApiKey "SOME KEY" -SourceSpaceName "Target - SQL Server" -DestinationOctopusUrl "https://myinstance.octopus" -DestinationOctopusApiKey "My Key" -DestinationSpace Name "Demo Clone" -EnvironmentsToClone "test,staging,production" -WorkerPoolsToClone "AWS*" -ProjectGroupsToClone "all" -TenantTagsToClone "all" -ExternalFeedsToClone "all" -StepTemplatesToClone "all" -InfrastructureAccountsToClone "AWS*" -LibraryVariableSetsToClone "AWS*,Global,Notification,SQL Server" -LifeCyclesToClone "AWS*" -ProjectsToClone "Redgate - Feature Branch Example" -TenantsToClone "all" -OverwriteExistingVariables "false" -OneInstanceOfVariableAllowedOnDestination "False" -OverwriteExistingCustomStepTemplates "false" -OverwriteExistingLifecyclesPhases "false"
 ```
 
 ### Clone specific project(s)
@@ -179,3 +211,38 @@ If all you want to do is clone a specific project without worrying about depende
 ```
 CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" -SourceOctopusApiKey "SOME KEY" -SourceSpaceName "Target - SQL Server" -DestinationOctopusUrl "https://myinstance.octopus" -DestinationOctopusApiKey "My Key" -DestinationSpace Name "Demo Clone" -ProjectsToClone "Redgate - Feature Branch Example,Redgate - Simple Deployment"
 ```
+
+# Debugging
+
+This is a script manipulating data and then calling an API, it is possible it will send a bad JSON body up to the API.  
+
+All JSON requests are stored in the log.  For example:
+
+```
+Going to invoke POST https://code-aperture.octopus.app/api/Spaces-104/Environments with the following body
+{
+    "Id":  null,
+    "Name":  "Test",
+    "Description":  "",
+    "SortOrder":  1,
+    "UseGuidedFailure":  false,
+    "AllowDynamicInfrastructure":  false,
+    "SpaceId":  "Spaces-104",
+    "ExtensionSettings":  [
+                              {
+                                  "ExtensionId":  "issuetracker-jira",
+                                  "Values":  {
+
+                                             }
+                              }
+                          ],
+    "Links":  {
+                  "Self":  "/api/Spaces-106/environments/Environments-111",
+                  "Machines":  "/api/Spaces-106/environments/Environments-111/machines{?skip,take,partialName,roles,isDisabled,healthStatuses,commStyles,tenantIds,tenantTags,shellNames}",
+                  "SinglyScopedVariableDetails":  "/api/Spaces-106/environments/Environments-111/singlyScopedVariableDetails",
+                  "Metadata":  "/api/Spaces-106/environments/Environments-111/metadata"
+              }
+}
+```
+
+You can copy that body and URL into Postman to manipulate until it works for you.  Once you know the cause you can update the script to make sure it doesn't happen again.

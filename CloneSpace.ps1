@@ -18,9 +18,9 @@ param (
     $ProjectsToClone,
     $TenantsToClone,
     $OverwriteExistingVariables,
-    $OneInstanceOfVariableAllowedOnDestination,
+    $AddAdditionalVariableValuesOnExistingVariableSets,
     $OverwriteExistingCustomStepTemplates,
-    $OverwriteExistingLifecycles   
+    $OverwriteExistingLifecyclesPhases   
 )
 
 Clear-Host
@@ -36,9 +36,9 @@ if ($null -eq $OverwriteExistingVariables)
     $OverwriteExistingVariables = $false
 }
 
-if ($null -eq $OneInstanceOfVariableAllowedOnDestination)
+if ($null -eq $AddAdditionalVariableValuesOnExistingVariableSets)
 {
-    $OneInstanceOfVariableAllowedOnDestination = $false
+    $AddAdditionalVariableValuesOnExistingVariableSets = $false
 }
 
 if ($null -eq $OverwriteExistingCustomStepTemplates)
@@ -46,9 +46,9 @@ if ($null -eq $OverwriteExistingCustomStepTemplates)
     $OverwriteExistingCustomStepTemplates = $false
 }
 
-if ($null -eq $OverwriteExistingLifecycles)
+if ($null -eq $OverwriteExistingLifecyclesPhases)
 {
-    $OverwriteExistingLifecycles = $false
+    $OverwriteExistingLifecyclesPhases = $false
 }
 
 $CloneScriptOptions = @{
@@ -63,9 +63,9 @@ $CloneScriptOptions = @{
     LifeCyclesToClone = $LifeCyclesToClone;
     ProjectsToClone = $ProjectsToClone;
     OverwriteExistingVariables = $OverwriteExistingVariables;
-    OneInstanceOfVariableAllowedOnDestination = $OneInstanceOfVariableAllowedOnDestination;
+    AddAdditionalVariableValuesOnExistingVariableSets = $AddAdditionalVariableValuesOnExistingVariableSets;
     OverwriteExistingCustomStepTemplates = $OverwriteExistingCustomStepTemplates;
-    OverwriteExistingLifecycles = $OverwriteExistingLifecycles;
+    OverwriteExistingLifecyclesPhases = $OverwriteExistingLifecyclesPhases;
     TenantsToClone = $TenantsToClone;
 }
 
@@ -868,7 +868,7 @@ function Copy-OctopusVariableSetValues
             }
         }        
         
-        if ($foundCounter -gt 1 -and $variableExistsOnDestination -eq $true -and $CloneScriptOptions.OneInstanceOfVariableAllowedOnDestination -eq $true)
+        if ($foundCounter -gt 1 -and $variableExistsOnDestination -eq $true -and $CloneScriptOptions.AddAdditionalVariableValuesOnExistingVariableSets -eq $true)
         {
             Write-YellowOutput "The variable $variableName already exists on destination. You selected to skip duplicate instances, skipping"
         }
@@ -971,7 +971,7 @@ function Copy-OctopusLifecycles
             $phase.AutomaticDeploymentTargets = @($NewEnvironmentIds)
         }
 
-        Copy-OctopusItem -ClonedItem $lifeCycleToClone -DestinationItemList $DestinationData.LifeCycleList -DestinationSpaceId $DestinationData.SpaceId -ApiKey $DestinationData.OctopusApiKey -EndPoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/lifecycles" -ItemTypeName "Lifecycle" -DestinationCanBeOverwritten $CloneScriptOptions.OverwriteExistingLifecycles
+        Copy-OctopusItem -ClonedItem $lifeCycleToClone -DestinationItemList $DestinationData.LifeCycleList -DestinationSpaceId $DestinationData.SpaceId -ApiKey $DestinationData.OctopusApiKey -EndPoint "$($destinationData.OctopusUrl)/api/$($destinationData.SpaceId)/lifecycles" -ItemTypeName "Lifecycle" -DestinationCanBeOverwritten $CloneScriptOptions.OverwriteExistingLifecyclesPhases
     }
 
     Write-GreenOutput "Reloading destination lifecycles"
