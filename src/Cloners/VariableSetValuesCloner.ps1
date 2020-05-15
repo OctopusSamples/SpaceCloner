@@ -39,21 +39,28 @@ function Copy-OctopusVariableSetValues
 
         if (Get-Member -InputObject $octopusVariable.Scope -Name "ProcessOwner" -MemberType Properties)
         {
-            Write-VerboseOutput "$variableName has process owner scoping, converting to destination values"
-            $NewOwnerIds = @()
-            foreach($value in $octopusVariable.Scope.ProcessOwner)
+            if ($destinationData.HasRunbooks)
             {
-                if ($value -contains "Projects-")
+                Write-VerboseOutput "$variableName has process owner scoping, converting to destination values"
+                $NewOwnerIds = @()
+                foreach($value in $octopusVariable.Scope.ProcessOwner)
                 {
-                    $NewOwnerIds += $DestinationProjectData.Project.Id
+                    if ($value -contains "Projects-")
+                    {
+                        $NewOwnerIds += $DestinationProjectData.Project.Id
+                    }
+                    elseif($value -contains "Runbooks-")
+                    {
+                        $NewOwnerIds += Convert-SourceIdToDestinationId -SourceList $SourceProjectData.RunbookList -DestinationList $DestinationProjectData.RunbookList -IdValue $value
+                    }
                 }
-                elseif($value -contains "Runbooks-")
-                {
-                    $NewOwnerIds += Convert-SourceIdToDestinationId -SourceList $SourceProjectData.RunbookList -DestinationList $DestinationProjectData.RunbookList -IdValue $value
-                }
+                
+                $octopusVariable.Scope.ProcessOwner = @($NewOwnerIds)            
             }
-            
-            $octopusVariable.Scope.ProcessOwner = @($NewOwnerIds)            
+            else 
+            {
+                $octopusVariable.Scope.PSObject.Properties.Remove('ProcessOwner')    
+            }
         }
 
         if ($octopusVariable.Type -match ".*Account")
@@ -99,7 +106,19 @@ function Copy-OctopusVariableSetValues
         
         if ($foundCounter -gt 1 -and $variableExistsOnDestination -eq $true -and $CloneScriptOptions.AddAdditionalVariableValuesOnExistingVariableSets -eq $true)
         {
-            Write-YellowOutput "The variable $variableName already exists on destination. You selected to skip duplicate instances, skipping"
+            Write-YellowOutput "The variable $variableName already exists on destination. You selected to skip duplicate instances, skipping."
+        }
+        elseif ($octopusVariable.Type -eq "AmazonWebServicesAccount" -and $destinationData.HasAWSSupport -eq $false)
+        {
+            Write-YellowOutput "The variable $variableName is an AWS Account Type, the destination does not support that variable type, skipping."
+        }
+        elseif ($octopusVariable.Type -eq "AzureAccount" -and $destinationData.HasAzureVariableTypeSupport -eq $false)
+        {
+            Write-YellowOutput "The variable $variableName is an Azure Account Type, the destination does not support that variable type, skipping."
+        }
+        elseif ($octopusVariable.Type -eq "WorkerPool" -and $destinationData.HasWorkerPoolVariableTypeSupport -eq $false)
+        {
+            Write-YellowOutput "The variable $variableName is a WorkerPool Type, the destination does not support that variable type, skipping."
         }
         elseif ($foundIndex -eq -1)
         {

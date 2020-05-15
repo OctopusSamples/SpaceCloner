@@ -14,6 +14,11 @@ function Copy-OctopusExternalFeeds
         $cloneScriptOptions
     )
     
+    if ($sourceData.HasWorkers -eq $false -or $destinationData.HasWorkers -eq $false)
+    {
+        return
+    }
+
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.FeedList -itemType "Feeds" -filters $cloneScriptOptions.ExternalFeedsToClone
     
     Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.FeedList -EndPoint "Feeds" -ApiKey $($destinationData.OctopusApiKey) -destinationSpaceId $($destinationData.SpaceId) -ItemTypeName "Feed" -DestinationCanBeOverwritten $false -DestinationOctopusUrl $destinationData.OctopusUrl

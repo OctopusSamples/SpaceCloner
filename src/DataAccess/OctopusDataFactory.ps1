@@ -234,6 +234,11 @@ function Get-OctopusData
     $octopusData.HasRunbooks = ([int]$splitVersion[0] -ge 2019 -and [int]$splitVersion[1] -ge 10) -or [int]$splitVersion[0] -ge 2020
     Write-GreenOutput "This version of Octopus has runbooks $($octopusData.HasRunBooks)"
 
+    $octopusData.HasAWSSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 2) -or [int]$splitVersion[0] -ge 2019
+    $octopusData.HasTokenSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 9) -or [int]$splitVersion[0] -ge 2019
+    $octopusData.HasAzureVariableTypeSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 5) -or [int]$splitVersion[0] -ge 2019
+    $octopusData.HasWorkerPoolVariableTypeSupport = [int]$splitversion[0] -ge 2020
+
     $octopusData.SpaceId = Get-OctopusSpaceId -octopusUrl $octopusUrl -octopusApiKey $octopusApiKey -hasSpaces $OctopusData.HasSpaces    
 
     Write-GreenOutput "Getting Environments for $spaceName in $octopusUrl"

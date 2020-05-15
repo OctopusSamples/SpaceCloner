@@ -15,6 +15,12 @@ function Copy-ProcessStepAction
     )
         
     $action = Copy-OctopusObject -ItemToCopy $sourceAction -ClearIdValue $true -SpaceId $null
+
+    if ($action.ActionType -eq "Octopus.AwsRunScript" -and $destinationData.HasAWSSupport -eq $false)
+    {
+        Write-YellowOutput -Message "The action $($action.Name) is an AWS Script, which isn't supported by the destination, skipping"
+        return $null
+    }
     
     if ($sourceData.HasWorkers -and $destinationData.HasWorkers -and (Test-OctopusObjectHasProperty -objectToTest $action -propertyName "WorkerPoolId"))
     {
@@ -114,16 +120,16 @@ function Copy-OctopusDeploymentProcess
         {
             $matchingAction = Get-OctopusItemByName -ItemList $stepToAdd.Actions -ItemName $action.Name
 
-            if ($null -eq $matchingAction)
+            if ($null -eq $matchingAction -or $newStep -eq $true)
             {
                 Write-VerboseOutput "The action $($action.Name) doesn't exist for the step, adding that to the list"
-                $newStepActions += Copy-ProcessStepAction -sourceAction $action -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData         
-            }
-            elseif ($newStep -eq $true)
-            {
-                Write-VerboseOutput "The step $($step.Name) is new, cloning the action from the source"
-                $newStepActions += Copy-ProcessStepAction -sourceAction $action -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData         
-            }
+                $clonedStep = Copy-ProcessStepAction -sourceAction $action -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData         
+
+                if ($null -ne $clonedStep)
+                {
+                    $newStepActions += $clonedStep
+                }
+            }            
             else
             {
                 Write-VerboseOutput "The action $($action.Name) already exists for the step, adding existing item to list"
@@ -143,8 +149,12 @@ function Copy-OctopusDeploymentProcess
             }
         }
         
-        $stepToAdd.Actions = $newStepActions
-        $newDeploymentProcessSteps += $stepToAdd
+        $stepToAdd.Actions = @($newStepActions)
+
+        if ($stepToAdd.Actions.Length -gt 0)
+        {
+            $newDeploymentProcessSteps += $stepToAdd
+        }
     }
 
     Write-VerboseOutput "Looping through the destination deployment process steps to make sure we didn't miss anything"

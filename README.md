@@ -25,6 +25,12 @@ This script was written to solve the following use cases.
 
 - As a user I have a set of "master" projects.  I clone from that project when I need to create a new project.  However, when the process on the "master" project is updated I would like to update the existing projects.
 
+# Versions Supported
+
+The closer the source and destination are in versions, the better the chance for success.  Big jumps, such as going from `4.0.4` to `2020.2.6` have a small chance of success.  Small jumps, going from `2020.1` to `2020.2` have a much, much, much better chance.
+
+This script does its best to exclude items found in newer versions of Octopus that are not in older versions.  
+
 # How it works
 You provide the a source Octopus instance space and a destination Octopus instance space.  It will hit the API of both instances and copy items from the source space into the destination space.
 

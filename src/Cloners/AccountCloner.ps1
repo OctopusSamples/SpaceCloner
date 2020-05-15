@@ -29,6 +29,12 @@ function Copy-OctopusInfrastructureAccounts
             
             if ($accountClone.AccountType -eq "AmazonWebServicesAccount")
             {
+                if ($destinationData.HasAWSSupport -eq $false)
+                {
+                    Write-YellowOutput "The destination does not support AWS Accounts Skipping this account"
+                    continue
+                }
+
                 $accountClone.AccessKey = "AKIABCDEFGHI3456789A"
                 $accountClone.SecretKey.HasValue = $false
                 $accountClone.SecretKey.NewValue = "DUMMY VALUE DUMMY VALUE"
@@ -43,8 +49,14 @@ function Copy-OctopusInfrastructureAccounts
             }
             elseif($accountClone.AccountType -eq "Token")
             {
+                if ($destinationData.HasTokenSupport -eq $false)
+                {          
+                    Write-YellowOutput "The destination does not support Token Accounts skipping this account"                              
+                    continue
+                }
+
                 $accountClone.Token.HasValue = $false
-                $accountClone.Token.NewValue = "DUMMY VALUE"
+                $accountClone.Token.NewValue = "DUMMY VALUE"                
             }
 
             $NewEnvironmentIds = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $accountClone.EnvironmentIds            

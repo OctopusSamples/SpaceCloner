@@ -96,10 +96,6 @@ function Copy-OctopusProject
     }
     else
     {            
-        $matchingProject.TenantedDeploymentMode = $sourceProject.TenantedDeploymentMode
-        $matchingProject.DefaultGuidedFailureMode = $sourceProject.DefaultGuidedFailureMode
-        $matchingProject.ReleaseNotesTemplate = $sourceProject.ReleaseNotesTemplate 
-        $matchingProject.DeploymentChangesTemplate = $sourceProject.DeploymentChangesTemplate
         $matchingProject.Description = $sourceProject.Description                   
 
         Save-OctopusApiItem -Item $matchingProject -Endpoint "projects" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
