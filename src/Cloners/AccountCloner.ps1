@@ -1,3 +1,9 @@
+. ($PSScriptRoot + ".\..\Core\Logging.ps1")
+. ($PSScriptRoot + ".\..\Core\Util.ps1")
+
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
+
 function Copy-OctopusInfrastructureAccounts
 {
     param(
@@ -35,6 +41,11 @@ function Copy-OctopusInfrastructureAccounts
                 $accountClone.Password.HasValue = $false
                 $accountClone.Password.NewValue = "DUMMY VALUE DUMMY VALUE"
             }
+            elseif($accountClone.AccountType -eq "Token")
+            {
+                $accountClone.Token.HasValue = $false
+                $accountClone.Token.NewValue = "DUMMY VALUE"
+            }
 
             $NewEnvironmentIds = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $accountClone.EnvironmentIds            
             $accountClone.EnvironmentIds = @($NewEnvironmentIds)
@@ -47,8 +58,7 @@ function Copy-OctopusInfrastructureAccounts
                 $accountClone.TenantedDeploymentParticipation = "Untenanted"
             }            
 
-            Save-OctopusApiItem -Item $accountClone -Endpoint "accounts" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $DestinationData.OctopusUrl -SpaceId $DestinationData.SpaceId
-            Write-YellowOutput "Account successfully cloned.  WARNING WARNING WARNING account values have dummy values."
+            Save-OctopusApiItem -Item $accountClone -Endpoint "accounts" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $DestinationData.OctopusUrl -SpaceId $DestinationData.SpaceId            
             Write-CleanUpOutput "Account $($account.Name) was created with dummy values."
         }
         else

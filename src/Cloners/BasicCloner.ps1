@@ -1,3 +1,9 @@
+. ($PSScriptRoot + ".\..\Core\Logging.ps1")
+. ($PSScriptRoot + ".\..\Core\Util.ps1")
+
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
+
 function Copy-OctopusSimpleItems
 {
     param(
@@ -34,8 +40,7 @@ function Copy-OctopusItem
     Write-VerboseOutput "Cloning $ItemTypeName $($clonedItem.Name)"
         
     $matchingItem = Get-OctopusItemByName -ItemName $clonedItem.Name -ItemList $DestinationItemList
-
-    Write-VerboseOutput -message $ClonedItem
+    
     $copyOfItemToClone = Copy-OctopusObject -ItemToCopy $ClonedItem -SpaceId $DestinationSpaceId -ClearIdValue $true    
 
     If ($null -eq $matchingItem)

@@ -1,5 +1,8 @@
-. ($PSScriptRoot + ".\Util.ps1")
-. ($PSScriptRoot + ".\Logging.ps1")
+. ($PSScriptRoot + ".\..\Core\Logging.ps1")
+. ($PSScriptRoot + ".\..\Core\Util.ps1")
+
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
 
 function Copy-ProcessStepAction
 {
@@ -13,7 +16,7 @@ function Copy-ProcessStepAction
         
     $action = Copy-OctopusObject -ItemToCopy $sourceAction -ClearIdValue $true -SpaceId $null
     
-    if ($sourceData.HasWorkerPools -and $destinationData.HasWorkerPools)
+    if ($sourceData.HasWorkers -and $destinationData.HasWorkers -and (Test-OctopusObjectHasProperty -objectToTest $action -propertyName "WorkerPoolId"))
     {
         if ($null -ne $action.WorkerPoolId)
         {
@@ -38,13 +41,21 @@ function Copy-ProcessStepAction
 
         foreach ($parameter in $stepTemplate.Parameters)
         {                                
-            $controlType = $parameter.DisplaySettings.'Octopus.ControlType'
-            Write-VerboseOutput "$($parameter.Name) is control type is $controlType"
-
-            if ($controlType -eq "Package")
+            if ((Test-OctopusObjectHasProperty -objectToTest $action.Properties -propertyName $parameter.Name))
             {
-                $action.Properties.$($parameter.Name) = ""
-            }                
+                $controlType = $parameter.DisplaySettings.'Octopus.ControlType'
+                Write-VerboseOutput "$($parameter.Name) is control type is $controlType"
+                
+                if ($controlType -eq "Package")
+                {
+                    $action.Properties.$($parameter.Name) = ""
+                }    
+                elseif ($controlType -eq "Sensitive")            
+                {
+                    Write-CleanUpOutput "Set $($parameter.Name) in $($action.Name) to Dummy Value"
+                    $action.Properties.$($parameter.Name) = "DUMMY VALUE"
+                }
+            }            
         }
     }
 
@@ -59,8 +70,7 @@ function Copy-ProcessStepAction
     }
 
     if ($action.Packages.Length -gt 0)
-    {
-        Write-YellowOutput "$($action.Name) has package references, I have to nuke them on the initial copy, please recreate them.  This information is logged in the clean-up log."
+    {        
         Write-CleanUpOutput "Removed package references from $($action.Name)"
         $action.Packages = @()
     }
@@ -149,5 +159,5 @@ function Copy-OctopusDeploymentProcess
         }
     }
 
-    return $newDeploymentProcessSteps
+    return @($newDeploymentProcessSteps)
 }

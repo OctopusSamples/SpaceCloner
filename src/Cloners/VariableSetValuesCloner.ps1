@@ -1,3 +1,9 @@
+. ($PSScriptRoot + ".\..\Core\Logging.ps1")
+. ($PSScriptRoot + ".\..\Core\Util.ps1")
+
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
+
 function Copy-OctopusVariableSetValues
 {
     param
@@ -112,8 +118,7 @@ function Copy-OctopusVariableSetValues
         {
             $DestinationVariableSetVariables.Variables[$i].Value = $octopusVariable.Value
             if ($octopusVariable.Value -eq "Dummy Value")         
-            {
-                Write-YellowOutput "The variable $variableName is a new sensitive variable found, the value was set to 'Dummy Value'.  This information is logged in the clean-up log."
+            {                
                 Write-CleanUpOutput "The variable $variableName is a sensitive variable, value set to 'Dummy Value'"
             }
         }        

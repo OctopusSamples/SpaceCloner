@@ -30,5 +30,6 @@ function Write-CleanUpOutput
 {
     param($message)
 
+    Write-YellowOutput $message
     Add-Content -Value $message -Path $cleanupLogPath
 }

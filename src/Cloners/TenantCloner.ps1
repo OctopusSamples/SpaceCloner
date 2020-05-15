@@ -1,3 +1,9 @@
+. ($PSScriptRoot + ".\..\Core\Logging.ps1")
+. ($PSScriptRoot + ".\..\Core\Util.ps1")
+
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
+
 function Copy-OctopusTenants
 {
     param(
@@ -19,22 +25,21 @@ function Copy-OctopusTenants
             $tenantToAdd = Copy-OctopusObject -ItemToCopy $tenant -ClearIdValue $true -SpaceId $destinationData.SpaceId
             $tenantToAdd.Id = $null
             $tenantToAdd.SpaceId = $destinationData.SpaceId
-            $tenantToAdd.ProjectEnvironments = @{}
+            $tenantToAdd.ProjectEnvironments = @{}            
 
-            foreach($key in $tenant.ProjectEnvironments.GetEnumerator())
-            {
-                Write-VerboseOutput "Attempting to matching $key with source"
-                $matchingProjectId = Convert-SourceIdToDestinationId -SourceList $sourceData.ProjectList -DestinationList $destinationData.ProjectList -IdValue $key
+            $tenant.ProjectEnvironments.PSObject.Properties | ForEach-Object {
+                Write-VerboseOutput "Attempting to matching $($_.Name) with source"
+                $matchingProjectId = Convert-SourceIdToDestinationId -SourceList $sourceData.ProjectList -DestinationList $destinationData.ProjectList -IdValue $_.Name
 
                 Write-VerboseOutput "Attempting to match the environment list with source"
-                $scopedEnvironments = Convert-SourceIdListToDestinationIdList -SourceList $sourceData.EnvironmentList -DestinationList $destinationData.EnvironmentList -IdList $tenant[$key]
+                $scopedEnvironments = Convert-SourceIdListToDestinationIdList -SourceList $sourceData.EnvironmentList -DestinationList $destinationData.EnvironmentList -IdList $_.Value
 
                 if ($scopedEnvironments.Length -gt 0 -and $null -ne $matchingProjectId)
                 {
                     Write-VerboseOutput "The matching environments were found and matching project was found, let's scope it to the tenant"
-                    $tenantToAdd.ProjectEnvironments[$matchingProjectId] = $scopedEnvironments
+                    $tenantToAdd.ProjectEnvironments[$matchingProjectId] = @($scopedEnvironments)
                 }
-            }
+            }            
 
             Save-OctopusApiItem -Item $tenantToAdd -Endpoint "tenants" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
         }

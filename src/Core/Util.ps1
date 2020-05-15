@@ -91,12 +91,14 @@ function Test-OctopusObjectHasProperty
 
     if ($hasProperty)
     {
-        Write-VerboseOutput "$propertyName property found on object $objectToTest"
+        Write-VerboseOutput "$propertyName property found."
     }
     else
     {
-        Write-VerboseOutput "$propertyName property missing on object $objectToTest"
+        Write-VerboseOutput "$propertyName property missing."
     }
+
+    return $hasProperty
 }
 
 function Copy-OctopusObject

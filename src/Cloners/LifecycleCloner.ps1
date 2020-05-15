@@ -1,3 +1,11 @@
+. ($PSScriptRoot + ".\..\Core\Logging.ps1")
+. ($PSScriptRoot + ".\..\Core\Util.ps1")
+
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
+
+. ($PSScriptRoot + ".\BasicCloner.ps1")
+
 function Copy-OctopusLifecycles
 {
     param(

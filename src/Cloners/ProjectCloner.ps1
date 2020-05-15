@@ -1,3 +1,9 @@
+. ($PSScriptRoot + ".\..\Core\Logging.ps1")
+. ($PSScriptRoot + ".\..\Core\Util.ps1")
+
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
+. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
+
 function Copy-OctopusProjectChannels
 {
     param(
@@ -48,7 +54,7 @@ function Copy-OctopusProjectDeploymentProcess
     $sourceDeploymentProcess = Get-OctopusApi -EndPoint $project.Links.DeploymentProcess -ApiKey $SourceData.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $null
     $destinationDeploymentProcess = Get-OctopusApi -EndPoint $destinationProject.Links.DeploymentProcess -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $null
     
-    $destinationDeploymentProcess.Steps = Copy-OctopusDeploymentProcess -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData -sourceDeploymentProcessSteps $sourceDeploymentProcess.Steps -destinationDeploymentProcessSteps $destinationDeploymentProcess.Steps
+    $destinationDeploymentProcess.Steps = @(Copy-OctopusDeploymentProcess -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData -sourceDeploymentProcessSteps $sourceDeploymentProcess.Steps -destinationDeploymentProcessSteps $destinationDeploymentProcess.Steps)
 
     Save-OctopusApiItem -Item $destinationDeploymentProcess -Endpoint "deploymentprocesses" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
 }
@@ -143,9 +149,8 @@ function Copy-OctopusProjectRunbooks
         $sourceRunbookProcess = Get-OctopusApi -EndPoint $runbook.Links.RunbookProcesses -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $null
         $destinationRunbookProcess = Get-OctopusApi -EndPoint $destinationRunbook.Links.RunbookProcesses -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $null
 
-        Write-CleanUpOutput "Syncing deployment process for $($runbook.Name)"
-        Write-GreenOutput "Syncing deployment process for $($runbook.Name)"
-        $destinationRunbookProcess.Steps = Copy-OctopusDeploymentProcess -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData -sourceDeploymentProcessSteps $sourceRunbookProcess.Steps -destinationDeploymentProcessSteps $destinationRunbookProcess.Steps
+        Write-CleanUpOutput "Syncing deployment process for $($runbook.Name)"        
+        $destinationRunbookProcess.Steps = @(Copy-OctopusDeploymentProcess -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData -sourceDeploymentProcessSteps $sourceRunbookProcess.Steps -destinationDeploymentProcessSteps $destinationRunbookProcess.Steps)
             
         Save-OctopusApiItem -Item $destinationRunbookProcess -Endpoint "runbookProcesses" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
     }
