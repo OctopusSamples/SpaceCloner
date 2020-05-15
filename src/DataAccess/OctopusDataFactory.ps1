@@ -235,9 +235,31 @@ function Get-OctopusData
     Write-GreenOutput "This version of Octopus has runbooks $($octopusData.HasRunBooks)"
 
     $octopusData.HasAWSSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 2) -or [int]$splitVersion[0] -ge 2019
+    Write-GreenOutput "This version of Octopus has AWS $($octopusData.HasAWSSupport)"
+
     $octopusData.HasTokenSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 9) -or [int]$splitVersion[0] -ge 2019
+    Write-GreenOutput "This version of Octopus has Token Account Types $($octopusData.HasTokenSupport)"
+
     $octopusData.HasAzureVariableTypeSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 5) -or [int]$splitVersion[0] -ge 2019
+    Write-GreenOutput "This version of Octopus has Azure Variable Type Support $($octopusData.HasAzureVariableTypeSupport)"
+
     $octopusData.HasWorkerPoolVariableTypeSupport = [int]$splitversion[0] -ge 2020
+    Write-GreenOutput "This version of Octopus has Worker Pool Variable Type Support $($octopusData.HasWorkerPoolVariableTypeSupport)"
+
+    $octopusData.HasOctopusProjectsFeedTypeSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 2) -or [int]$splitVersion[0] -ge 2019
+    Write-GreenOutput "This version of Octopus has deploy a project $($octopusData.HasProjectsFeedTypeSupport)"
+
+    $octopusData.HasMavenFeedTypeSupport = [int]$splitVersion[0] -ge 2018
+    Write-GreenOutput "This version of Octopus has Maven feed type support $($octopusData.HasMavenFeedTypeSupport)"
+
+    $octopusData.HasGitHubFeedTypeSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 3) -or [int]$splitVersion[0] -ge 2019
+    Write-GreenOutput "This version of Octopus has github feed type $($octopusData.HasGitHubFeedTypeSupport)"
+
+    $octopusData.HasK8sSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 8) -or [int]$splitVersion[0] -ge 2019
+    Write-GreenOutput "This version of Octopus has kubernetes $($octopusData.HasK8sSupport)"
+
+    $octopusData.HasTerraformSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 3) -or [int]$splitVersion[0] -ge 2019
+    Write-GreenOutput "This version of Octopus has terraform support $($octopusData.HasTerraformSupport)"
 
     $octopusData.SpaceId = Get-OctopusSpaceId -octopusUrl $octopusUrl -octopusApiKey $octopusApiKey -hasSpaces $OctopusData.HasSpaces    
 
