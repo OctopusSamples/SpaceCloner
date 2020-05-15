@@ -62,6 +62,8 @@ The script `CloneSpace.ps1` will not clone the following items:
 - External Auth Providers (or groups)
 - Server settings like folders
 - Spaces
+- Project Versioning Strategy (clears out package references)
+- Project Automatic Release Creation (clears out package references)
 
 The assumption is you are using this script to clone a process to another instance for testing purposes.  You don't need the headache of deployments, releases and everything associated with it.
 
@@ -90,6 +92,8 @@ This script was designed to be run multiple times with the same parameters.  It 
 - Worker Pools (match by name)
 - Process steps (match by name)
 - Channels (match by name)
+- Project Versioning Strategy (once you set it in the destination project, it keeps it)
+- Project Automatic Release Creation (once you set it in the destination project, it keeps it)
 
 ## Limitations
 Because this is hitting the Octopus API (and not the database) it cannot decrypt items from the Octopus Database.  It also cannot download packages for you.
