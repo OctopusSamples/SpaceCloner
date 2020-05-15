@@ -7,8 +7,15 @@ Please test it on an empty space before attempting to use it for any kind of rea
 ## Who uses this process?
 This script was developed by the Customer Success team at Octopus Deploy.  We use it to clone items for our [samples instance](https://samples.octopus.app).
 
-## Will you fix my bug?  What about feature requests?
-Honestly, probably not.  Unless it is something we (Customer Success) needs, we probably won't add it ourselves.  
+## Will you fix my bug?  
+Submit an issue if you encounter a bug.  We will triage it and give you a decision on if it will be fixed.
+
+What won't be fixed:
+- Failures as a result of cloning from massive differences in versions, for example `3.17.14` to `2020.2.6`.  However, if it is a small difference in versions, we are much more likely to fix it.
+- Certain Excluded Object Types (sensitive variables, targets, workers, etc).  They were excluded for a specific reason.  
+
+## What about feature requests?
+Unless it is something we (Customer Success) needs, we probably won't add it ourselves.  We encourage you to fork the repo, add your desired functionality.  If you think others will benefit submit a PR.
 
 ## Do you accept pull requests?
 Yes!  If you want to improve this script please submit a pull request!
@@ -27,7 +34,9 @@ This script was written to solve the following use cases.
 
 # Versions Supported
 
-The closer the source and destination are in versions, the better the chance for success.  Big jumps, such as going from `4.0.4` to `2020.2.6` have a small chance of success.  Small jumps, going from `2020.1` to `2020.2` have a much, much, much better chance.
+It _should_ work with any Octopus version `3.4` or higher.  It was developed by testing against a version running `2020.x`.  Take from that what you will.    
+
+The key factor here is the difference in version between the source server and destination server.  The closer the source and destination are in versions, the better the chance for success.  Big jumps, such as going from `4.0.4` to `2020.2.6` have a small chance of success.  Small jumps, going from `2020.1` to `2020.2` have a much, much, much better chance.
 
 This script does its best to exclude items found in newer versions of Octopus that are not in older versions.  
 
