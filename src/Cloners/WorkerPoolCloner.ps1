@@ -21,7 +21,12 @@ function Copy-OctopusWorkerPools
     }
 
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.WorkerPoolList -itemType "Worker Pool List" -filters $cloneScriptOptions.WorkerPoolsToClone
-    
+
+    foreach ($workerPool in $filteredList)
+    {      
+        Add-PropertyIfMissing -objectToTest $workerPool -propertyName "WorkerPoolType" -propertyValue "StaticWorkerPool"                  
+    }
+
     Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.WorkerPoolList -DestinationSpaceId $destinationData.SpaceId -ApiKey $destinationData.OctopusApiKey -EndPoint "WorkerPools" -ItemTypeName "Worker Pools" -DestinationCanBeOverwritten $false -DestinationOctopusUrl $DestinationData.OctopusUrl
 
     Write-GreenOutput "Reloading destination worker pool list"

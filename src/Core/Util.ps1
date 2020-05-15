@@ -92,13 +92,26 @@ function Test-OctopusObjectHasProperty
     if ($hasProperty)
     {
         Write-VerboseOutput "$propertyName property found."
+        return $true
     }
     else
     {
         Write-VerboseOutput "$propertyName property missing."
-    }
+        return $false
+    }    
+}
 
-    return $hasProperty
+function Add-PropertyIfMissing
+{
+    param(
+        $objectToTest,
+        $propertyName,
+        $propertyValue)
+    
+    if ((Test-OctopusObjectHasProperty -objectToTest $objectToTest -propertyName $propertyName) -eq $false)
+    {            
+        $objectToTest | Add-Member -MemberType NoteProperty -Name $propertyName -Value $propertyValue
+    }
 }
 
 function Copy-OctopusObject
