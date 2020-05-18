@@ -29,7 +29,7 @@ function Copy-OctopusWorkerPools
             Add-PropertyIfMissing -objectToTest $copyOfItemToClone -propertyName "WorkerPoolType" -propertyValue "StaticWorkerPool"                  
 
             Save-OctopusApiItem -Item $copyOfItemToClone `
-                -Endpoint "projectgroups" `
+                -Endpoint "workerpools" `
                 -ApiKey $destinationData.OctopusApiKey `
                 -SpaceId $destinationData.SpaceId `
                 -OctopusUrl $destinationData.OctopusUrl
