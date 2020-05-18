@@ -5,7 +5,7 @@ function Copy-OctopusWorkerPools
         $destinationData,
         $cloneScriptOptions
     )
-    
+
     if ($sourceData.HasWorkers -eq $false -or $destinationData.HasWorkers -eq $false)
     {
         Write-YellowOutput "The source or destination Octopus instance doesn't have workers, skipping cloning workers"

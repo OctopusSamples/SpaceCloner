@@ -26,6 +26,14 @@ function Write-YellowOutput
     Write-VerboseOutput $message
 }
 
+function Write-RedOutput
+{
+    param ($message)
+
+    Write-Host $message -ForegroundColor Red
+    Write-VerboseOutput $message
+}
+
 function Write-CleanUpOutput
 {
     param($message)

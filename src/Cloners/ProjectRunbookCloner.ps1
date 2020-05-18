@@ -21,8 +21,7 @@ function Copy-OctopusProjectRunbooks
     foreach ($runbook in $sourceRunbooks)
     {
         $destinationRunbook = Get-OctopusItemByName -ItemList $destinationRunbooks -ItemName $runbook.Name
-
-        $canProceed = $false
+        
         if ($null -eq $destinationRunbook)
         {
             $runbookToClone = Copy-OctopusObject -ItemToCopy $runbook -SpaceId $destinationData.SpaceId -ClearIdValue $true
@@ -32,8 +31,7 @@ function Copy-OctopusProjectRunbooks
             $runbookToClone.RunbookProcessId = $null            
 
             Write-GreenOutput "The runbook $($runbook.Name) for $($destinationProject.Name) doesn't exist, creating it now"
-            $destinationRunbook = Save-OctopusApiItem -Item $runbookToClone -Endpoint "runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
-            $canProceed = $true
+            $destinationRunbook = Save-OctopusApiItem -Item $runbookToClone -Endpoint "runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId            
         }
         
         $sourceRunbookProcess = Get-OctopusApi -EndPoint $runbook.Links.RunbookProcesses -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $null

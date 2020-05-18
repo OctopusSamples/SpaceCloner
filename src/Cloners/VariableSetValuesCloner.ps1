@@ -101,19 +101,7 @@ function Copy-OctopusVariableSetValues
         if ($foundCounter -gt 1 -and $variableExistsOnDestination -eq $true -and $CloneScriptOptions.AddAdditionalVariableValuesOnExistingVariableSets -eq $true)
         {
             Write-YellowOutput "The variable $variableName already exists on destination. You selected to skip duplicate instances, skipping."
-        }
-        elseif ($octopusVariable.Type -eq "AmazonWebServicesAccount" -and $destinationData.HasAWSSupport -eq $false)
-        {
-            Write-YellowOutput "The variable $variableName is an AWS Account Type, the destination does not support that variable type, skipping."
-        }
-        elseif ($octopusVariable.Type -eq "AzureAccount" -and $destinationData.HasAzureVariableTypeSupport -eq $false)
-        {
-            Write-YellowOutput "The variable $variableName is an Azure Account Type, the destination does not support that variable type, skipping."
-        }
-        elseif ($octopusVariable.Type -eq "WorkerPool" -and $destinationData.HasWorkerPoolVariableTypeSupport -eq $false)
-        {
-            Write-YellowOutput "The variable $variableName is a WorkerPool Type, the destination does not support that variable type, skipping."
-        }
+        }       
         elseif ($foundIndex -eq -1)
         {
             Write-GreenOutput "New variable $variableName value found.  This variable has appeared so far $($variableTracker[$trackingName]) time(s) in the source variable set.  Adding to list."

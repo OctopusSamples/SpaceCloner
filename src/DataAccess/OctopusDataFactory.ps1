@@ -222,45 +222,21 @@ function Get-OctopusData
     }
 
     $octopusData.ApiInformation = Get-OctopusApi -OctopusUrl $octopusUrl -SpaceId $null -EndPoint "/api" -ApiKey $octopusApiKey
-    Write-GreenOutput "The version of $octopusUrl is $($octopusData.ApiInformation.Version)"
+    $octopusData.Version = $octopusData.ApiInformation.Version
+    Write-GreenOutput "The version of $octopusUrl is $($octopusData.Version)"
 
     $splitVersion = $octopusData.ApiInformation.Version -split "\."
-    $octopusData.HasSpaces = [int]$splitVersion[0] -ge 2019
+    $octopusData.MajorVersion = [int]$splitVersion[0]
+    $octopusData.MinorVersion = [int]$splitVersion[1]
+    $octopusData.HasSpaces = $octopusData.MajorVersion -ge 2019
     Write-GreenOutput "This version of Octopus has spaces $($octopusData.HasSpaces)"
-    
-    $octopusData.HasWorkers = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 7) -or [int]$splitVersion[0] -ge 2019
+
+    $octopusData.HasRunbooks = ($octopusData.MajorVersion -ge 2019 -and $octopusData.MinorVersion -ge 11) -or $octopusData.MajorVersion -ge 2020
+    Write-GreenOutput "This version of Octopus has runbooks $($octopusData.HasSpaces)"
+
+    $octopusData.HasWorkers = ($octopusData.MajorVersion -ge 2018 -and $octopusData.MinorVersion -ge 7) -or $octopusData.MajorVersion -ge 2019
     Write-GreenOutput "This version of Octopus has workers $($octopusData.HasWorkers)"
-
-    $octopusData.HasRunbooks = ([int]$splitVersion[0] -ge 2019 -and [int]$splitVersion[1] -ge 10) -or [int]$splitVersion[0] -ge 2020
-    Write-GreenOutput "This version of Octopus has runbooks $($octopusData.HasRunBooks)"
-
-    $octopusData.HasAWSSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 2) -or [int]$splitVersion[0] -ge 2019
-    Write-GreenOutput "This version of Octopus has AWS $($octopusData.HasAWSSupport)"
-
-    $octopusData.HasTokenSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 9) -or [int]$splitVersion[0] -ge 2019
-    Write-GreenOutput "This version of Octopus has Token Account Types $($octopusData.HasTokenSupport)"
-
-    $octopusData.HasAzureVariableTypeSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 5) -or [int]$splitVersion[0] -ge 2019
-    Write-GreenOutput "This version of Octopus has Azure Variable Type Support $($octopusData.HasAzureVariableTypeSupport)"
-
-    $octopusData.HasWorkerPoolVariableTypeSupport = [int]$splitversion[0] -ge 2020
-    Write-GreenOutput "This version of Octopus has Worker Pool Variable Type Support $($octopusData.HasWorkerPoolVariableTypeSupport)"
-
-    $octopusData.HasOctopusProjectsFeedTypeSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 2) -or [int]$splitVersion[0] -ge 2019
-    Write-GreenOutput "This version of Octopus has deploy a project $($octopusData.HasProjectsFeedTypeSupport)"
-
-    $octopusData.HasMavenFeedTypeSupport = [int]$splitVersion[0] -ge 2018
-    Write-GreenOutput "This version of Octopus has Maven feed type support $($octopusData.HasMavenFeedTypeSupport)"
-
-    $octopusData.HasGitHubFeedTypeSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 3) -or [int]$splitVersion[0] -ge 2019
-    Write-GreenOutput "This version of Octopus has github feed type $($octopusData.HasGitHubFeedTypeSupport)"
-
-    $octopusData.HasK8sSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 8) -or [int]$splitVersion[0] -ge 2019
-    Write-GreenOutput "This version of Octopus has kubernetes $($octopusData.HasK8sSupport)"
-
-    $octopusData.HasTerraformSupport = ([int]$splitVersion[0] -ge 2018 -and [int]$splitVersion[1] -ge 3) -or [int]$splitVersion[0] -ge 2019
-    Write-GreenOutput "This version of Octopus has terraform support $($octopusData.HasTerraformSupport)"
-
+        
     $octopusData.SpaceId = Get-OctopusSpaceId -octopusUrl $octopusUrl -octopusApiKey $octopusApiKey -hasSpaces $OctopusData.HasSpaces    
 
     Write-GreenOutput "Getting Environments for $spaceName in $octopusUrl"

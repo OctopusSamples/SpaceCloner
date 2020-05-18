@@ -11,8 +11,9 @@ This script was developed by the Customer Success team at Octopus Deploy.  We us
 Submit an issue if you encounter a bug.  We will triage it and give you a decision on if it will be fixed.
 
 What won't be fixed:
-- Failures as a result of cloning from massive differences in versions, for example `3.17.14` to `2020.2.6`.  However, if it is a small difference in versions, we are much more likely to fix it.
+- Failures as a result of cloning from differences in versions, for example `3.17.14` to `2020.2.6`.  
 - Certain Excluded Object Types (sensitive variables, targets, workers, etc).  They were excluded for a specific reason.  
+- Bugs from versions `3.x`, or `2018.x`.  If the script happens to work for those versions, yay, but it is unsupported.
 
 ## What about feature requests?
 Unless it is something we (Customer Success) needs, we probably won't add it ourselves.  We encourage you to fork the repo, add your desired functionality.  If you think others will benefit submit a PR.
@@ -34,11 +35,13 @@ This script was written to solve the following use cases.
 
 # Versions Supported
 
-It _should_ work with any Octopus version `3.4` or higher.  It was developed by testing against a version running `2020.x`.  Take from that what you will.    
+It _should_ work with any Octopus version `3.4` or higher.  It was developed by testing against a version running `2020.x`.  Take from that what you will. 
 
-The key factor here is the difference in version between the source server and destination server.  The closer the source and destination are in versions, the better the chance for success.  Big jumps, such as going from `4.0.4` to `2020.2.6` have a small chance of success.  Small jumps, going from `2020.1` to `2020.2` have a much, much, much better chance.
+The script will run a check at the start to compare the major and minor versions of the source and destination.  
 
-This script does its best to exclude items found in newer versions of Octopus that are not in older versions.  
+**Unless the source and destination major.minor versions are the same, the script will not proceed.**
+
+You will notice some version checks being run in the script.  This is to prevent the script from calling the API when it shouldn't.
 
 # How it works
 You provide the a source Octopus instance space and a destination Octopus instance space.  It will hit the API of both instances and copy items from the source space into the destination space.

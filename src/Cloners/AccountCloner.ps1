@@ -10,12 +10,7 @@ function Copy-OctopusInfrastructureAccounts
 
     Write-CleanUpOutput "Starting Infrastructure Accounts"
     foreach($account in $filteredList)
-    {
-        if ((Get-OctopusAccountTypeSupportedOnDestination -account $account -destinationData $DestinationData) -eq $false)
-        {
-            continue
-        }        
-
+    {             
         $matchingAccount = Get-OctopusItemByName -ItemName $account.Name -ItemList $DestinationData.InfrastructureAccounts
 
         if ($null -eq $matchingAccount)
@@ -43,28 +38,6 @@ function Copy-OctopusInfrastructureAccounts
 
     Write-GreenOutput "Reloading the destination accounts"    
     $destinationData.InfrastructureAccounts = Get-OctopusInfrastructureAccounts -OctopusServerUrl $($destinationData.OctopusUrl) -ApiKey $($destinationData.OctopusApiKey) -SpaceId $($destinationData.SpaceId)
-}
-
-function Get-OctopusAccountTypeSupportedOnDestination
-{
-    param (
-        $account,
-        $destinationData
-    )
-
-    if ($accountClone.AccountType -eq "AmazonWebServicesAccount" -and $destinationData.HasAWSSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The account $($Account.Name) is an $($action.AccountType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($accountClone.AccountType -eq "Token" -and $destinationData.HasTokenSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The account $($Account.Name) is an $($action.AccountType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    return $true
 }
 
 function Convert-OctopusAWSAccountInformation
