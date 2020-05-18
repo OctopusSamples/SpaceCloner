@@ -23,10 +23,10 @@ Please see the [how it works page](docs/HowItWorks.md).
 Please see the [debugging and logging page](docs/Debugging.md).
 
 # Reference
-Please see [parameter reference page](docs/ParameterReference.md)
+Please see [parameter reference page](docs/ParameterReference.md).
 
 # Examples
-Please see the [example page](docs/Examples.md)
+Please see the [example page](docs/Examples.md).
 
 # FAQ
 Some common questions and answers about this sample project.
@@ -37,7 +37,8 @@ This script was developed by the Customer Success team at Octopus Deploy.  We us
 ### Will you fix my bug?  
 Maybe.  As this is a sample script we may or may not fix it.  You can submit an issue.  We will triage it and give you a decision on if it will be fixed.  You are free to fork this repo and fix the issue yourself.
 
-What won't be fixed:
+### What won't be fixed
+The following issues we have no intention of every fixing.
 - Failures as a result of cloning from differences in versions, for example `3.17.14` to `2020.2.6`.  
 - Certain Excluded Object Types (sensitive variables, targets, workers, etc).  They were excluded for a specific reason.  
 - Bugs from versions `3.x`, or `2018.x`.  If the script happens to work for those versions, yay, but it is unsupported.
