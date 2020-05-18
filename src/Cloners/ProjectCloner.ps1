@@ -6,9 +6,9 @@ function Copy-OctopusProjects
         $CloneScriptOptions
     )  
     
-    if ([string]::IsNullOrWhiteSpace($CloneScriptOptions.ChildProjectsToSync) -eq $false)
+    if ([string]::IsNullOrWhiteSpace($CloneScriptOptions.ParentProjectName) -eq $false -or [string]::IsNullOrWhiteSpace($CloneScriptOptions.ChildProjectsToSync) -eq $false)
     {
-        Write-YellowOutput "You have elected to sync child projects with a master template, skipping the normal project cloner"
+        Write-YellowOutput "You have elected to sync child projects with a parent project, skipping the normal project cloner"
         return
     }
 

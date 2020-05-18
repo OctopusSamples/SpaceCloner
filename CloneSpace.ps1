@@ -16,7 +16,7 @@ param (
     $LibraryVariableSetsToClone,
     $LifeCyclesToClone,    
     $ProjectsToClone,
-    $TemplateProjectName,
+    $ParentProjectName,
     $ChildProjectsToSync,
     $TenantsToClone,
     $OverwriteExistingVariables,
@@ -38,7 +38,7 @@ param (
 . ($PSScriptRoot + ".\src\Cloners\ExternalFeedCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\LibraryVariableSetCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\LifecycleCloner.ps1")
-. ($PSScriptRoot + ".\src\Cloners\MasterProjectTemplateSyncer.ps1")
+. ($PSScriptRoot + ".\src\Cloners\ParentProjectTemplateSyncer.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProcessCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectChannelCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectCloner.ps1")
@@ -98,7 +98,7 @@ $CloneScriptOptions = @{
     TenantsToClone = $TenantsToClone;
     CloneProjectRunbooks = $CloneProjectRunbooks;
     ChildProjectsToSync = $ChildProjectsToSync;
-    TemplateProjectName = $TemplateProjectName;
+    ParentProjectName = $ParentProjectName;
 }
 
 $sourceData = Get-OctopusData -octopusUrl $SourceOctopusUrl -octopusApiKey $SourceOctopusApiKey -spaceName $SourceSpaceName

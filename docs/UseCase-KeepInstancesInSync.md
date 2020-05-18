@@ -36,8 +36,10 @@ Please refer to the [Parameter reference page](ParameterReference.md) for more d
 For this example will clone a specific project, but it will exclude all environments, accounts, external feeds, tenants, and lifecycles as those will all likely be different between the two instances.  
 
 The other options are:
-- The variable cloning is set so it will only create a new variable if it comes across it.
-- Overwrite custom step templates as they will likely have changed with the process.  It is important to keep them up to date.
+- `OverwriteExistingVariables` - set to `false` to keep the differences preserved.  Any new variable found will be added.
+- `OverwriteExistingCustomStepTemplates` - Set to `True` so the step templates are kept in sync. You might have made some recent changes to the step template.  It is important to keep them up to date.
+- `AddAdditionalVariableValuesOnExistingVariableSets` - set to `false` to skip new variables values found for the same variable name.  
+- `OverwriteExistingLifecyclesPhases` - Set to `false` as the two instances will have different phases.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
@@ -53,7 +55,7 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -LibraryVariableSetsToClone "AWS*,Global,Notification,SQL Server" `
     -ProjectsToClone "Redgate - Feature Branch Example" `    
     -OverwriteExistingVariables "false" `
-    -OneInstanceOfVariableAllowedOnDestination "False" `
+    -AddAdditionalVariableValuesOnExistingVariableSets "False" `
     -OverwriteExistingCustomStepTemplates "true" `
     -OverwriteExistingLifecyclesPhases "false"
 ```
@@ -65,9 +67,10 @@ Please refer to the [Parameter reference page](ParameterReference.md) for more d
 For this example will clone a specific project, but it will exclude infrastructure accounts as those will likely be difference between data centers.  
 
 The other options are:
-- The variable cloning is set so it will only create a new variable if it comes across it.
-- Overwrite custom step templates as they will likely have changed with the process.  It is important to keep them up to date.
-- It will overwrite existing lifecycle phases as we want to keep those in sync.
+- `OverwriteExistingVariables` - set to `false` to keep the differences preserved.  Any new variable found will be added.
+- `OverwriteExistingCustomStepTemplates` - Set to `True` so the step templates are kept in sync. You might have made some recent changes to the step template.  It is important to keep them up to date.
+- `AddAdditionalVariableValuesOnExistingVariableSets` - set to `false` to skip variables values found for the same variable name.  
+- `OverwriteExistingLifecyclesPhases` - Set to `false` as the two instances will have different phases.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
@@ -88,7 +91,7 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -ProjectsToClone "Redgate - Feature Branch Example" `
     -TenantsToClone "all" `
     -OverwriteExistingVariables "false" `
-    -OneInstanceOfVariableAllowedOnDestination "False" `
+    -AddAdditionalVariableValuesOnExistingVariableSets "False" `
     -OverwriteExistingCustomStepTemplates "true" `
     -OverwriteExistingLifecyclesPhases "true"
 ```

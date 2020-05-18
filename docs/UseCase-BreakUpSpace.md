@@ -22,6 +22,11 @@ Please refer to the [Parameter reference page](ParameterReference.md) for more d
 
 This example will clone a project from one space (along with its dependencies) to another on the same instance.  It includes only dependencies the project cares about.
 
+- `OverwriteExistingVariables` - set to `false` to keep the differences preserved.  Any new variable found will be added still.
+- `AddAdditionalVariableValuesOnExistingVariableSets` - set to `false` so any new values (specifically around scoping) are not added.  
+- `OverwriteExistingCustomStepTemplates` - Set to `false` so the step templates are not updated. 
+- `OverwriteExistingLifecyclesPhases` - Set to `false` as the two spaces will have different phases.
+
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" `
     -SourceOctopusApiKey "SOME KEY" `
@@ -41,7 +46,7 @@ CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" `
     -ProjectsToClone "Redgate - Feature Branch Example" `
     -TenantsToClone "all" `
     -OverwriteExistingVariables "false" `
-    -OneInstanceOfVariableAllowedOnDestination "False" `
+    -AddAdditionalVariableValuesOnExistingVariableSets "False" `
     -OverwriteExistingCustomStepTemplates "false" `
     -OverwriteExistingLifecyclesPhases "false"
 ```
