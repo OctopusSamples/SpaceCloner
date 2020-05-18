@@ -1,9 +1,3 @@
-. ($PSScriptRoot + ".\..\Core\Logging.ps1")
-. ($PSScriptRoot + ".\..\Core\Util.ps1")
-
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
-
 function Copy-OctopusTenantTags
 {
     param(
@@ -16,7 +10,7 @@ function Copy-OctopusTenantTags
     
     foreach($tagSet in $filteredList)
     {
-        Write-VerboseOutput "Cloning Tag Set $($tagSet.Name)"
+        Write-VerboseOutput "Starting Clone Of Tag Set $($tagSet.Name)"
         
         $matchingItem = Get-OctopusItemByName -ItemName $tagSet.Name -ItemList $destinationData.TenantTagList
         

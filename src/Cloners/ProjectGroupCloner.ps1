@@ -1,11 +1,3 @@
-. ($PSScriptRoot + ".\..\Core\Logging.ps1")
-. ($PSScriptRoot + ".\..\Core\Util.ps1")
-
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
-
-. ($PSScriptRoot + ".\BasicCloner.ps1")
-
 function Copy-OctopusProjectGroups
 {
     param(
@@ -16,9 +8,30 @@ function Copy-OctopusProjectGroups
     
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.ProjectGroupList -itemType "Project Groups" -filters $cloneScriptOptions.ProjectGroupsToClone
     
-    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.ProjectGroupList -EndPoint "projectgroups" -ApiKey $($destinationData.OctopusApiKey) -destinationSpaceId $destinationData.SpaceId -ItemTypeName "Project Groups" -DestinationCanBeOverwritten $false -DestinationOctopusUrl $destinationData.OctopusUrl
-
-    Write-GreenOutput "Reloading destination project groups"
+    foreach ($projectGroup in $filteredList)
+    {
+        Write-VerboseOutput "Starting Clone Of Project Group $($projectGroup.Name)"
         
+        $matchingItem = Get-OctopusItemByName -ItemName $projectGroup.Name -ItemList $destinationData.ProjectGroupList                
+
+        If ($null -eq $matchingItem)
+        {
+            Write-GreenOutput "Project Group $($projectGroup.Name) was not found in destination, creating new record."  
+
+            $copyOfItemToClone = Copy-OctopusObject -ItemToCopy $projectGroup -SpaceId $destinationData.SpaceId -ClearIdValue $true                                          
+
+            Save-OctopusApiItem -Item $copyOfItemToClone `
+                -Endpoint "projectgroups" `
+                -ApiKey $destinationData.OctopusApiKey `
+                -SpaceId $destinationData.SpaceId `
+                -OctopusUrl $destinationData.OctopusUrl
+        }
+        else 
+        {
+            Write-GreenOutput "Project Group $($workerPool.Name) already exists in destination, skipping"    
+        }
+    } 
+    
+    Write-GreenOutput "Reloading destination project groups"        
     $destinationData.ProjectGroupList = Get-ProjectGroups -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
 }

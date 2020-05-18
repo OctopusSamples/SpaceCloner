@@ -77,7 +77,7 @@ function Convert-SourceIdListToDestinationIdList
         }
     }
 
-    return $NewIdList
+    return @($NewIdList)
 }
 
 function Test-OctopusObjectHasProperty

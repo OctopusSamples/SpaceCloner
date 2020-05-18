@@ -1,9 +1,3 @@
-. ($PSScriptRoot + ".\..\Core\Logging.ps1")
-. ($PSScriptRoot + ".\..\Core\Util.ps1")
-
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
-
 function Copy-OctopusInfrastructureAccounts
 {
     param(
@@ -17,7 +11,10 @@ function Copy-OctopusInfrastructureAccounts
     Write-CleanUpOutput "Starting Infrastructure Accounts"
     foreach($account in $filteredList)
     {
-        Write-VerboseOutput "Cloning the account $($account.Name)"
+        if ((Get-OctopusAccountTypeSupportedOnDestination -account $account -destinationData $DestinationData) -eq $false)
+        {
+            continue
+        }        
 
         $matchingAccount = Get-OctopusItemByName -ItemName $account.Name -ItemList $DestinationData.InfrastructureAccounts
 
@@ -26,49 +23,14 @@ function Copy-OctopusInfrastructureAccounts
             Write-GreenOutput "The account $($account.Name) does not exist.  Creating it."
 
             $accountClone = Copy-OctopusObject -ItemToCopy $account -ClearIdValue $true -SpaceId $DestinationData.SpaceId
+
+            $accountClone.EnvironmentIds = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $accountClone.EnvironmentIds            
+            $accountClone.TenantIds = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.TenantList -DestinationList $DestinationData.TenantList -IdList $accountClone.TenantIds
             
-            if ($accountClone.AccountType -eq "AmazonWebServicesAccount")
-            {
-                if ($destinationData.HasAWSSupport -eq $false)
-                {
-                    Write-YellowOutput "The destination does not support AWS Accounts Skipping this account"
-                    continue
-                }
-
-                $accountClone.AccessKey = "AKIABCDEFGHI3456789A"
-                $accountClone.SecretKey.HasValue = $false
-                $accountClone.SecretKey.NewValue = "DUMMY VALUE DUMMY VALUE"
-            }
-            elseif ($accountClone.AccountType -eq "AzureServicePrincipal")
-            {
-                $accountClone.SubscriptionNumber = New-Guid
-                $accountClone.ClientId = New-Guid
-                $accountClone.TenantId = New-Guid
-                $accountClone.Password.HasValue = $false
-                $accountClone.Password.NewValue = "DUMMY VALUE DUMMY VALUE"
-            }
-            elseif($accountClone.AccountType -eq "Token")
-            {
-                if ($destinationData.HasTokenSupport -eq $false)
-                {          
-                    Write-YellowOutput "The destination does not support Token Accounts skipping this account"                              
-                    continue
-                }
-
-                $accountClone.Token.HasValue = $false
-                $accountClone.Token.NewValue = "DUMMY VALUE"                
-            }
-
-            $NewEnvironmentIds = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $accountClone.EnvironmentIds            
-            $accountClone.EnvironmentIds = @($NewEnvironmentIds)
-
-            $NewTenantIds = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.TenantList -DestinationList $DestinationData.TenantList -IdList $accountClone.TenantIds
-            $accountClone.TenantIds = @($NewTenantIds)
-
-            if ($accountClone.TenantIds.Length -eq 0)
-            {
-                $accountClone.TenantedDeploymentParticipation = "Untenanted"
-            }            
+            Convert-OctopusAWSAccountInformation -accountClone $accountClone
+            Convert-OctopusAzureServicePrincipalAccount -accountClone $accountClone
+            Convert-OctopusTokenAccount -accountClone $accountClone                                
+            Convert-OctopusAccountTenantedDeploymentParticipation -accountClone $accountClone                       
 
             Save-OctopusApiItem -Item $accountClone -Endpoint "accounts" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $DestinationData.OctopusUrl -SpaceId $DestinationData.SpaceId            
             Write-CleanUpOutput "Account $($account.Name) was created with dummy values."
@@ -79,7 +41,81 @@ function Copy-OctopusInfrastructureAccounts
         }
     }
 
-    Write-GreenOutput "Reloading the destination accounts"
-    
+    Write-GreenOutput "Reloading the destination accounts"    
     $destinationData.InfrastructureAccounts = Get-OctopusInfrastructureAccounts -OctopusServerUrl $($destinationData.OctopusUrl) -ApiKey $($destinationData.OctopusApiKey) -SpaceId $($destinationData.SpaceId)
+}
+
+function Get-OctopusAccountTypeSupportedOnDestination
+{
+    param (
+        $account,
+        $destinationData
+    )
+
+    if ($accountClone.AccountType -eq "AmazonWebServicesAccount" -and $destinationData.HasAWSSupport -eq $false)
+    {
+        Write-YellowOutput -Message "The account $($Account.Name) is an $($action.AccountType), which isn't supported by the destination, skipping"
+        return $false
+    }
+
+    if ($accountClone.AccountType -eq "Token" -and $destinationData.HasTokenSupport -eq $false)
+    {
+        Write-YellowOutput -Message "The account $($Account.Name) is an $($action.AccountType), which isn't supported by the destination, skipping"
+        return $false
+    }
+
+    return $true
+}
+
+function Convert-OctopusAWSAccountInformation
+{
+    param ($accountClone)
+
+    if ($accountClone.AccountType -ne "AmazonWebServicesAccount")
+    {
+        return
+    } 
+
+    $accountClone.AccessKey = "AKIABCDEFGHI3456789A"
+    $accountClone.SecretKey.HasValue = $false
+    $accountClone.SecretKey.NewValue = "DUMMY VALUE DUMMY VALUE"    
+}
+
+function Convert-OctopusAzureServicePrincipalAccount
+{
+    param ($accountClone)
+
+    if ($accountClone.AccountType -ne "AzureServicePrincipal")
+    {
+        return
+    }
+
+    $accountClone.SubscriptionNumber = New-Guid
+    $accountClone.ClientId = New-Guid
+    $accountClone.TenantId = New-Guid
+    $accountClone.Password.HasValue = $false
+    $accountClone.Password.NewValue = "DUMMY VALUE DUMMY VALUE"    
+}
+
+function Convert-OctopusTokenAccount
+{
+    param ($accountClone)
+
+    if($accountClone.AccountType -ne "Token")
+    {
+        return
+    }
+
+    $accountClone.Token.HasValue = $false
+    $accountClone.Token.NewValue = "DUMMY VALUE"                    
+}
+
+function Convert-OctopusAccountTenantedDeploymentParticipation
+{
+    param ($accountClone)
+
+    if ($accountClone.TenantIds.Length -eq 0)
+    {
+        $accountClone.TenantedDeploymentParticipation = "Untenanted"
+    }
 }

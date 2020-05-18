@@ -188,6 +188,7 @@ The script accepts the following parameters.
 - OverwriteExistingCustomStepTemplates - Indicates if existing custom step templates (not community step templates) should be overwritten.  Useful when you make a change to a step template you want to move over to another instance.  Possible values are `true` or `false`.  Defaults to `false`.
 - OverwriteExistingLifecyclesPhases - Indicates you want to overwrite the phases on existing lifecycles.  This is useful when you have an updated lifecycle you want applied to applied to another space/instance.  You would want to leave this to false if the destination lifecycle has different phases.  Possible values are `true` or `false`.  Defaults to `false`.
 - OverwriteExistingVariables - Indicates if all existing variables (except sensitive variables) should be overwritten.  Possible values are `true` or `false`.  Defaults to `false`.
+- CloneProjectRunbooks - Indicates if project runbooks should be cloned or should be skipped.  This is useful when you just want a quick copy of a project and the variables, but not the runbooks.  Possible values are `true` or `false`.  Defaults to `true`.
 - AddAdditionalVariableValuesOnExistingVariableSets - Indicates a variable on the destination should only have one value.  You would have multiple values if you were scoping variables.  Possible values are `true` or `false`.  Defaults to `false`.
 
 ## AddAdditionalVariableValuesOnExistingVariableSets further detail

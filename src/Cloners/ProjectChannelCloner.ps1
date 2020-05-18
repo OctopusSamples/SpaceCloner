@@ -1,0 +1,35 @@
+function Copy-OctopusProjectChannels
+{
+    param(
+        $sourceChannelList,
+        $destinationChannelList,
+        $destinationProject,
+        $sourceData,
+        $destinationData
+    )
+
+    foreach($channel in $sourceChannelList)
+    {
+        $matchingChannel = Get-OctopusItemByName -ItemList $destinationChannelList -ItemName $channel.Name
+
+        if ($null -eq $matchingChannel)
+        {
+            $cloneChannel = Copy-OctopusObject -ItemToCopy $channel -ClearIdValue $false -SpaceId $destinationData.SpaceId
+            $cloneChannel.Id = $null
+            $cloneChannel.ProjectId = $destinationProject.Id
+            if ($null -ne $cloneChannel.LifeCycleId)
+            {
+                $cloneChannel.LifeCycleId = Convert-SourceIdToDestinationId -SourceList $SourceData.LifeCycleList -DestinationList $DestinationData.LifeCycleList -IdValue $cloneChannel.LifeCycleId
+            }
+
+            $cloneChannel.Rules = @()
+
+            Write-GreenOutput "The channel $($channel.Name) does not exist for the project $($destinationProject.Name), creating one now.  Please note, I cannot create version rules, so those will be emptied out"
+            Save-OctopusApiItem -Item $cloneChannel -Endpoint "channels" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+        }        
+        else
+        {
+            Write-GreenOutput "The channel $($channel.Name) already exists for project $($destinationProject.Name).  Skipping it."
+        }
+    }
+}

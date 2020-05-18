@@ -1,9 +1,3 @@
-. ($PSScriptRoot + ".\..\Core\Logging.ps1")
-. ($PSScriptRoot + ".\..\Core\Util.ps1")
-
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
-
 function Copy-OctopusStepTemplates
 {
     param(
@@ -14,27 +8,41 @@ function Copy-OctopusStepTemplates
 
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.StepTemplates -itemType "Step Templates" -filters $cloneScriptOptions.StepTemplatesToClone
 
-    foreach ($clonedItem in $filteredList)
+    foreach ($stepTemplate in $filteredList)
     {
-        Write-VerboseOutput "Cloning step template $($clonedItem.Name)"
+        Write-VerboseOutput "Starting Clone of step template $($stepTemplate.Name)"
         
-        $matchingItem = Get-OctopusItemByName -ItemName $clonedItem.Name -ItemList $destinationData.StepTemplates       
+        $matchingItem = Get-OctopusItemByName -ItemName $stepTemplate.Name -ItemList $destinationData.StepTemplates       
 
-        if ($null -ne $clonedItem.CommunityActionTemplateId -and $null -eq $matchingItem)
+        if ($null -ne $stepTemplate.CommunityActionTemplateId -and $null -eq $matchingItem)
         {
-            Write-GreenOutput "This is a step template which hasn't been install yet, pulling down from the interwebs"
-            $destinationTemplate = Get-OctopusItemByName -ItemList $destinationData.CommunityActionTemplates -ItemName $clonedItem.Name            
+            Write-GreenOutput "The step template $($stepTemplate.Name) is a community step template and it hasn't been installed yet, installing"
+            $destinationTemplate = Get-OctopusItemByName -ItemList $destinationData.CommunityActionTemplates -ItemName $stepTemplate.Name            
 
             Save-OctopusApi -OctopusUrl $destinationData.OctopusUrl -SpaceId $null -EndPoint "/communityactiontemplates/$($destinationTemplate.Id)/installation/$($destinationData.SpaceId)" -ApiKey $destinationData.OctopusApiKey -Method POST
         }        
-        elseif ($null -eq $clonedItem.CommunityActionTemplateId)
+        elseif ($null -eq $stepTemplate.CommunityActionTemplateId -and $null -ne $matchingItem -and $cloneScriptOptions.OverwriteExistingCustomStepTemplates -eq $false)
         {
-            Write-GreenOutput "This is a custom step template following normal cloning logic"
-            Copy-OctopusItem -ClonedItem $clonedItem -DestinationItemList $destinationData.StepTemplates -DestinationSpaceId $destinationData.SpaceId -ApiKey $destinationData.OctopusApiKey -EndPoint "actiontemplates" -ItemTypeName "Custom Step Template" -DestinationCanBeOverwritten $cloneScriptOptions.OverwriteExistingCustomStepTemplates -DestinationOctopusUrl $destinationData.OctopusUrl
+            Write-GreenOutput "The step template $($stepTemplate.Name) already exists on the destination machine and you elected to skip existing step templates, skipping"                        
         }                
+        else 
+        {
+            Write-GreenOutput "Saving $($stepTemplate.Name) to destination."
+
+            $stepTemplateToClone = Copy-OctopusObject -ItemToCopy $workerpool -SpaceId $destinationData.SpaceId -ClearIdValue $true    
+            if ($null -ne $matchingItem)
+            {
+                $stepTemplateToClone.Id = $matchingItem.Id
+            }
+
+            Save-OctopusApiItem -Item $stepTemplateToClone `
+                -Endpoint "actiontemplates" `
+                -ApiKey $destinationData.OctopusApiKey `
+                -SpaceId $destinationData.SpaceId `
+                -OctopusUrl $destinationData.OctopusUrl
+        }        
     }
 
-    Write-GreenOutput "Reloading step template list"
-    
+    Write-GreenOutput "Reloading step template list"    
     $destinationData.StepTemplates = Get-OctopusStepTemplateList -SpaceId $($destinationData.SpaceId) -OctopusServerUrl $($destinationData.OctopusUrl) -ApiKey $($destinationData.OctopusApiKey)
 }

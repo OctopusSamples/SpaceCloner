@@ -1,9 +1,3 @@
-. ($PSScriptRoot + ".\..\Core\Logging.ps1")
-. ($PSScriptRoot + ".\..\Core\Util.ps1")
-
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
-
 function Copy-OctopusTenants
 {
     param(
@@ -17,6 +11,8 @@ function Copy-OctopusTenants
 
     foreach($tenant in $filteredList)
     {
+        Write-GreenOutput "Starting clone of tenant $($tenant.Name)"
+        
         $matchingTenant = Get-OctopusItemByName -ItemName $tenant.Name -ItemList $destinationData.TenantList
 
         if ($null -eq $matchingTenant)

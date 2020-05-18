@@ -20,7 +20,8 @@ param (
     $OverwriteExistingVariables,
     $AddAdditionalVariableValuesOnExistingVariableSets,
     $OverwriteExistingCustomStepTemplates,
-    $OverwriteExistingLifecyclesPhases   
+    $OverwriteExistingLifecyclesPhases,
+    $CloneProjectRunbooks   
 )
 
 . ($PSScriptRoot + ".\src\Core\Logging.ps1")
@@ -30,14 +31,18 @@ param (
 . ($PSScriptRoot + ".\src\DataAccess\OctopusDataFactory.ps1")
 
 . ($PSScriptRoot + ".\src\Cloners\AccountCloner.ps1")
-. ($PSScriptRoot + ".\src\Cloners\BasicCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\ActionCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\EnvironmentCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ExternalFeedCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\LibraryVariableSetCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\LifecycleCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProcessCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\ProjectChannelCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\ProjectDeploymentProcessCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectGroupCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\ProjectRunbookCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\ProjectVariableCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\StepTemplateCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\TenantCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\TenantTagSetCloner.ps1")
@@ -67,6 +72,11 @@ if ($null -eq $OverwriteExistingLifecyclesPhases)
     $OverwriteExistingLifecyclesPhases = $false
 }
 
+if ($null -eq $CloneProjectRunbooks)
+{
+    $CloneProjectRunbooks = $true
+}
+
 $CloneScriptOptions = @{
     EnvironmentsToClone = $EnvironmentsToClone; 
     WorkerPoolsToClone = $WorkerPoolsToClone; 
@@ -83,6 +93,7 @@ $CloneScriptOptions = @{
     OverwriteExistingCustomStepTemplates = $OverwriteExistingCustomStepTemplates;
     OverwriteExistingLifecyclesPhases = $OverwriteExistingLifecyclesPhases;
     TenantsToClone = $TenantsToClone;
+    CloneProjectRunbooks = CloneProjectRunbooks;
 }
 
 $sourceData = Get-OctopusData -octopusUrl $SourceOctopusUrl -octopusApiKey $SourceOctopusApiKey -spaceName $SourceSpaceName

@@ -1,11 +1,3 @@
-. ($PSScriptRoot + ".\..\Core\Logging.ps1")
-. ($PSScriptRoot + ".\..\Core\Util.ps1")
-
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
-
-. ($PSScriptRoot + ".\BasicCloner.ps1")
-
 function Copy-OctopusWorkerPools
 {
     param(
@@ -23,11 +15,30 @@ function Copy-OctopusWorkerPools
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.WorkerPoolList -itemType "Worker Pool List" -filters $cloneScriptOptions.WorkerPoolsToClone
 
     foreach ($workerPool in $filteredList)
-    {      
-        Add-PropertyIfMissing -objectToTest $workerPool -propertyName "WorkerPoolType" -propertyValue "StaticWorkerPool"                  
-    }
+    {                              
+        Write-VerboseOutput "Starting Clone of Worker Pool $($workerPool.Name)"
+        
+        $matchingItem = Get-OctopusItemByName -ItemName $workerPool.Name -ItemList $destinationData.WorkerPoolList
+                
+        If ($null -eq $matchingItem)
+        {            
+            Write-GreenOutput "Worker Pool $($WorkerPool.Name) was not found in destination, creating new record."                                        
 
-    Copy-OctopusSimpleItems -SourceItemList $filteredList -DestinationItemList $destinationData.WorkerPoolList -DestinationSpaceId $destinationData.SpaceId -ApiKey $destinationData.OctopusApiKey -EndPoint "WorkerPools" -ItemTypeName "Worker Pools" -DestinationCanBeOverwritten $false -DestinationOctopusUrl $DestinationData.OctopusUrl
+            $copyOfItemToClone = Copy-OctopusObject -ItemToCopy $workerpool -SpaceId $destinationData.SpaceId -ClearIdValue $true    
+
+            Add-PropertyIfMissing -objectToTest $copyOfItemToClone -propertyName "WorkerPoolType" -propertyValue "StaticWorkerPool"                  
+
+            Save-OctopusApiItem -Item $copyOfItemToClone `
+                -Endpoint "projectgroups" `
+                -ApiKey $destinationData.OctopusApiKey `
+                -SpaceId $destinationData.SpaceId `
+                -OctopusUrl $destinationData.OctopusUrl
+        }
+        else 
+        {
+            Write-GreenOutput "Worker Pool $($workerPool.Name) already exists in destination, skipping"    
+        }
+    }    
 
     Write-GreenOutput "Reloading destination worker pool list"
     $destinationData.WorkerPoolList = Get-OctopusWorkerPoolList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 

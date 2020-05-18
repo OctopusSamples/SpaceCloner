@@ -1,11 +1,3 @@
-. ($PSScriptRoot + ".\..\Core\Logging.ps1")
-. ($PSScriptRoot + ".\..\Core\Util.ps1")
-
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataAdapter.ps1")
-. ($PSScriptRoot + ".\..\DataAccess\OctopusDataFactory.ps1")
-
-. ($PSScriptRoot + ".\BasicCloner.ps1")
-
 function Copy-OctopusLifecycles
 {
     param(
@@ -18,19 +10,35 @@ function Copy-OctopusLifecycles
 
     foreach ($lifecycle in $filteredList)
     {
-        $lifeCycleToClone = Copy-OctopusObject -ItemToCopy $lifecycle -ClearIdValue $false -SpaceId $null      
+        Write-GreenOutput "Starting clone of Lifecycle $($lifecycle.Name)"
 
-        foreach ($phase in $lifeCycleToClone.Phases)
+        $matchingItem = Get-OctopusItemByName -ItemName $lifecycle.Name -ItemList $destinationData.LifeCycleList   
+
+        if ($null -ne $matchingItem -and $CloneScriptOptions.OverwriteExistingLifecyclesPhases -eq $false)             
         {
-            $NewEnvironmentIds = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $phase.OptionalDeploymentTargets            
-            $phase.OptionalDeploymentTargets = @($NewEnvironmentIds)
+            Write-GreenOutput "Lifecycle already exists and you selected not to overwrite phases, skipping"
+            continue
+        }        
 
-            $NewEnvironmentIds = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $phase.AutomaticDeploymentTargets            
-            $phase.AutomaticDeploymentTargets = @($NewEnvironmentIds)
+        $lifeCycleToClone = Copy-OctopusObject -ItemToCopy $lifecycle -ClearIdValue $false -SpaceId $null  
+        
+        if ($null -ne $matchingItem)
+        {
+            $lifeCycleToClone.Id = $matchingItem.Id
         }
 
-        Copy-OctopusItem -ClonedItem $lifeCycleToClone -DestinationItemList $DestinationData.LifeCycleList -DestinationSpaceId $DestinationData.SpaceId -ApiKey $DestinationData.OctopusApiKey -EndPoint "lifecycles" -ItemTypeName "Lifecycle" -DestinationCanBeOverwritten $CloneScriptOptions.OverwriteExistingLifecyclesPhases -DestinationOctopusUrl $DestinationData.OctopusUrl
-    }
+        foreach ($phase in $lifeCycleToClone.Phases)
+        {            
+            $phase.OptionalDeploymentTargets = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $phase.OptionalDeploymentTargets
+            $phase.AutomaticDeploymentTargets = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $phase.AutomaticDeploymentTargets
+        }
+
+        Save-OctopusApiItem -Item $lifeCycleToClone `
+                -Endpoint "lifecycles" `
+                -ApiKey $destinationData.OctopusApiKey `
+                -SpaceId $destinationData.SpaceId `
+                -OctopusUrl $destinationData.OctopusUrl
+    }    
 
     Write-GreenOutput "Reloading destination lifecycles"
     
