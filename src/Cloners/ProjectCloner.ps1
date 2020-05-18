@@ -4,7 +4,13 @@ function Copy-OctopusProjects
         $SourceData,
         $DestinationData,
         $CloneScriptOptions
-    )    
+    )  
+    
+    if ([string]::IsNullOrWhiteSpace($CloneScriptOptions.ChildProjectsToSync) -eq $false)
+    {
+        Write-YellowOutput "You have elected to sync child projects with a master template, skipping the normal project cloner"
+        return
+    }
 
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.ProjectList -itemType "Projects" -filters $cloneScriptOptions.ProjectsToClone
 
@@ -22,7 +28,7 @@ function Copy-OctopusProjects
         $destinationChannels = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/channels" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
 
         Copy-OctopusProjectChannels -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData
-        Copy-OctopusProjectDeploymentProcess -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData 
+        Copy-OctopusProjectDeploymentProcess -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -sourceProject $project -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData 
 
         if ($CloneScriptOptions.CloneProjectRunbooks -eq $true)
         {
@@ -51,7 +57,7 @@ function Copy-OctopusProjectSettings
         $copyOfProject.VariableSetId = $null
         $copyOfProject.ClonedFromProjectId = $null        
 
-        $VariableSetIds = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.VariableSetList -DestinationList $DestinationData.VariableSetList -IdList $copyOfProject.IncludedLibraryVariableSetIds            
+        $VariableSetIds = @(Convert-SourceIdListToDestinationIdList -SourceList $SourceData.VariableSetList -DestinationList $DestinationData.VariableSetList -IdList $copyOfProject.IncludedLibraryVariableSetIds)
         $copyOfProject.IncludedLibraryVariableSetIds = @($VariableSetIds)
         $copyOfProject.ProjectGroupId = Convert-SourceIdToDestinationId -SourceList $SourceData.ProjectGroupList -DestinationList $DestinationData.ProjectGroupList -IdValue $copyOfProject.ProjectGroupId
         $copyOfProject.LifeCycleId = Convert-SourceIdToDestinationId -SourceList $SourceData.LifeCycleList -DestinationList $DestinationData.LifeCycleList -IdValue $copyOfProject.LifeCycleId        

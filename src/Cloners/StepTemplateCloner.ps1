@@ -12,7 +12,9 @@ function Copy-OctopusStepTemplates
     {
         Write-VerboseOutput "Starting Clone of step template $($stepTemplate.Name)"
         
-        $matchingItem = Get-OctopusItemByName -ItemName $stepTemplate.Name -ItemList $destinationData.StepTemplates       
+        $matchingItem = Get-OctopusItemByName -ItemName $stepTemplate.Name -ItemList $destinationData.StepTemplates
+        
+        Write-Host "The matching item is: $matchingItem"
 
         if ($null -ne $stepTemplate.CommunityActionTemplateId -and $null -eq $matchingItem)
         {
@@ -25,11 +27,11 @@ function Copy-OctopusStepTemplates
         {
             Write-GreenOutput "The step template $($stepTemplate.Name) already exists on the destination machine and you elected to skip existing step templates, skipping"                        
         }                
-        else 
+        elseif ($null -eq $stepTemplate.CommunityActionTemplateId) 
         {
             Write-GreenOutput "Saving $($stepTemplate.Name) to destination."
 
-            $stepTemplateToClone = Copy-OctopusObject -ItemToCopy $workerpool -SpaceId $destinationData.SpaceId -ClearIdValue $true    
+            $stepTemplateToClone = Copy-OctopusObject -ItemToCopy $stepTemplate -SpaceId $destinationData.SpaceId -ClearIdValue $true    
             if ($null -ne $matchingItem)
             {
                 $stepTemplateToClone.Id = $matchingItem.Id

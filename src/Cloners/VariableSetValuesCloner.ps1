@@ -20,14 +20,14 @@ function Copy-OctopusVariableSetValues
         if (Get-Member -InputObject $octopusVariable.Scope -Name "Environment" -MemberType Properties)
         {
             Write-VerboseOutput "$variableName has environment scoping, converting to destination values"
-            $NewEnvironmentIds = Convert-SourceIdListToDestinationIdList -SourceList $sourcedata.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $octopusVariable.Scope.Environment
+            $NewEnvironmentIds = @(Convert-SourceIdListToDestinationIdList -SourceList $sourcedata.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $octopusVariable.Scope.Environment)
             $octopusVariable.Scope.Environment = @($NewEnvironmentIds)            
         }
 
         if (Get-Member -InputObject $octopusVariable.Scope -Name "Channel" -MemberType Properties)
         {
             Write-VerboseOutput "$variableName has channel scoping, converting to destination values"
-            $NewChannelIds = Convert-SourceIdListToDestinationIdList -SourceList $sourceProjectData.ChannelList -DestinationList $DestinationProjectData.ChannelList -IdList $octopusVariable.Scope.Channel
+            $NewChannelIds = @(Convert-SourceIdListToDestinationIdList -SourceList $sourceProjectData.ChannelList -DestinationList $DestinationProjectData.ChannelList -IdList $octopusVariable.Scope.Channel)
             $octopusVariable.Scope.Channel = @($NewChannelIds)            
         }
 

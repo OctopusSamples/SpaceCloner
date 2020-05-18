@@ -20,7 +20,7 @@ function Copy-OctopusLifecycles
             continue
         }        
 
-        $lifeCycleToClone = Copy-OctopusObject -ItemToCopy $lifecycle -ClearIdValue $false -SpaceId $null  
+        $lifeCycleToClone = Copy-OctopusObject -ItemToCopy $lifecycle -ClearIdValue $true -SpaceId $null  
         
         if ($null -ne $matchingItem)
         {
@@ -29,8 +29,8 @@ function Copy-OctopusLifecycles
 
         foreach ($phase in $lifeCycleToClone.Phases)
         {            
-            $phase.OptionalDeploymentTargets = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $phase.OptionalDeploymentTargets
-            $phase.AutomaticDeploymentTargets = Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $phase.AutomaticDeploymentTargets
+            $phase.OptionalDeploymentTargets = @(Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $phase.OptionalDeploymentTargets)
+            $phase.AutomaticDeploymentTargets = @(Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $phase.AutomaticDeploymentTargets)
         }
 
         Save-OctopusApiItem -Item $lifeCycleToClone `

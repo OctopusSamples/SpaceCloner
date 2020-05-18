@@ -28,7 +28,7 @@ function Copy-OctopusProjectGroups
         }
         else 
         {
-            Write-GreenOutput "Project Group $($workerPool.Name) already exists in destination, skipping"    
+            Write-GreenOutput "Project Group $($projectGroup.Name) already exists in destination, skipping"    
         }
     } 
     

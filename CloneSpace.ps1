@@ -16,6 +16,8 @@ param (
     $LibraryVariableSetsToClone,
     $LifeCyclesToClone,    
     $ProjectsToClone,
+    $TemplateProjectName,
+    $ChildProjectsToSync,
     $TenantsToClone,
     $OverwriteExistingVariables,
     $AddAdditionalVariableValuesOnExistingVariableSets,
@@ -36,6 +38,7 @@ param (
 . ($PSScriptRoot + ".\src\Cloners\ExternalFeedCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\LibraryVariableSetCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\LifecycleCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\MasterProjectTemplateSyncer.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProcessCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectChannelCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectCloner.ps1")
@@ -93,7 +96,9 @@ $CloneScriptOptions = @{
     OverwriteExistingCustomStepTemplates = $OverwriteExistingCustomStepTemplates;
     OverwriteExistingLifecyclesPhases = $OverwriteExistingLifecyclesPhases;
     TenantsToClone = $TenantsToClone;
-    CloneProjectRunbooks = CloneProjectRunbooks;
+    CloneProjectRunbooks = $CloneProjectRunbooks;
+    ChildProjectsToSync = $ChildProjectsToSync;
+    TemplateProjectName = $TemplateProjectName;
 }
 
 $sourceData = Get-OctopusData -octopusUrl $SourceOctopusUrl -octopusApiKey $SourceOctopusApiKey -spaceName $SourceSpaceName
@@ -102,6 +107,70 @@ $destinationData = Get-OctopusData -octopusUrl $DestinationOctopusUrl -octopusAp
 if ($sourceData.MajorVersion -ne $destinationData.MajorVersion -or $sourceData.MinorVersion -ne $sourceData.MinorVersion)
 {
     Throw "The source $($sourceData.OctopusUrl) is on version $($sourceData.MajorVersion).$($sourceData.MinorVersion).x while the destination $($destinationData.OctopusUrl) is on version $($destinationData.MajorVersion).$($DestinationData.MinorVersion).x.  Nothing good will come of this clone.  Please upgrade the source or destination to match and try again."    
+}
+
+if ($sourceData.OctopusUrl -eq $destinationData.OctopusUrl -and $SourceSpaceName -eq $DestinationSpaceName)
+{
+    $canProceed = $true
+
+    if ([string]::IsNullOrWhiteSpace($EnvironmentsToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified environments to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($WorkerPoolsToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified worker pools to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($ProjectGroupsToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified project groups to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($TenantTagsToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified tenant tags to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($ExternalFeedsToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified external feeds to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($StepTemplatesToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified step templates to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($InfrastructureAccountsToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified infrastructure accounts to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($LibraryVariableSetsToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified variable sets to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($LifeCyclesToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified lifecycles to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ($canProceed -eq $false)
+    {
+        throw "Invalid parameters detected.  Please check log and correct them."
+    }
 }
 
 Copy-OctopusEnvironments -sourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
@@ -115,5 +184,6 @@ Copy-OctopusLibraryVariableSets -SourceData $sourceData -DestinationData $destin
 Copy-OctopusLifecycles -sourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusProjects -SourceData $sourceData -DestinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 Copy-OctopusTenants -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
+Sync-OctopusMasterOctopusProjectWithChildProjects -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 
 Write-GreenOutput "The script to clone $SourceSpaceName from $SourceOctopusUrl to $DestinationSpaceName in $DestinationOctopusUrl has completed"
