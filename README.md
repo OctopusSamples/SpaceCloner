@@ -31,10 +31,10 @@ Please see the [example page](docs/Examples.md)
 # FAQ
 Some common questions and answers about this sample project.
 
-## Who uses this process?
+### Why was this script created?
 This script was developed by the Customer Success team at Octopus Deploy.  We use it to clone items for our [samples instance](https://samples.octopus.app).
 
-## Will you fix my bug?  
+### Will you fix my bug?  
 Maybe.  As this is a sample script we may or may not fix it.  You can submit an issue.  We will triage it and give you a decision on if it will be fixed.  You are free to fork this repo and fix the issue yourself.
 
 What won't be fixed:
@@ -42,19 +42,19 @@ What won't be fixed:
 - Certain Excluded Object Types (sensitive variables, targets, workers, etc).  They were excluded for a specific reason.  
 - Bugs from versions `3.x`, or `2018.x`.  If the script happens to work for those versions, yay, but it is unsupported.
 
-## What about feature requests?
+### What about feature requests?
 Unless it is something we (Customer Success) needs, we probably won't add it ourselves.  We encourage you to fork the repo, add your desired functionality.  If you think others will benefit submit a PR.
 
-## Do you accept pull requests?
+### Do you accept pull requests?
 Yes!  If you want to improve this script please submit a pull request!
 
-## Can I use this to migrate from self-hosted to the cloud?
-It depends.  Because this script uses the Octopus API, as long as your machine can see both the source and destination, it should work.  However, it doesn't clone everything.  See the [how it works](docs/HowItWorks.md) page for details on what it will and won't clone.  This script will help jump start your migration.
+### Can I use this to migrate from self-hosted to the cloud?
+It won't do a full migration.  Because this script uses the Octopus API, as long as your machine can see both the source and destination, it should work.  However, it doesn't clone everything.  See the [how it works](docs/HowItWorks.md) page for details on what it will and won't clone.  This script will help jump start your migration.
 
-## Is this the space migration / self-hosted to Octopus Cloud migrator tool we've been waiting for?
+### Is this the space migration / self-hosted to Octopus Cloud migrator tool we've been waiting for?
 No.  It was designed for specific use cases and the limits placed on it were intentional.  It can't access your Master Key, and without that it cannot decrypt you sensitive data.  It should get you 80% of the way there.  You are free to fork this repo to modify the scripts to help get you another 15% of the way there.  
 
-## What version of Octopus Deploy does this support?
+### What version of Octopus Deploy does this support?
 It _should_ work with any Octopus version `3.4` or higher.  It was developed by testing against a version running `2020.x`.  Take from that what you will. 
 
 The script will run a check at the start to compare the major and minor versions of the source and destination.  
