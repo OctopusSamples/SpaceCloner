@@ -83,26 +83,26 @@ If that binding on a specific object is required the script will fail.
 
 Let's use environment scoping as the example.  In my source I have a variable set called `Global`.  That variable set has an environment scoped to environments.
 
-![](img/source-global-variables-environment-scoping.png)
+![](../img/source-global-variables-environment-scoping.png)
 
 In my destination space I only have three of those four environments, `Test`, `Staging`, and `Production`.  As a result, the cloned variable set still has the `Development` value but it doesn't have a scope associated with it.
 
-![](img/destination-global-variables-environment-scoping-missing-env.png)
+![](../img/destination-global-variables-environment-scoping-missing-env.png)
 
 ## Intelligent Process Cloning
 This script assumes when you clone a deployment process you want to add missing steps but leave existing steps as is.
 
 I have a deployment process on my source where I added a new step.
 
-![](img/process-source-added-step.png)
+![](../img/process-source-added-step.png)
 
 My destination deployment process has a new step on the end that is not in the source.
 
-![](img/destination-deployment-process-before-sync.png)
+![](../img/destination-deployment-process-before-sync.png)
 
 After the sync is complete the new step was added and the additional step was left as is.
 
-![](img/destination-deployment-process-after-sync.png)
+![](../img/destination-deployment-process-after-sync.png)
 
 The rules for cloning a deployment process are:
 
