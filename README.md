@@ -63,3 +63,11 @@ The script will run a check at the start to compare the major and minor versions
 **Unless the source and destination major.minor versions are the same, the script will not proceed.**
 
 You will notice some version checks being run in the script.  This is to prevent the script from calling the API when it shouldn't.
+
+## What permissions should I have?
+For the source instance, a user with read-only permissions to all objects copied is required.
+
+For the destination instance, we recommend a user with `Space Manager` or higher.  You can go through and lock down permissions as you see fit, but `Space Manager` will get you going.
+
+## Can I use this in a Octopus Deploy runbook?
+Yes!  It is a PowerShell script.  It calls the APIs, so you should be fine in using it in an Octopus Deploy runbook.
