@@ -6,12 +6,7 @@ function Copy-OctopusProcessStepAction
         $destinationChannelList,
         $sourceData,
         $destinationData
-    )
-        
-    if ((Get-OctopusDestinationSupportsActionType -action $sourceAction -destinationData $destinationData) -eq $false)
-    {
-        return $null
-    }
+    )            
 
     $action = Copy-OctopusObject -ItemToCopy $sourceAction -ClearIdValue $true -SpaceId $null   
 
@@ -28,106 +23,6 @@ function Copy-OctopusProcessStepAction
     return $action    
 }
 
-function Get-OctopusDestinationSupportsActionType
-{
-    param(
-        $action,
-        $destinationData
-    )
-
-    if ($action.ActionType -eq "Octopus.AwsRunScript" -and $destinationData.HasAWSSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.AwsRunCloudFormation" -and $destinationData.HasAWSSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.AwsDeleteCloudFormation" -and $destinationData.HasAWSSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.AwsUploadS3" -and $destinationData.HasAWSSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.AwsApplyCloudFormationChangeSet" -and $destinationData.HasAWSSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.KubernetesDeployContainers" -and $destinationData.HasK8sSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.KubernetesDeployService" -and $destinationData.HasK8sSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.KubernetesDeployIngress" -and $destinationData.HasK8sSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.KubernetesDeployConfigMap" -and $destinationData.HasK8sSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.KubernetesDeploySecret" -and $destinationData.HasK8sSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.HelmChartUpgrade" -and $destinationData.HasK8sSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.TerraformApply" -and $destinationData.HasTerraformSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.TerraformDestroy" -and $destinationData.HasTerraformSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.TerraformPlan" -and $destinationData.HasTerraformSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-
-    if ($action.ActionType -eq "Octopus.TerraformPlanDestroy" -and $destinationData.HasTerraformSupport -eq $false)
-    {
-        Write-YellowOutput -Message "The action $($action.Name) is an $($action.ActionType), which isn't supported by the destination, skipping"
-        return $false
-    }
-    
-    return $true
-}
-
 function Convert-OctopusProcessActionWorkerPoolId
 {
     param (
@@ -136,7 +31,7 @@ function Convert-OctopusProcessActionWorkerPoolId
         $destinationData
     )
 
-    if ($sourceData.HasWorkers -and $destinationData.HasWorkers -and (Test-OctopusObjectHasProperty -objectToTest $action -propertyName "WorkerPoolId"))
+    if ((Test-OctopusObjectHasProperty -objectToTest $action -propertyName "WorkerPoolId"))
     {
         if ($null -ne $action.WorkerPoolId)
         {
