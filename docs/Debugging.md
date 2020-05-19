@@ -5,7 +5,7 @@ This script will write to the host for you to keep track of what is going on.  I
 - CleanUpLog -> A log of items indicating what you will need to clean up
 - Log -> The verbose log of the clone
 
-The logs will be placed in the $PSScriptRoot\Core folder (where logging.ps1 is located) folder.
+The logs will be placed in the logs\[date of run] folder.  The script will create that folder automatically.
 
 # Debugging
 

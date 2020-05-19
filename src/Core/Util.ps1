@@ -168,7 +168,7 @@ function Get-OctopusFilteredList
                     Write-VerboseOutput "The filter is 'all' -> adding $($item.Name) to $itemType filtered list"
                     $filteredList += $item
                 }
-                elseif ($item.Name -match $filter)
+                elseif ($item.Name -like $filter)
                 {
                     Write-VerboseOutput "The filter $filter matches $($item.Name), adding $($item.Name) to $itemType filtered list"
                     $filteredList += $item

@@ -1,7 +1,15 @@
 $currentDate = Get-Date
 $currentDateFormatted = $currentDate.ToString("yyyy_MM_dd_HH_mm")
-$logPath = "$PSScriptRoot\Log_$currentDateFormatted.txt"
-$cleanupLogPath = "$PSScriptRoot\CleanUp_$currentDateFormatted.txt"
+
+$logFolder = "$PSScriptRoot\..\..\logs\clonerun_$currentDateFormatted" 
+
+if ((Test-Path -Path $logFolder) -eq $false)
+{
+    New-Item -Path $logFolder -ItemType Directory
+}
+
+$logPath = "$logFolder\Log.txt"
+$cleanupLogPath = "$logFolder\CleanUp.txt"
 
 function Write-VerboseOutput
 {

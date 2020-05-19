@@ -8,7 +8,7 @@ function Copy-OctopusInfrastructureAccounts
 
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.InfrastructureAccounts -itemType "Infrastructure Accounts" -filters $cloneScriptOptions.InfrastructureAccountsToClone
 
-    Write-CleanUpOutput "Starting Infrastructure Accounts"
+    Write-CleanUpOutput "*************Starting Infrastructure Accounts*************"
     foreach($account in $filteredList)
     {             
         $matchingAccount = Get-OctopusItemByName -ItemName $account.Name -ItemList $DestinationData.InfrastructureAccounts
@@ -25,7 +25,8 @@ function Copy-OctopusInfrastructureAccounts
             Convert-OctopusAWSAccountInformation -accountClone $accountClone
             Convert-OctopusAzureServicePrincipalAccount -accountClone $accountClone
             Convert-OctopusTokenAccount -accountClone $accountClone                                
-            Convert-OctopusAccountTenantedDeploymentParticipation -accountClone $accountClone                       
+            Convert-OctopusAccountTenantedDeploymentParticipation -accountClone $accountClone   
+            Convert-OctopusSSHAccount -accountClone $accountClone                    
 
             Save-OctopusApiItem -Item $accountClone -Endpoint "accounts" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $DestinationData.OctopusUrl -SpaceId $DestinationData.SpaceId            
             Write-CleanUpOutput "Account $($account.Name) was created with dummy values."
@@ -35,6 +36,7 @@ function Copy-OctopusInfrastructureAccounts
             Write-GreenOutput "The account $($account.Name) already exists.  Skipping it."
         }
     }
+    Write-CleanUpOutput "*************End Infrastructure Accounts*************"
 
     Write-GreenOutput "Reloading the destination accounts"    
     $destinationData.InfrastructureAccounts = Get-OctopusInfrastructureAccounts -OctopusServerUrl $($destinationData.OctopusUrl) -ApiKey $($destinationData.OctopusApiKey) -SpaceId $($destinationData.SpaceId)
@@ -91,4 +93,17 @@ function Convert-OctopusAccountTenantedDeploymentParticipation
     {
         $accountClone.TenantedDeploymentParticipation = "Untenanted"
     }
+}
+
+function Convert-OctopusSSHAccount
+{
+    param ($accountClone)
+
+    if ($accountClone.AccountType -ne "SshKeyPair")
+    {
+        return
+    }
+
+    $accountClone.PrivateKeyFile.HasValue = $true
+    $accountClone.PrivateKeyFile.NewValue = "VGVzdA=="
 }
