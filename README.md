@@ -1,8 +1,10 @@
 # Space Cloner
 Sample PowerShell script to help you clone a space using the Octopus Deploy Restful API.
 
-# This cloning process is provided as is!
-Please test it on an empty space before attempting to use it for any kind of real-world use.  Please clone this repo and modify the script to meet your needs.  This script should be a starting point for your process.
+# This cloning process is provided as is
+This script was developed internally for the Customer Success team at Octopus Deploy to solve specific use cases we encounter each day.  We are sharing this script to help others.  Think of this script as a starting point for your process.
+
+Please test it on an empty space before attempting to use it for any kind of real-world use.  If you find something isn't working for your instance, fork this repo and modify the script to meet your needs.  
 
 # Use Cases
 This script was written to solve the following use cases.
@@ -38,9 +40,9 @@ This script was developed by the Customer Success team at Octopus Deploy.  We us
 Maybe.  As this is a sample script we may or may not fix it.  You can submit an issue.  We will triage it and give you a decision on if it will be fixed.  You are free to fork this repo and fix the issue yourself.
 
 ### What won't be fixed
-The following issues we have no intention of every fixing.
+The following issues we know will happen and we have no intention of ever fixing.
 - Failures as a result of cloning from differences in versions, for example `3.17.14` to `2020.2.6`.  
-- Certain Excluded Object Types (sensitive variables, targets, workers, etc).  They were excluded for a specific reason.  
+- Certain Excluded Object Types (sensitive variables, teams, users, etc).  They were excluded for a specific reason.  
 - Bugs from versions `3.x`, or `2018.x`.  If the script happens to work for those versions, yay, but it is unsupported.
 
 ### What about feature requests?
@@ -50,24 +52,34 @@ Unless it is something we (Customer Success) needs, we probably won't add it our
 Yes!  If you want to improve this script please submit a pull request!
 
 ### Can I use this to migrate from self-hosted to the cloud?
-It won't do a full migration.  Because this script uses the Octopus API, as long as your machine can see both the source and destination, it should work.  However, it doesn't clone everything.  See the [how it works](docs/HowItWorks.md) page for details on what it will and won't clone.  This script will help jump start your migration.
+Yes.  However, this script will only jump start your migration, but it it won't do a full migration.  This script hits the API, meaning it won't have access to your sensitive variables, and purposely leaves out workers and tentacles.  See the [how it works](docs/HowItWorks.md) page for details on what it will and won't clone.  
 
-### Is this the space migration / self-hosted to Octopus Cloud migrator tool we've been waiting for?
-No.  It was designed for specific use cases and the limits placed on it were intentional.  It can't access your Master Key, and without that it cannot decrypt you sensitive data.  It should get you 80% of the way there.  You are free to fork this repo to modify the scripts to help get you another 15% of the way there.  
+### Is this the space migration / self-hosted to Octopus Cloud migrator tool that has been teased in the past?
+No.  It was designed for specific use cases and the limits placed on it were intentional.  For example, it can't access your Master Key, and without that it cannot decrypt you sensitive data.  It should get you 80% of the way there.  You are free to fork this repo to modify the scripts to help get you another 15% of the way there.  
 
-### What version of Octopus Deploy does this support?
+### What version of Octopus Deploy does this script support?
 It _should_ work with any Octopus version `3.4` or higher.  It was developed by testing against a version running `2020.x`.  Take from that what you will. 
 
 The script will run a check at the start to compare the major and minor versions of the source and destination.  
 
 **Unless the source and destination major.minor versions are the same, the script will not proceed.**
 
-You will notice some version checks being run in the script.  This is to prevent the script from calling the API when it shouldn't.
+You will notice some version checks being run in the script.  This is to prevent the script from calling specific API endpoints when it shouldn't.
 
-## What permissions should I have?
-For the source instance, a user with read-only permissions to all objects copied is required.
+### What permissions should the users tied to the API keys have?
+For the source instance, a user with read-only permissions to all objects copied is required.  It will never write anything back to the source.
 
 For the destination instance, we recommend a user with `Space Manager` or higher.  You can go through and lock down permissions as you see fit, but `Space Manager` will get you going.
 
-## Can I use this in a Octopus Deploy runbook?
+### Can I use this in a Octopus Deploy runbook?
 Yes!  It is a PowerShell script.  It calls the APIs, so you should be fine in using it in an Octopus Deploy runbook.
+
+### Why doesn't the script clone targets and workers?
+If you look at the use cases above, cloning targets and workers only come into play for one specific use case, which is splitting a massive space into multiple spaces.  And that will only work if listening tentacles are used.  Polling tentacles create unique connections / registrations to a space.  For polling tentacles, the tentacles themselves would have to re-register.
+
+There would be different targets and workers for the majority of use cases this script was designed for.  This script is not trying to be all things to all people.  You can fork this repo and add the necessary bits and pieces to clone your targets and workers.  
+
+### Why doesn't this script create the destination space?
+Honestly, it's a security concern.  There are two built-in roles which provide space create permission, `System Manager` and `System Administrator`.  The [service account user](https://octopus.com/docs/security/users-and-teams/service-accounts) would either need to be added to `Octopus Managers` or `Octopus Administrators` teams.  That user would also have permissions to create users and update other settings on your instance.  We want you to feel comfortable using the script as is.  Requiring elevated permissions is concern and it isn't something we felt good about asking our users to do.
+
+Yes, you can create a custom role and assign the service account user to that role.  The goal of this script is it should "just work" with a minimal amount of configuration on your end.  Once you start diving into permissions and custom roles, it is going to be much harder to get working.  
