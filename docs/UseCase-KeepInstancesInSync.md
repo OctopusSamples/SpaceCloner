@@ -52,6 +52,7 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -ProjectGroupsToClone "all" `
     -TenantTagsToClone "all" `    
     -StepTemplatesToClone "all" `    
+    -ScriptModulesToClone "all" `
     -LibraryVariableSetsToClone "AWS*,Global,Notification,SQL Server" `
     -ProjectsToClone "Redgate - Feature Branch Example" `    
     -OverwriteExistingVariables "false" `

@@ -13,6 +13,7 @@ The script `CloneSpace.ps1` will clone the following:
 - Accounts
 - Library Variable Sets
 - Lifecycles
+- Script Modules
 - Projects
     - Settings
     - Deployment Process
@@ -23,7 +24,6 @@ The script `CloneSpace.ps1` will clone the following:
 ## What won't it clone
 The script `CloneSpace.ps1` will not clone the following items:
 - Tenant Variables
-- Script Modules (yet)
 - Deployments
 - Releases
 - Packages

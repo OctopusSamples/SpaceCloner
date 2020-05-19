@@ -40,6 +40,7 @@ CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" `
     -TenantTagsToClone "all" `
     -ExternalFeedsToClone "all" `
     -StepTemplatesToClone "all" `
+    -ScriptModulesToClone "all" `
     -InfrastructureAccountsToClone "AWS*" `
     -LibraryVariableSetsToClone "AWS*,Global,Notification,SQL Server" `
     -LifeCyclesToClone "AWS*" `

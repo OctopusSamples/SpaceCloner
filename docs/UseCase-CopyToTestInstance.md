@@ -29,6 +29,7 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -TenantTagsToClone "all" `
     -ExternalFeedsToClone "all" `
     -StepTemplatesToClone "all" `
+    -ScriptModulesToClone "all" `
     -InfrastructureAccountsToClone "all" `
     -LibraryVariableSetsToClone "all" `
     -LifeCyclesToClone "all" `

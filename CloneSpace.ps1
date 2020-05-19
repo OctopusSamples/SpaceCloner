@@ -14,7 +14,8 @@ param (
     $StepTemplatesToClone,
     $InfrastructureAccountsToClone,
     $LibraryVariableSetsToClone,
-    $LifeCyclesToClone,    
+    $LifeCyclesToClone,
+    $ScriptModulesToClone,    
     $ProjectsToClone,
     $ParentProjectName,
     $ChildProjectsToSync,
@@ -46,6 +47,7 @@ param (
 . ($PSScriptRoot + ".\src\Cloners\ProjectGroupCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectRunbookCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectVariableCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\ScriptModuleCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\StepTemplateCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\TenantCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\TenantTagSetCloner.ps1")
@@ -96,6 +98,7 @@ $CloneScriptOptions = @{
     OverwriteExistingCustomStepTemplates = $OverwriteExistingCustomStepTemplates;
     OverwriteExistingLifecyclesPhases = $OverwriteExistingLifecyclesPhases;
     TenantsToClone = $TenantsToClone;
+    ScriptModulesToClone = $ScriptModulesToClone;
     CloneProjectRunbooks = $CloneProjectRunbooks;
     ChildProjectsToSync = $ChildProjectsToSync;
     ParentProjectName = $ParentProjectName;
@@ -181,6 +184,7 @@ Copy-OctopusTenantTags -sourceData $sourceData -destinationData $destinationData
 Copy-OctopusStepTemplates -sourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusInfrastructureAccounts -SourceData $sourceData -DestinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 Copy-OctopusLibraryVariableSets -SourceData $sourceData -DestinationData $destinationData  -cloneScriptOptions $CloneScriptOptions
+Copy-OctopusScriptModules -SourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusLifecycles -sourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusProjects -SourceData $sourceData -DestinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 Copy-OctopusTenants -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions

@@ -11,10 +11,10 @@ function Copy-OctopusVariableSetValues
         $CloneScriptOptions
     )
     
-    $variableTracker = @{}        
-
+    $variableTracker = @{}  
+    
     foreach ($octopusVariable in $sourceVariableSetVariables.Variables)
-    {                     
+    {                             
         $variableName = $octopusVariable.Name        
         
         if (Get-Member -InputObject $octopusVariable.Scope -Name "Environment" -MemberType Properties)
@@ -117,7 +117,7 @@ function Copy-OctopusVariableSetValues
         }
         elseif ($foundIndex -gt -1)
         {
-            $DestinationVariableSetVariables.Variables[$i].Value = $octopusVariable.Value
+            $DestinationVariableSetVariables.Variables[$foundIndex].Value = $octopusVariable.Value
             if ($octopusVariable.Value -eq "Dummy Value")         
             {                
                 Write-CleanUpOutput "The variable $variableName is a sensitive variable, value set to 'Dummy Value'"

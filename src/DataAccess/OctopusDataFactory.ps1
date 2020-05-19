@@ -41,6 +41,17 @@ Function Get-OctopusLibrarySetList
     return Get-OctopusApiItemList -EndPoint "libraryvariablesets?skip=0&take=1000&contentType=Variables" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
+Function Get-OctopusScriptModules
+{
+    param (
+        $SpaceId,
+        $OctopusServerUrl,
+        $ApiKey
+    )
+    
+    return Get-OctopusApiItemList -EndPoint "libraryvariablesets?skip=0&take=1000&contentType=ScriptModule" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
+}
+
 Function Get-OctopusLibrarySetVariables
 {
     param(
@@ -272,6 +283,9 @@ function Get-OctopusData
 
     Write-GreenOutput "Getting Feed List for $spaceName in $octopusUrl"
     $octopusData.FeedList = Get-OctopusFeedList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+
+    Write-GreenOutput "Getting Script Modules for $spaceName in $OctopusUrl"
+    $octopusData.ScriptModuleList = Get-OctopusScriptModules -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
 
     return $octopusData
 }
