@@ -71,10 +71,7 @@ This script was designed to be run multiple times with the same parameters.  It 
 ## Limitations
 Because this is hitting the Octopus API (and not the database) it cannot decrypt items from the Octopus Database.  It also cannot download packages for you.
 
-- All Sensitive Variables cloned will be set to 'Dummy Value'.
-- All Accounts cloned will have dummy values for keys and ids.
-- All External Feeds will have their login credentials set to `null`.
-- All package references in "script steps" (AWS CLI, Run a Script, Azure CLI) in deployment process or runbook process steps will be removed.  All deployment steps with package references will remain as is.
+Please see the [sensitive variables page](SensitiveVariables.md) for more information on the script handles sensitive variables.
 
 ## Simple Relationship Management
 The process does not attempt to walk a tree of dependencies.  It loads up all the necessary data from the source and destination.  When it comes across an ID in the source space it will attempt to find the corresponding ID in the destination space.  If it cannot find a matching item it removes that binding.  

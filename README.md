@@ -21,6 +21,9 @@ This script was written to solve the following use cases.
 # How It Works
 Please see the [how it works page](docs/HowItWorks.md).
 
+# Sensitive Variables
+Please see the page [sensitive variables](docs/SensitiveVariables.md) to see how sensitive variables are handled.
+
 # Debugging and Logging
 Please see the [debugging and logging page](docs/Debugging.md).
 
