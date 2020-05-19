@@ -23,7 +23,7 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -SourceSpaceName "My Space Name" `
     -DestinationOctopusUrl "https://instance1.yoursite.com" `
     -DestinationOctopusApiKey "My Key" `
-    -DestinationSpace Name "My Space Name" `        
+    -DestinationSpaceName "My Space Name" `        
     -ParentProjectName "Redgate - Feature Branch Example" `
     -ChildProjectsToSync "Redgate - Child*" `   
     -OverwriteExistingVariables "false" `
