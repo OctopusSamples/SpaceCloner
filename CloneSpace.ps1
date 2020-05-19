@@ -16,10 +16,13 @@ param (
     $LibraryVariableSetsToClone,
     $LifeCyclesToClone,
     $ScriptModulesToClone,    
+    $MachinePoliciesToClone,
+    $WorkersToClone,
+    $TargetsToClone,
     $ProjectsToClone,
     $ParentProjectName,
     $ChildProjectsToSync,
-    $TenantsToClone,
+    $TenantsToClone,    
     $OverwriteExistingVariables,
     $AddAdditionalVariableValuesOnExistingVariableSets,
     $OverwriteExistingCustomStepTemplates,
@@ -32,6 +35,7 @@ param (
 
 . ($PSScriptRoot + ".\src\DataAccess\OctopusDataAdapter.ps1")
 . ($PSScriptRoot + ".\src\DataAccess\OctopusDataFactory.ps1")
+. ($PSScriptRoot + ".\src\DataAccess\OctopusRepository.ps1")
 
 . ($PSScriptRoot + ".\src\Cloners\AccountCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ActionCloner.ps1")
@@ -39,6 +43,7 @@ param (
 . ($PSScriptRoot + ".\src\Cloners\ExternalFeedCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\LibraryVariableSetCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\LifecycleCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\MachinePolicyCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ParentProjectTemplateSyncer.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProcessCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectChannelCloner.ps1")
@@ -49,9 +54,11 @@ param (
 . ($PSScriptRoot + ".\src\Cloners\ProjectVariableCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ScriptModuleCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\StepTemplateCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\TargetCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\TenantCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\TenantTagSetCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\VariableSetValuesCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\WorkerCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\WorkerPoolCloner.ps1")
 
 Clear-Host
@@ -99,6 +106,9 @@ $CloneScriptOptions = @{
     OverwriteExistingLifecyclesPhases = $OverwriteExistingLifecyclesPhases;
     TenantsToClone = $TenantsToClone;
     ScriptModulesToClone = $ScriptModulesToClone;
+    TargetsToClone = $TargetsToClone;
+    MachinePoliciesToClone = $MachinePoliciesToClone;
+    WorkersToClone = $WorkersToClone;
     CloneProjectRunbooks = $CloneProjectRunbooks;
     ChildProjectsToSync = $ChildProjectsToSync;
     ParentProjectName = $ParentProjectName;
@@ -170,6 +180,30 @@ if ($sourceData.OctopusUrl -eq $destinationData.OctopusUrl -and $SourceSpaceName
         $canProceed = $false
     }
 
+    if ([string]::IsNullOrWhiteSpace($ScriptModulesToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified script modules to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($MachinePoliciesToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have machine policeis sets to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($WorkersToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified workers sets to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($TargetsToClone) -eq $false)
+    {
+        Write-RedOutput "You are cloning to the same space, but have specified variable sets to clone.  This is not allowed.  Please remove that parameter."
+        $canProceed = $false
+    }
+
     if ($canProceed -eq $false)
     {
         throw "Invalid parameters detected.  Please check log and correct them."
@@ -185,9 +219,12 @@ Copy-OctopusStepTemplates -sourceData $sourceData -destinationData $destinationD
 Copy-OctopusInfrastructureAccounts -SourceData $sourceData -DestinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 Copy-OctopusLibraryVariableSets -SourceData $sourceData -DestinationData $destinationData  -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusScriptModules -SourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
+Copy-OctopusMachinePolicies -SourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusLifecycles -sourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusProjects -SourceData $sourceData -DestinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 Copy-OctopusTenants -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
+Copy-OctopusWorkers -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
+Copy-OctopusTargets -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 Sync-OctopusMasterOctopusProjectWithChildProjects -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 
 Write-GreenOutput "The script to clone $SourceSpaceName from $SourceOctopusUrl to $DestinationSpaceName in $DestinationOctopusUrl has completed"

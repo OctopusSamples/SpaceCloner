@@ -14,12 +14,15 @@ The script `CloneSpace.ps1` will clone the following:
 - Library Variable Sets
 - Lifecycles
 - Script Modules
+- Machine Policies
 - Projects
     - Settings
     - Deployment Process
     - Runbooks
     - Variables
 - Tenants (no tenant variables)
+- Targets (no polling tentacles)
+- Workers (no polling tentacles)
 
 ## What won't it clone
 The script `CloneSpace.ps1` will not clone the following items:
@@ -27,8 +30,6 @@ The script `CloneSpace.ps1` will not clone the following items:
 - Deployments
 - Releases
 - Packages
-- Workers
-- Targets
 - Users
 - Teams
 - Roles
@@ -41,15 +42,6 @@ The script `CloneSpace.ps1` will not clone the following items:
 The assumption is you are using this script to clone a process to another instance for testing purposes.  You don't need the headache of deployments, releases and everything associated with it.
 
 Tenant variables were excluded mostly due to how they are returned from the API.  Honestly it looked like a bit of a maintenance nightmare.
-
-### No targets or workers
-The majority of the use cases this script was designed for involved moving between Octopus Deploy instances.  This made targets almost impossible to bring over.
-
-- The thumbprint on the server will be different than the tentacle is expecting.
-- Polling tentacles are configured to point to a specific instance, bring over the registration won't work.
-- Several targets rely on accounts (Azure Targets and K8s specifically).  The script has to enter default values for those items, meaning they won't connect.
-
-Chances are you will want different targets per instance.  
 
 ## The Space Has to Exist
 The space on the source and destination must exist prior to running the script.  The script will fail if the destination space doesn't exist.  It doesn't create a space for you.
@@ -67,6 +59,8 @@ This script was designed to be run multiple times with the same parameters.  It 
 - Channels (match by name)
 - Project Versioning Strategy (once you set it in the destination project, it keeps it)
 - Project Automatic Release Creation (once you set it in the destination project, it keeps it)
+- Workers (match by name)
+- Targets (match by name)
 
 ## Limitations
 Because this is hitting the Octopus API (and not the database) it cannot decrypt items from the Octopus Database.  It also cannot download packages for you.
@@ -107,3 +101,18 @@ The rules for cloning a deployment process are:
 - Leave existing steps as is
 - Clear out package references when cloning new steps
 - The source process is the source of truth for step order.  It will ensure the destination deployment process order matches.  It will then add additional steps found in the deployment process not found in the source to the end of the deployment process.
+
+## Targets and Workers
+
+The script will clone your targets and workers.  However there are a few key items you should know.
+
+The first is if you are cloning from one instance to another the tentacle will not trust the server thumbprint.  You will need to run `Tentacle configure --trust="YOUR SERVER THUMBPRINT"` on the server itself for the tentacle to trust the new server.  See [documentation](https://octopus.com/docs/octopus-rest-api/tentacle.exe-command-line/configure) for more details.
+
+Secondly, the clone script only supports a subset of all targets.  The targets supported are:
+
+- Listening Tentacle
+- K8s Cluster (not using a token or cert to auth with)
+- Cloud Regions
+- Azure Web Apps
+
+Due to how polling tentacles work, the script cannot clone polling tentacles from one instance to another.  The polling tentacles won't know about the switch.  You will need to set up a new polling tentacle instance on the server.  

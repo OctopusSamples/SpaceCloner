@@ -46,6 +46,9 @@ CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" `
     -LifeCyclesToClone "AWS*" `
     -ProjectsToClone "Redgate - Feature Branch Example" `
     -TenantsToClone "all" `
+    -WorkersToCLone "AWS*" `
+    -TargetsToClone "AWS*" `
+    -MachinePoliciesToClone "all" `
     -OverwriteExistingVariables "false" `
     -AddAdditionalVariableValuesOnExistingVariableSets "False" `
     -OverwriteExistingCustomStepTemplates "false" `

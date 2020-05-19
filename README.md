@@ -77,11 +77,6 @@ For the destination instance, we recommend a user with `Space Manager` or higher
 ### Can I use this in a Octopus Deploy runbook?
 Yes!  It is a PowerShell script.  It calls the APIs, so you should be fine in using it in an Octopus Deploy runbook.
 
-### Why doesn't the script clone targets and workers?
-If you look at the use cases above, cloning targets and workers only come into play for one specific use case, which is splitting a massive space into multiple spaces.  And that will only work if listening tentacles are used.  Polling tentacles create unique connections / registrations to a space.  For polling tentacles, the tentacles themselves would have to re-register.
-
-There would be different targets and workers for the majority of use cases this script was designed for.  This script is not trying to be all things to all people.  You can fork this repo and add the necessary bits and pieces to clone your targets and workers.  
-
 ### Why doesn't this script create the destination space?
 Honestly, it's a security concern.  There are two built-in roles which provide space create permission, `System Manager` and `System Administrator`.  The [service account user](https://octopus.com/docs/security/users-and-teams/service-accounts) would either need to be added to `Octopus Managers` or `Octopus Administrators` teams.  That user would also have permissions to create users and update other settings on your instance.  We want you to feel comfortable using the script as is.  Requiring elevated permissions is concern and it isn't something we felt good about asking our users to do.
 

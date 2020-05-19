@@ -34,7 +34,10 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -LibraryVariableSetsToClone "all" `
     -LifeCyclesToClone "all" `
     -ProjectsToClone "Redgate - Feature Branch Example,DBUp SQL Server" `
-    -TenantsToClone "all" `   
+    -TenantsToClone "all" `
+    -WorkersToCLone "AWS*" `
+    -TargetsToClone "AWS*" `
+    -MachinePoliciesToClone "all" `   
     -OverwriteExistingVariables "true" `
     -AddAdditionalVariableValuesOnExistingVariableSets "true" `
     -OverwriteExistingCustomStepTemplates "true" `
