@@ -22,7 +22,7 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -SourceSpaceName "My Space Name" `
     -DestinationOctopusUrl "https://instance2.yoursite.com" `
     -DestinationOctopusApiKey "My Key" `
-    -DestinationSpace Name "My Space Name" `    
+    -DestinationSpaceName "My Space Name" `    
     -EnvironmentsToClone "all" `
     -WorkerPoolsToClone "all" `
     -ProjectGroupsToClone "all" `

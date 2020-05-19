@@ -33,7 +33,7 @@ CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" `
     -SourceSpaceName "Target - SQL Server" `
     -DestinationOctopusUrl "https://samples.octopus.app" `
     -DestinationOctopusApiKey "My Key" `
-    -DestinationSpace Name "Redgate Space" `
+    -DestinationSpaceName "Redgate Space" `
     -EnvironmentsToClone "test,staging,production" `
     -WorkerPoolsToClone "AWS*" `
     -ProjectGroupsToClone "all" `
