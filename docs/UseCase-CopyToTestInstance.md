@@ -8,7 +8,9 @@ Please refer to the [how it works page](HowItWorks.md#what-will-it-clone) to get
 
 # Example
 
-In this case, you probably want to copy everything, but only include a handful of projects.  In the example script below it will copy all everything in a space plus a set of specific projects.
+In this use case, you probably want to copy everything, but only include a handful of projects.  In the example script below it will copy all everything in a space plus a set of specific projects.  It will only copy targets and workers related to the projects you wish to clone.
+
+Please refer to the [Parameter reference page](ParameterReference.md) for more details on the parameters.
 
 The other options are:
 - `OverwriteExistingVariables` - set to `True` so variables are always overwritten (except for sensitive variables).

@@ -5,6 +5,7 @@ This script was written to solve the following use cases.  The options you choos
 - As a user I have two Octopus Deploy instances.  One for dev/test deployments.  Another for staging/prod deployments.  I have the [same set of projects I want to keep in sync](UseCase-KeepInstancesInSync.md).
 - As a user I want to clone a set of projects to a test instance to [verify an upgrade](UseCase-CopyToTestInstance.md).
 - As a user I have a set of "parent" projects.  I clone from that project when I need to create a new project.  However, when the process on the "parent" project is updated I would like to [update the existing "child" projects](UseCase-ParentChildProjects.md).
+- As a user I would like to copy my projects from [self-hosted Octopus to Octopus Cloud](UseCase-MigrateFromSelfHostedToCloud.md).
 
 ## Possible but not recommended.
 

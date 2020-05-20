@@ -31,9 +31,9 @@ This should be done once, after that, the space cloner should be used or subsequ
 
 # Example - Dev/Test Instance and Staging/Prod instance
 
-Please refer to the [Parameter reference page](ParameterReference.md) for more details on the parameters.
+This example will clone a specific project, but it will exclude all environments, accounts, external feeds, tenants, and lifecycles as those will all likely be different between the two instances.  
 
-For this example will clone a specific project, but it will exclude all environments, accounts, external feeds, tenants, and lifecycles as those will all likely be different between the two instances.  
+Please refer to the [Parameter reference page](ParameterReference.md) for more details on the parameters.
 
 The other options are:
 - `OverwriteExistingVariables` - set to `false` to keep the differences preserved.  Any new variable found will be added.
@@ -64,9 +64,9 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
 
 # Example - Mirrored Instances
 
-Please refer to the [Parameter reference page](ParameterReference.md) for more details on the parameters.
+This example will clone a specific project between a mirrored instance.
 
-For this example will clone a specific project, but it will exclude infrastructure accounts as those will likely be difference between data centers.  
+Please refer to the [Parameter reference page](ParameterReference.md) for more details on the parameters.
 
 The other options are:
 - `OverwriteExistingVariables` - set to `false` to keep the differences preserved.  Any new variable found will be added.

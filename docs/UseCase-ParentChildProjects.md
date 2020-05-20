@@ -11,6 +11,8 @@ Right now the runbook clone is very simple.  You tell it to sync the runbooks or
 
 This example is syncing the parent project in the same space.  
 
+Please refer to the [Parameter reference page](ParameterReference.md) for more details on the parameters.
+
 Options:
 - `OverwriteExistingVariables` - set to `false` to keep the differences preserved.  Any new variable found will be added still.
 - `AddAdditionalVariableValuesOnExistingVariableSets` - set to `True` to add new variables values found for the same variable name.  

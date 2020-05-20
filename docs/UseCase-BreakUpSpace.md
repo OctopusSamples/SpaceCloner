@@ -18,9 +18,9 @@ In my destination space I only have three of those four environments, `Test`, `S
 ![](../img/destination-global-variables-environment-scoping-missing-env.png)
 
 # Example
-Please refer to the [Parameter reference page](ParameterReference.md) for more details on the parameters.
-
 This example will clone a project from one space (along with its dependencies) to another on the same instance.  It includes only dependencies the project cares about.
+
+Please refer to the [Parameter reference page](ParameterReference.md) for more details on the parameters.
 
 - `OverwriteExistingVariables` - set to `false` to keep the differences preserved.  Any new variable found will be added still.
 - `AddAdditionalVariableValuesOnExistingVariableSets` - set to `false` so any new values (specifically around scoping) are not added.  
