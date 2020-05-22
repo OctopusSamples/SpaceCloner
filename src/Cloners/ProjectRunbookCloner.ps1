@@ -15,8 +15,8 @@ function Copy-OctopusProjectRunbooks
         return
     }
 
-    $sourceRunbooks = Get-OctopusProjectRunbookList -project $sourceProject -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $sourceData.SpaceId
-    $destinationRunbooks = Get-OctopusProjectRunbookList -project $destinationProject -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+    $sourceRunbooks = Get-OctopusProjectRunbookList -project $sourceProject -OctopusData $sourceData
+    $destinationRunbooks = Get-OctopusProjectRunbookList -project $destinationProject -OctopusData $DestinationData
 
     foreach ($runbook in $sourceRunbooks)
     {
@@ -34,8 +34,8 @@ function Copy-OctopusProjectRunbooks
             $destinationRunbook = Save-OctopusProjectRunbook -Runbook $runbookToClone -DestinationData $destinationData
         }
         
-        $sourceRunbookProcess = Get-OctopusRunbookProcess -runbook $runbook -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl
-        $destinationRunbookProcess = Get-OctopusRunbookProcess -runbook $destinationRunbook -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl
+        $sourceRunbookProcess = Get-OctopusRunbookProcess -runbook $runbook -OctopusData $sourceData
+        $destinationRunbookProcess = Get-OctopusRunbookProcess -runbook $destinationRunbook -OctopusData $DestinationData
 
         Write-OctopusPostCloneCleanUp "*****************Starting Sync for runbook process $($runbook.Name)***************"        
         $destinationRunbookProcess.Steps = @(Copy-OctopusDeploymentProcess -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData -sourceDeploymentProcessSteps $sourceRunbookProcess.Steps -destinationDeploymentProcessSteps $destinationRunbookProcess.Steps)

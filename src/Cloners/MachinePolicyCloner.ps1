@@ -30,5 +30,5 @@ function Copy-OctopusMachinePolicies
     }    
 
     Write-OctopusSuccess "Machine policies successfully cloned, reloading destination list"    
-    $destinationData.MachinePolicyList = Get-OctopusMachinePolicyList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.MachinePolicyList = Get-OctopusMachinePolicyList -OctopusData $DestinationData
 }

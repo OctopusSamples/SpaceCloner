@@ -27,14 +27,14 @@ function Copy-OctopusProjects
         
         Write-OctopusSuccess "Reloading destination projects"        
         
-        $destinationData.ProjectList = Get-OctopusProjectList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId       
+        $destinationData.ProjectList = Get-OctopusProjectList -OctopusData $DestinationData
 
         $destinationProject = Get-OctopusItemByName -ItemList $DestinationData.ProjectList -ItemName $project.Name
 
-        $sourceChannels = Get-OctopusProjectChannelList -project $project -ApiKey $SourceData.OctopusApiKey -OctopusUrl $SourceData.OctopusUrl -SpaceId $SourceData.SpaceId
-        $destinationChannels = Get-OctopusProjectChannelList -project $destinationProject -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+        $sourceChannels = Get-OctopusProjectChannelList -project $project -octopusData $sourceData
+        $destinationChannels = Get-OctopusProjectChannelList -project $destinationProject -OctopusData $DestinationData
         Copy-OctopusProjectChannels -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData
-        $destinationChannels = Get-OctopusProjectChannelList -project $destinationProject -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+        $destinationChannels = Get-OctopusProjectChannelList -project $destinationProject -OctopusData $DestinationData
 
         Copy-OctopusProjectDeploymentProcess -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -sourceProject $project -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData 
 
@@ -116,8 +116,8 @@ function Copy-OctopusProjectReleaseVersioningSettings
     }
 
     Write-OctopusSuccess "Cloning release versioning settings for project $($project.Name)"
-    $sourceDeploymentProcess = Get-OctopusProjectDeploymentProcess -project $sourceProject -ApiKey $SourceData.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl
-    $destinationDeploymentProcess = Get-OctopusProjectDeploymentProcess -project $destinationProject -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl 
+    $sourceDeploymentProcess = Get-OctopusProjectDeploymentProcess -project $sourceProject -OctopusData $sourceData
+    $destinationDeploymentProcess = Get-OctopusProjectDeploymentProcess -project $destinationProject -OctopusData $DestinationData
 
     if ($null -eq $sourceProject.VersioningStrategy.DonorPackage.Template)
     {

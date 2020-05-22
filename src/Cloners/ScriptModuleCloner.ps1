@@ -39,8 +39,8 @@ function Copy-OctopusScriptModules
         
         Write-OctopusVerbose "The script module variable set has been created, time to copy over the script module itself"
 
-        $scriptModuleVariables = Get-OctopusApi -EndPoint $scriptModule.Links.Variables -ApiKey $sourceData.OctopusApiKey -SpaceId $null -OctopusUrl $SourceData.OctopusUrl 
-        $destinationVariableSetVariables = Get-OctopusApi -EndPoint $destinationVariableSet.Links.Variables -ApiKey $destinationData.OctopusApiKey -SpaceId $null -OctopusUrl $DestinationData.OctopusUrl        
+        $scriptModuleVariables = Get-OctopusVariableSetVariables -variableSet $scriptModule -OctopusData $sourceData
+        $destinationVariableSetVariables = Get-OctopusVariableSetVariables -variableSet $destinationVariableSet -OctopusData $destinationData 
 
         Write-OctopusPostCloneCleanUp "*****************Starting clone of script module $($scriptModule.Name)*****************"
         Copy-OctopusVariableSetValues -SourceVariableSetVariables $scriptModuleVariables -DestinationVariableSetVariables $destinationVariableSetVariables -SourceData $SourceData -DestinationData $DestinationData -SourceProjectData @{} -DestinationProjectData @{} -CloneScriptOptions $newCloneScriptOptions
@@ -48,5 +48,5 @@ function Copy-OctopusScriptModules
     }
 
     Write-OctopusSuccess "Script Modules successfully cloned, reloading destination list"    
-    $destinationData.ScriptModuleList = Get-OctopusScriptModuleList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.ScriptModuleList = Get-OctopusScriptModuleList -OctopusData $DestinationData
 }

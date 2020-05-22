@@ -57,7 +57,7 @@ function Copy-OctopusTargets
     }    
 
     Write-OctopusSuccess "Targets successfully cloned, reloading destination list"
-    $destinationData.TargetList = Get-OctopusTargetList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.TargetList = Get-OctopusTargetList -OctopusData $DestinationData
 }
 
 function Get-OctopusTargetCanBeCloned

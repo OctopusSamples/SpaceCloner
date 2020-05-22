@@ -34,5 +34,5 @@ function Copy-OctopusExternalFeeds
     }
         
     Write-OctopusSuccess "External Feeds successfully cloned, reloading destination list"    
-    $destinationData.FeedList = Get-OctopusFeedList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.FeedList = Get-OctopusFeedList -OctopusData $DestinationData
 }

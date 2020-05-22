@@ -25,8 +25,8 @@ function Sync-OctopusMasterOctopusProjectWithChildProjects
     
     foreach($destinationProject in $filteredDestinationList)
     {                
-        $sourceChannels = Get-OctopusProjectChannelList -project $project -ApiKey $SourceData.OctopusApiKey -OctopusUrl $SourceData.OctopusUrl -SpaceId $SourceData.SpaceId
-        $destinationChannels = Get-OctopusProjectChannelList -project $destinationProject -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId        
+        $sourceChannels = Get-OctopusProjectChannelList -project $project -OctopusData $sourceData
+        $destinationChannels = Get-OctopusProjectChannelList -project $destinationProject -OctopusData $DestinationData
 
         Copy-OctopusProjectDeploymentProcess -sourceChannelList $sourceChannels -sourceProject $sourceProject -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData 
 

@@ -34,5 +34,5 @@ function Copy-OctopusProjectGroups
     } 
     
     Write-OctopusSuccess "Project Groups successfully cloned, reloading destination list"
-    $destinationData.ProjectGroupList = Get-ProjectGroupList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.ProjectGroupList = Get-ProjectGroupList -OctopusData $DestinationData
 }

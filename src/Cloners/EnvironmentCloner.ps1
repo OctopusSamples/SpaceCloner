@@ -34,5 +34,5 @@ function Copy-OctopusEnvironments
     }    
 
     Write-OctopusSuccess "Environments successfully cloned, reloading destination list"    
-    $destinationData.EnvironmentList = Get-OctopusEnvironmentList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.EnvironmentList = Get-OctopusEnvironmentList -OctopusData $DestinationData
 }

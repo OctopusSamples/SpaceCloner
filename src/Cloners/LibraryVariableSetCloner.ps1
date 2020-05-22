@@ -35,8 +35,8 @@ function Copy-OctopusLibraryVariableSets
 
         Write-OctopusVerbose "The variable set has been created, time to copy over the variables themselves"
 
-        $sourceVariableSetVariables = Get-OctopusApi -EndPoint $sourceVariableSet.Links.Variables -ApiKey $sourceData.OctopusApiKey -SpaceId $null -OctopusUrl $SourceData.OctopusUrl 
-        $destinationVariableSetVariables = Get-OctopusApi -EndPoint $destinationVariableSet.Links.Variables -ApiKey $destinationData.OctopusApiKey -SpaceId $null -OctopusUrl $DestinationData.OctopusUrl
+        $sourceVariableSetVariables = Get-OctopusVariableSetVariables -variableSet $sourceVariableSet -OctopusData $sourceData
+        $destinationVariableSetVariables = Get-OctopusVariableSetVariables -variableSet $destinationVariableSet -OctopusData $DestinationData 
 
         Write-OctopusPostCloneCleanUp "*****************Starting clone of variable set $($sourceVariableSet.Name)*****************"
         Copy-OctopusVariableSetValues -SourceVariableSetVariables $sourceVariableSetVariables -DestinationVariableSetVariables $destinationVariableSetVariables -SourceData $SourceData -DestinationData $DestinationData -SourceProjectData @{} -DestinationProjectData @{} -CloneScriptOptions $cloneScriptOptions
@@ -44,5 +44,5 @@ function Copy-OctopusLibraryVariableSets
     }
 
     Write-OctopusSuccess "Library Variable Sets successfully cloned, reloading destination list"    
-    $destinationData.VariableSetList = Get-OctopusLibrarySetList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.VariableSetList = Get-OctopusLibrarySetList -OctopusData $DestinationData
 }

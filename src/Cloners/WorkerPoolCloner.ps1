@@ -42,5 +42,5 @@ function Copy-OctopusWorkerPools
     }    
 
     Write-OctopusSuccess "Worker Pools successfully cloned, reloading destination list"
-    $destinationData.WorkerPoolList = Get-OctopusWorkerPoolList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.WorkerPoolList = Get-OctopusWorkerPoolList -OctopusData $DestinationData
 }

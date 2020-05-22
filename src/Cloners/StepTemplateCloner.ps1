@@ -45,5 +45,5 @@ function Copy-OctopusStepTemplates
     }
 
     Write-OctopusSuccess "Step Templates successfully cloned, reloading destination list"
-    $destinationData.StepTemplates = Get-OctopusStepTemplateList -SpaceId $($destinationData.SpaceId) -OctopusServerUrl $($destinationData.OctopusUrl) -ApiKey $($destinationData.OctopusApiKey)
+    $destinationData.StepTemplates = Get-OctopusStepTemplateList -octopusData $destinationData
 }

@@ -58,5 +58,5 @@ function Copy-OctopusTenantTags
         Save-OctopusTenantTagSet -TenantTagSet $copyOfItemToClone -DestinationData $destinationData        
     }    
     
-    $destinationData.TenantTagList = Get-OctopusTenantTagSetList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.TenantTagList = Get-OctopusTenantTagSetList -OctopusData $DestinationData
 }

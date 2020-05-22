@@ -53,5 +53,5 @@ function Copy-OctopusSpaceTeams
     Write-OctopusPostCloneCleanUpHeader "*************End Teams******************"
 
     Write-OctopusSuccess "Teams successfully cloned, reloading destination list"    
-    $destinationData.TeamList = Get-OctopusTeamList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.TeamList = Get-OctopusTeamList -OctopusData $DestinationData
 }
