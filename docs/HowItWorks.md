@@ -20,6 +20,7 @@ The script `CloneSpace.ps1` will clone the following:
     - Deployment Process
     - Runbooks
     - Variables
+- Teams
 - Tenants (no tenant variables)
 - Targets (no polling tentacles)
 - Workers (no polling tentacles)
@@ -31,7 +32,6 @@ The script `CloneSpace.ps1` will not clone the following items:
 - Releases
 - Packages
 - Users
-- Teams
 - Roles
 - External Auth Providers (or groups)
 - Server settings like folders
@@ -49,18 +49,22 @@ The space on the source and destination must exist prior to running the script. 
 ## Leaves in Place
 This script was designed to be run multiple times with the same parameters.  It isn't useful if the script is constantly overwriting / removing values each time you run it.  It will not overwrite the following:
 
-- Accounts (match by name)
-- Feeds (match by name)
-- Tenants (match by name)
-- Sensitive variables (match by name)
 - Community Step Templates (match by name)
+- Feeds (match by name)
+- Infrastructure Accounts (match by name)
+- Library Variable Set Sensitive variables (match by name)
+- Project Items
+    - Channels (match by name)
+    - Deployment Process steps (match by name)    
+    - Library Variable Set Sensitive variables (match by name)    
+    - Project Versioning Strategy (once you set it in the destination project, it keeps it)
+    - Project Automatic Release Creation (once you set it in the destination project, it keeps it)
+    - Runbook Process steps (match by name)    
 - Worker Pools (match by name)
-- Process steps (match by name)
-- Channels (match by name)
-- Project Versioning Strategy (once you set it in the destination project, it keeps it)
-- Project Automatic Release Creation (once you set it in the destination project, it keeps it)
 - Workers (match by name)
+- Teams (match by name)
 - Targets (match by name)
+- Tenants (match by name)
 
 ## Limitations
 Because this is hitting the Octopus API (and not the database) it cannot decrypt items from the Octopus Database.  It also cannot download packages for you.
