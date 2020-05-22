@@ -49,11 +49,7 @@ function Copy-OctopusWorkers
             $copyOfItemToClone.StatusSummary = ""
             $copyOfItemToClone.IsInProcess = $false
 
-            Save-OctopusApiItem -Item $copyOfItemToClone `
-                -Endpoint "workers" `
-                -ApiKey $destinationData.OctopusApiKey `
-                -SpaceId $destinationData.SpaceId `
-                -OctopusUrl $destinationData.OctopusUrl
+            Save-OctopusWorker -worker $copyOfItemToClone -destinationData $destinationData            
         }
         else 
         {

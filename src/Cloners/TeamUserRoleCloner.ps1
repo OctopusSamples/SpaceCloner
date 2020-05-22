@@ -68,11 +68,7 @@ function Copy-OctopusSpaceTeamUserRoles
 
             if ($null -ne $copyOfItemToClone.RoleId)
             {
-                Save-OctopusApiItem -Item $copyOfItemToClone `
-                    -Endpoint "scopeduserroles" `
-                    -ApiKey $destinationData.OctopusApiKey `
-                    -SpaceId $null `
-                    -OctopusUrl $destinationData.OctopusUrl 
+                Save-OctopusTeamScopedRoles -teamScopedUserRoles $copyOfItemToClone -destinationData $destinationData 
             }           
             else
             {

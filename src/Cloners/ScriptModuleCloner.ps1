@@ -29,8 +29,8 @@ function Copy-OctopusScriptModules
             Write-OctopusVerbose "Script Module Variable Set $($scriptModule.Name) was not found in destination, creating new base record."
             $copyscriptModule = Copy-OctopusObject -ItemToCopy $scriptModule -ClearIdValue $true -SpaceId $destinationData.SpaceId                       
             $copyscriptModule.VariableSetId = $null
-
-            $destinationVariableSet = Save-OctopusApi -EndPoint "libraryvariablesets" -ApiKey $($destinationData.OctopusApiKey) -Method POST -Item $copyscriptModule -OctopusUrl $DestinationData.OctopusUrl -SpaceId $DestinationData.SpaceId
+            
+            $destinationVariableSet = Save-OctopusVariableSet -libraryVariableSet $copyscriptModule -destinationData $destinationData
         }
         else
         {

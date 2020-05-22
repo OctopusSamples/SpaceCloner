@@ -38,11 +38,7 @@ function Copy-OctopusLifecycles
             $phase.AutomaticDeploymentTargets = @(Convert-SourceIdListToDestinationIdList -SourceList $SourceData.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $phase.AutomaticDeploymentTargets)
         }
 
-        Save-OctopusApiItem -Item $lifeCycleToClone `
-                -Endpoint "lifecycles" `
-                -ApiKey $destinationData.OctopusApiKey `
-                -SpaceId $destinationData.SpaceId `
-                -OctopusUrl $destinationData.OctopusUrl
+        Save-OctopusLifecycle -lifecycle $lifeCycleToClone -destinationData $DestinationData        
     }    
 
     Write-OctopusSuccess "Lifecycles successfully cloned, reloading destination list"    

@@ -25,11 +25,7 @@ function Copy-OctopusExternalFeeds
 
             $copyOfItemToClone = Copy-OctopusObject -ItemToCopy $feed -SpaceId $destinationData.SpaceId -ClearIdValue $true    
 
-            Save-OctopusApiItem -Item $copyOfItemToClone `
-                -Endpoint "Feeds" `
-                -ApiKey $destinationData.OctopusApiKey `
-                -SpaceId $destinationData.SpaceId `
-                -OctopusUrl $destinationData.OctopusUrl
+            Save-OctopusExternalFeed -ExternalFeed $copyOfItemToClone -DestinationData $destinationData            
         }
         else 
         {

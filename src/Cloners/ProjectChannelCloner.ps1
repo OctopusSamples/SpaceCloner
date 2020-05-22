@@ -26,11 +26,7 @@ function Copy-OctopusProjectChannels
             $cloneChannel.Rules = @()
 
             Write-OctopusVerbose "The channel $($channel.Name) does not exist for the project $($destinationProject.Name), creating one now.  Please note, I cannot create version rules, so those will be emptied out"
-            Save-OctopusApiItem -Item $cloneChannel `
-                -Endpoint "channels" `
-                -ApiKey $DestinationData.OctopusApiKey `
-                -OctopusUrl $destinationData.OctopusUrl `
-                -SpaceId $destinationData.SpaceId
+            Save-OctopusProjectChannel -projectChannel $cloneChannel -destinationData $destinationData            
         }        
         else
         {

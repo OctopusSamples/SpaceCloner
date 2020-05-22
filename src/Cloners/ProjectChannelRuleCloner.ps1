@@ -44,11 +44,7 @@ function Copy-OctopusProjectChannelRules
         }
 
         Write-OctopusVerbose "Updating the channel $($channel.Name) rules to match the source"
-        Save-OctopusApiItem -Item $cloneChannel `
-            -Endpoint "channels" `
-            -ApiKey $DestinationData.OctopusApiKey `
-            -OctopusUrl $destinationData.OctopusUrl `
-            -SpaceId $destinationData.SpaceId                        
+        Save-OctopusProjectChannel -projectChannel $cloneChannel -destinationData $destinationData                        
     }
 
     Write-OctopusSuccess "Finished clone of project channels rules"

@@ -26,7 +26,7 @@ function Copy-OctopusLibraryVariableSets
             $copySourceVariableSet = Copy-OctopusObject -ItemToCopy $sourceVariableSet -ClearIdValue $true -SpaceId $destinationData.SpaceId                       
             $copySourceVariableSet.VariableSetId = $null
 
-            $destinationVariableSet = Save-OctopusApi -EndPoint "libraryvariablesets" -ApiKey $($destinationData.OctopusApiKey) -Method POST -Item $copySourceVariableSet -OctopusUrl $DestinationData.OctopusUrl -SpaceId $DestinationData.SpaceId
+            $destinationVariableSet = Save-OctopusVariableSet -libraryVariableSet $copySourceVariableSet -destinationData $destinationData
         }
         else
         {

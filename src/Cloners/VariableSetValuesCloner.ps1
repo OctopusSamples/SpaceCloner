@@ -125,5 +125,5 @@ function Copy-OctopusVariableSetValues
         }        
     }
 
-    Save-OctopusApi -OctopusUrl $DestinationData.OctopusUrl -SpaceId $null -EndPoint $DestinationVariableSetVariables.Links.Self -ApiKey $DestinationData.OctopusApiKey -Method "PUT" -Item $DestinationVariableSetVariables    
+    Save-OctopusVariableSetVariables -libraryVariableSetVariables $DestinationVariableSetVariables -destinationData $DestinationData    
 }

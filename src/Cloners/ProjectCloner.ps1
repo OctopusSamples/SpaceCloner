@@ -83,7 +83,7 @@ function Copy-OctopusProjectSettings
         $copyOfProject.ReleaseCreationStrategy.ReleaseCreationPackageStepId = $null
         $copyOfProject.AutoCreateRelease = $false
         
-        Save-OctopusApiItem -Item $copyOfProject -Endpoint "projects" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId                 
+        Save-OctopusProject -Project $copyOfProject -DestinationData $destinationData        
 
         return $true
     }
@@ -91,7 +91,7 @@ function Copy-OctopusProjectSettings
     {            
         $matchingProject.Description = $sourceProject.Description                   
 
-        Save-OctopusApiItem -Item $matchingProject -Endpoint "projects" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+        Save-OctopusProject -Project $matchingProject -DestinationData $destinationData        
 
         return $false
     }    
@@ -148,7 +148,8 @@ function Copy-OctopusProjectReleaseVersioningSettings
         $destinationProject.AutoCreateRelease = $false    
     }
 
-    Save-OctopusApiItem -Item $destinationProject -Endpoint "projects" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+    
+    Save-OctopusProject -Project $destinationProject -DestinationData $destinationData
 
     Write-OctopusSuccess "Finished cloning release versioning settings for project $($project.Name)"
 }

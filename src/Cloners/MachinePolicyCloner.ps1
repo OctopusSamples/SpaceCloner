@@ -26,11 +26,7 @@ function Copy-OctopusMachinePolicies
             $machinePolicyToClone.Id = $matchingItem.Id
         }
 
-        Save-OctopusApiItem -Item $machinePolicyToClone `
-                -Endpoint "machinepolicies" `
-                -ApiKey $destinationData.OctopusApiKey `
-                -SpaceId $destinationData.SpaceId `
-                -OctopusUrl $destinationData.OctopusUrl
+        Save-OctopusMachinePolicy -MachinePolicy $machinePolicyToClone -destinationData $DestinationData        
     }    
 
     Write-OctopusSuccess "Machine policies successfully cloned, reloading destination list"    

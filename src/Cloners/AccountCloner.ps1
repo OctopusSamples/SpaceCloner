@@ -33,7 +33,7 @@ function Copy-OctopusInfrastructureAccounts
             Convert-OctopusAccountTenantedDeploymentParticipation -accountClone $accountClone   
             Convert-OctopusSSHAccount -accountClone $accountClone                    
 
-            Save-OctopusApiItem -Item $accountClone -Endpoint "accounts" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $DestinationData.OctopusUrl -SpaceId $DestinationData.SpaceId            
+            Save-OctopusAccount -Account $accountClone -DestinationData $DestinationData            
             Write-OctopusPostCloneCleanUp "Account $($account.Name) was created with dummy values."
         }
         else

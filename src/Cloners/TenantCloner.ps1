@@ -42,7 +42,7 @@ function Copy-OctopusTenants
                 }
             }            
 
-            Save-OctopusApiItem -Item $tenantToAdd -Endpoint "tenants" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+            Save-OctopusTenant -Tenant $tenantToAdd -destinationData $destinationData            
         }
         else
         {

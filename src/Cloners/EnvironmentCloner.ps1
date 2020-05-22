@@ -25,11 +25,7 @@ function Copy-OctopusEnvironments
 
             $copyOfItemToClone = Copy-OctopusObject -ItemToCopy $environment -SpaceId $destinationData.SpaceId -ClearIdValue $true    
 
-            Save-OctopusApiItem -Item $copyOfItemToClone `
-                -Endpoint "Environments" `
-                -ApiKey $destinationData.OctopusApiKey `
-                -SpaceId $destinationData.SpaceId `
-                -OctopusUrl $destinationData.OctopusUrl
+            Save-OctopusEnvironment -environment $copyOfItemToClone -DestinationData $destinationData            
         }
         else 
         {

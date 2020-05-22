@@ -48,11 +48,7 @@ function Copy-OctopusTargets
             Convert-OctopusAzureWebAppTarget -target $copyOfItemToClone -sourceData $sourceData -destinationData $destinationData
             Convert-OctopusTargetTenantedDeploymentParticipation -target $copyOfItemToClone
 
-            Save-OctopusApiItem -Item $copyOfItemToClone `
-                -Endpoint "machines" `
-                -ApiKey $destinationData.OctopusApiKey `
-                -SpaceId $destinationData.SpaceId `
-                -OctopusUrl $destinationData.OctopusUrl
+            Save-OctopusTarget -target $copyOfItemToClone -destinationdata $destinationData            
         }
         else 
         {

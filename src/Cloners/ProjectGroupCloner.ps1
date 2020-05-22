@@ -25,11 +25,7 @@ function Copy-OctopusProjectGroups
 
             $copyOfItemToClone = Copy-OctopusObject -ItemToCopy $projectGroup -SpaceId $destinationData.SpaceId -ClearIdValue $true                                          
 
-            Save-OctopusApiItem -Item $copyOfItemToClone `
-                -Endpoint "projectgroups" `
-                -ApiKey $destinationData.OctopusApiKey `
-                -SpaceId $destinationData.SpaceId `
-                -OctopusUrl $destinationData.OctopusUrl
+            Save-OctopusProjectGroup -ProjectGroup $copyOfItemToClone -DestinationData $destinationData            
         }
         else 
         {

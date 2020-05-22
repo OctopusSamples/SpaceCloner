@@ -17,5 +17,5 @@ function Copy-OctopusProjectDeploymentProcess
     $destinationDeploymentProcess.Steps = @(Copy-OctopusDeploymentProcess -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData -sourceDeploymentProcessSteps $sourceDeploymentProcess.Steps -destinationDeploymentProcessSteps $destinationDeploymentProcess.Steps)
     Write-OctopusPostCloneCleanUp "*****************Ending sync of deployment process for $($destinationProject.Name)*****************"
 
-    Save-OctopusApiItem -Item $destinationDeploymentProcess -Endpoint "deploymentprocesses" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+    Save-OctopusProjectDeploymentProcess -DeploymentProcess $destinationDeploymentProcess -DestinationData $destinationData    
 }

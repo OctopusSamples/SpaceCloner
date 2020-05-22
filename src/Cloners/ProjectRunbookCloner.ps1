@@ -30,8 +30,8 @@ function Copy-OctopusProjectRunbooks
             $runbookToClone.PublishedRunbookSnapshotId = $null
             $runbookToClone.RunbookProcessId = $null            
 
-            Write-OctopusVerbose "The runbook $($runbook.Name) for $($destinationProject.Name) doesn't exist, creating it now"
-            $destinationRunbook = Save-OctopusApiItem -Item $runbookToClone -Endpoint "runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId            
+            Write-OctopusVerbose "The runbook $($runbook.Name) for $($destinationProject.Name) doesn't exist, creating it now"            
+            $destinationRunbook = Save-OctopusProjectRunbook -Runbook $runbookToClone -DestinationData $destinationData
         }
         
         $sourceRunbookProcess = Get-OctopusRunbookProcess -runbook $runbook -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl
@@ -41,6 +41,6 @@ function Copy-OctopusProjectRunbooks
         $destinationRunbookProcess.Steps = @(Copy-OctopusDeploymentProcess -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData -sourceDeploymentProcessSteps $sourceRunbookProcess.Steps -destinationDeploymentProcessSteps $destinationRunbookProcess.Steps)
         Write-OctopusPostCloneCleanUp "*****************End Sync for runbook process $($runbook.Name)********************"        
             
-        Save-OctopusApiItem -Item $destinationRunbookProcess -Endpoint "runbookProcesses" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+        Save-OctopusProjectRunbookProcess -RunbookProcess $destinationRunbookProcess -DestinationData $destinationData        
     }
 }
