@@ -29,7 +29,8 @@ param (
     $OverwriteExistingCustomStepTemplates,
     $OverwriteExistingLifecyclesPhases,
     $CloneProjectRunbooks,
-    $CloneTeamUserRoleScoping   
+    $CloneTeamUserRoleScoping,
+    $CloneProjectChannelRules  
 )
 
 . ($PSScriptRoot + ".\src\Core\Logging.ps1")
@@ -49,6 +50,7 @@ param (
 . ($PSScriptRoot + ".\src\Cloners\ParentProjectTemplateSyncer.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProcessCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectChannelCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\ProjectChannelRuleCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectDeploymentProcessCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProjectGroupCloner.ps1")
@@ -98,6 +100,11 @@ if ($null -eq $CloneTeamUserRoleScoping)
     $CloneTeamUserRoleScoping = $false
 }
 
+if ($null -eq $CloneProjectChannelRules)
+{
+    $CloneProjectChannelRules = $false
+}
+
 $CloneScriptOptions = @{
     EnvironmentsToClone = $EnvironmentsToClone; 
     WorkerPoolsToClone = $WorkerPoolsToClone; 
@@ -123,6 +130,7 @@ $CloneScriptOptions = @{
     ParentProjectName = $ParentProjectName;
     SpaceTeamsToClone = $SpaceTeamsToClone;
     CloneTeamUserRoleScoping = $CloneTeamUserRoleScoping;
+    CloneProjectChannelRules = $CloneProjectChannelRules
 }
 
 $sourceData = Get-OctopusData -octopusUrl $SourceOctopusUrl -octopusApiKey $SourceOctopusApiKey -spaceName $SourceSpaceName

@@ -26,6 +26,8 @@ Please refer to the [Parameter reference page](ParameterReference.md) for more d
 - `AddAdditionalVariableValuesOnExistingVariableSets` - set to `false` so any new values (specifically around scoping) are not added.  
 - `OverwriteExistingCustomStepTemplates` - Set to `false` so the step templates are not updated. 
 - `OverwriteExistingLifecyclesPhases` - Set to `false` as the two spaces will have different phases.
+- `CloneProjectChannelRules` - set to `true` as you'll want to include the channel rules with the project.
+- `CloneTeamUserRoleScoping` - set to `true` as you'll want to include all the scoped permissions with the teams.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" `
@@ -49,8 +51,11 @@ CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" `
     -WorkersToCLone "AWS*" `
     -TargetsToClone "AWS*" `
     -MachinePoliciesToClone "all" `
+    -SpaceTeamsToClone "all" `
     -OverwriteExistingVariables "false" `
     -AddAdditionalVariableValuesOnExistingVariableSets "False" `
     -OverwriteExistingCustomStepTemplates "false" `
-    -OverwriteExistingLifecyclesPhases "false"
+    -OverwriteExistingLifecyclesPhases "false" `
+    -CloneProjectChannelRules "true" `
+    -CloneTeamUserRoleScoping "true"
 ```

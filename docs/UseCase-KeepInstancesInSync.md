@@ -40,6 +40,8 @@ The other options are:
 - `OverwriteExistingCustomStepTemplates` - Set to `True` so the step templates are kept in sync. You might have made some recent changes to the step template.  It is important to keep them up to date.
 - `AddAdditionalVariableValuesOnExistingVariableSets` - set to `false` to skip new variables values found for the same variable name.  
 - `OverwriteExistingLifecyclesPhases` - Set to `false` as the two instances will have different phases.
+- `CloneProjectChannelRules` - set to `true` as you'll want to include the channel rules with the project.
+- `CloneTeamUserRoleScoping` - set to `true` as you'll want to include all the scoped permissions with the teams.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
@@ -54,12 +56,15 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -StepTemplatesToClone "all" `    
     -ScriptModulesToClone "all" `    
     -MachinePoliciesToClone "all" `
+    -SpaceTeamsToClone "all" `
     -LibraryVariableSetsToClone "AWS*,Global,Notification,SQL Server" `
     -ProjectsToClone "Redgate - Feature Branch Example" `    
     -OverwriteExistingVariables "false" `
     -AddAdditionalVariableValuesOnExistingVariableSets "False" `
     -OverwriteExistingCustomStepTemplates "true" `
     -OverwriteExistingLifecyclesPhases "false"
+    -CloneProjectChannelRules "true" `
+    -CloneTeamUserRoleScoping "true"
 ```
 
 # Example - Mirrored Instances
@@ -73,6 +78,8 @@ The other options are:
 - `OverwriteExistingCustomStepTemplates` - Set to `True` so the step templates are kept in sync. You might have made some recent changes to the step template.  It is important to keep them up to date.
 - `AddAdditionalVariableValuesOnExistingVariableSets` - set to `false` to skip variables values found for the same variable name.  
 - `OverwriteExistingLifecyclesPhases` - Set to `false` as the two instances will have different phases.
+- `CloneProjectChannelRules` - set to `true` as you'll want to include the channel rules with the project.
+- `CloneTeamUserRoleScoping` - set to `true` as you'll want to include all the scoped permissions with the teams.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
@@ -93,10 +100,13 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -LifeCyclesToClone "all" `
     -ProjectsToClone "Redgate - Feature Branch Example" `
     -TenantsToClone "all" `
+    -SpaceTeamsToClone "all" `
     -OverwriteExistingVariables "false" `
     -AddAdditionalVariableValuesOnExistingVariableSets "False" `
     -OverwriteExistingCustomStepTemplates "true" `
     -OverwriteExistingLifecyclesPhases "true"
+    -CloneProjectChannelRules "true" `
+    -CloneTeamUserRoleScoping "true"
 ```
 
 

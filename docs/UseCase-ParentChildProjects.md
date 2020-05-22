@@ -16,8 +16,10 @@ Please refer to the [Parameter reference page](ParameterReference.md) for more d
 Options:
 - `OverwriteExistingVariables` - set to `false` to keep the differences preserved.  Any new variable found will be added still.
 - `AddAdditionalVariableValuesOnExistingVariableSets` - set to `True` to add new variables values found for the same variable name.  
-- `OverwriteExistingCustomStepTemplates` - Set to `false` as its the same space instance and this makes no sense to do.
-- `OverwriteExistingLifecyclesPhases` - Set to `false` as its the same space on the same instance and this makes no sense to do.
+- `OverwriteExistingCustomStepTemplates` - Set to `false` as its the same space instance and this makes no sense to rune.
+- `OverwriteExistingLifecyclesPhases` - Set to `false` as its the same space on the same instance and this makes no sense to run.
+- `CloneProjectChannelRules` - set to `false` as its the same space on the same instance and this makes no sense to rune.
+- `CloneTeamUserRoleScoping` - set to `false` as its the same space on the same instance and this makes no sense to run.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `

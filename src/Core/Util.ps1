@@ -151,7 +151,7 @@ function Copy-OctopusObject
         $copyOfItem.Id = $null
     }
 
-    if(Test-OctopusObjectHasProperty -objectToTest $copyOfItem -propertyName "SpaceId" -and $null -ne $SpaceId)
+    if($null -ne $SpaceId -and (Test-OctopusObjectHasProperty -objectToTest $copyOfItem -propertyName "SpaceId"))
     {
         $copyOfItem.SpaceId = $SpaceId
     }

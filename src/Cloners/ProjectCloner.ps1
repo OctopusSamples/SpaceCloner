@@ -20,6 +20,7 @@ function Copy-OctopusProjects
     }
     
     Write-OctopusPostCloneCleanUp "*****************Starting clone for all projects***************"
+    
     foreach($project in $filteredList)
     {
         $createdNewProject = Copy-OctopusProjectSettings -sourceData $SourceData -destinationData $DestinationData -sourceProject $project               
@@ -32,8 +33,9 @@ function Copy-OctopusProjects
 
         $sourceChannels = Get-OctopusApiItemList -EndPoint "projects/$($project.Id)/channels" -ApiKey $SourceData.OctopusApiKey -OctopusUrl $SourceData.OctopusUrl -SpaceId $SourceData.SpaceId
         $destinationChannels = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/channels" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
-
         Copy-OctopusProjectChannels -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData
+        $destinationChannels = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/channels" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+
         Copy-OctopusProjectDeploymentProcess -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -sourceProject $project -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData 
 
         if ($CloneScriptOptions.CloneProjectRunbooks -eq $true)
@@ -42,7 +44,9 @@ function Copy-OctopusProjects
         }
 
         Copy-OctopusProjectVariables -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceProject $project -destinationData $DestinationData -sourceData $SourceData -cloneScriptOptions $CloneScriptOptions -createdNewProject $createdNewProject        
+        Copy-OctopusProjectChannelRules -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData -cloneScriptOptions $CloneScriptOptions
     }
+
     Write-OctopusPostCloneCleanUp "*****************Ending Clone for all projects***************"
 }
 

@@ -28,6 +28,8 @@ The other options are:
 - `OverwriteExistingCustomStepTemplates` - Set to `true` so all step templates are cloned from the source instance.
 - `AddAdditionalVariableValuesOnExistingVariableSets` - set to `true` to add all variables.  
 - `OverwriteExistingLifecyclesPhases` - Set to `true` to keep the lifecycles in sync.
+- `CloneProjectChannelRules` - set to `true` as you'll want to include the channel rules with the project.
+- `CloneTeamUserRoleScoping` - set to `true` as you'll want to include all the scoped permissions with the teams.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
@@ -50,10 +52,13 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -TenantsToClone "all" `
     -TargetsToClone "all" `
     -WorkersToClone "all" `
+    -SpaceTeamsToClone "all" `
     -OverwriteExistingVariables "true" `
     -AddAdditionalVariableValuesOnExistingVariableSets "true" `
     -OverwriteExistingCustomStepTemplates "true" `
-    -OverwriteExistingLifecyclesPhases "true"
+    -OverwriteExistingLifecyclesPhases "true" `
+    -CloneProjectChannelRules "true" `
+    -CloneTeamUserRoleScoping "true"   
 ```
 
 ## Clone Everything But Environments, Workers, and Targets
@@ -67,6 +72,8 @@ The other options are:
 - `OverwriteExistingCustomStepTemplates` - Set to `true` so all step templates are cloned from the source instance.
 - `AddAdditionalVariableValuesOnExistingVariableSets` - set to `true` to add all variables.  
 - `OverwriteExistingLifecyclesPhases` - Set to `true` to keep the lifecycles in sync.
+- `CloneProjectChannelRules` - set to `true` as you'll want to include the channel rules with the project.
+- `CloneTeamUserRoleScoping` - set to `true` as you'll want to include all the scoped permissions with the teams.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
@@ -85,8 +92,11 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -LifeCyclesToClone "all" `
     -ProjectsToClone "all" `
     -TenantsToClone "all" `
+    -SpaceTeamsToClone "all" `
     -OverwriteExistingVariables "true" `
     -AddAdditionalVariableValuesOnExistingVariableSets "true" `
     -OverwriteExistingCustomStepTemplates "true" `
-    -OverwriteExistingLifecyclesPhases "true"
+    -OverwriteExistingLifecyclesPhases "true" `
+    -CloneProjectChannelRules "true" `
+    -CloneTeamUserRoleScoping "true"
 ``` 

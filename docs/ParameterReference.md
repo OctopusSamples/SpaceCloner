@@ -48,12 +48,13 @@ If you wish to skip an item you can exclude it from the parameter list OR set th
 
 The values for these options are either `True`, `False` or `null`.  Null will cause the default parameter to be used.
 
-- OverwriteExistingCustomStepTemplates` - Indicates if existing custom step templates (not community step templates) should be overwritten.  Useful when you make a change to a step template you want to move over to another instance.  Defaults to `false`.
-- OverwriteExistingLifecyclesPhases` - Indicates you want to overwrite the phases on existing lifecycles.  This is useful when you have an updated lifecycle you want applied to applied to another space/instance.  You would want to leave this to false if the destination lifecycle has different phases.  Defaults to `false`.
-- OverwriteExistingVariables` - Indicates if all existing variables (except sensitive variables) should be overwritten.  Defaults to `false`.
-- CloneProjectRunbooks` - Indicates if project runbooks should be cloned or should be skipped.  This is useful when you just want a quick copy of a project and the variables, but not the runbooks.  Defaults to `true`.
-- CloneTeamUserRoleScoping - Indicates if the space teams should have their scoping cloned.  Will use the same teams based on parameter `SpaceTeamsToClone`.  Defaults to `false`.
-- AddAdditionalVariableValuesOnExistingVariableSets` - Indicates a variable on the destination should only have one value.  You would have multiple values if you were scoping variables.  Defaults to `false`.
+- `OverwriteExistingCustomStepTemplates` - Indicates if existing custom step templates (not community step templates) should be overwritten.  Useful when you make a change to a step template you want to move over to another instance.  Defaults to `false`.
+- `OverwriteExistingLifecyclesPhases` - Indicates you want to overwrite the phases on existing lifecycles.  This is useful when you have an updated lifecycle you want applied to applied to another space/instance.  You would want to leave this to false if the destination lifecycle has different phases.  Defaults to `false`.
+- `OverwriteExistingVariables` - Indicates if all existing variables (except sensitive variables) should be overwritten.  Defaults to `false`.
+- `CloneProjectChannelRules` - Indicates if the project channel rules should be cloned and overwrite existing channel rules.  Defaults to `false`.
+- `CloneProjectRunbooks` - Indicates if project runbooks should be cloned or should be skipped.  This is useful when you just want a quick copy of a project and the variables, but not the runbooks.  Defaults to `true`.
+- `CloneTeamUserRoleScoping` - Indicates if the space teams should have their scoping cloned.  Will use the same teams based on parameter `SpaceTeamsToClone`.  Defaults to `false`.
+- `AddAdditionalVariableValuesOnExistingVariableSets` - Indicates a variable on the destination should only have one value.  You would have multiple values if you were scoping variables.  Defaults to `false`.
 
 ## AddAdditionalVariableValuesOnExistingVariableSets further detail
 
