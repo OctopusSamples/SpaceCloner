@@ -16,6 +16,8 @@ The script `CloneSpace.ps1` will clone the following:
     - Deployment Process
     - Runbooks
     - Variables
+    - Project Versioning Strategy 
+    - Project Automatic Release Creation 
 - Script Modules
 - Step Templates (both community and custom step templates)
 - Teams
@@ -30,13 +32,10 @@ The script `CloneSpace.ps1` will not clone the following items:
 - Deployments
 - External Auth Providers (or groups)
 - Packages
-- Project Versioning Strategy (clears out package references)
-- Project Automatic Release Creation (clears out package references)
 - Releases
 - Roles
 - Tenant Variables
-- Server settings like folders
-- Spaces
+- Server settings (folders, smtp, jira integration, proxy settings)
 - Users
 
 This script assumes the user for the destination instance has `Space manager` rights.  Some of those items, users, roles, spaces, cannot be copied over because space manager does not have permissions to do so.
@@ -59,9 +58,7 @@ This script was designed to be run multiple times with the same parameters.  It 
 - Project Items
     - Channels (match by name)
     - Deployment Process steps (match by name)    
-    - Library Variable Set Sensitive variables (match by name)    
-    - Project Versioning Strategy (once you set it in the destination project, it keeps it)
-    - Project Automatic Release Creation (once you set it in the destination project, it keeps it)
+    - Library Variable Set Sensitive variables (match by name)        
     - Runbook Process steps (match by name)    
 - Worker Pools (match by name)
 - Workers (match by name)
@@ -106,7 +103,6 @@ The rules for cloning a deployment process are:
 
 - Clone steps not found in the destination process
 - Leave existing steps as is
-- Clear out package references when cloning new steps
 - The source process is the source of truth for step order.  It will ensure the destination deployment process order matches.  It will then add additional steps found in the deployment process not found in the source to the end of the deployment process.
 
 ## Targets and Workers

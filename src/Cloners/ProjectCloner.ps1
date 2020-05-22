@@ -31,10 +31,10 @@ function Copy-OctopusProjects
 
         $destinationProject = Get-OctopusItemByName -ItemList $DestinationData.ProjectList -ItemName $project.Name
 
-        $sourceChannels = Get-OctopusApiItemList -EndPoint "projects/$($project.Id)/channels" -ApiKey $SourceData.OctopusApiKey -OctopusUrl $SourceData.OctopusUrl -SpaceId $SourceData.SpaceId
-        $destinationChannels = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/channels" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+        $sourceChannels = Get-OctopusProjectChannelList -project $project -ApiKey $SourceData.OctopusApiKey -OctopusUrl $SourceData.OctopusUrl -SpaceId $SourceData.SpaceId
+        $destinationChannels = Get-OctopusProjectChannelList -project $destinationProject -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
         Copy-OctopusProjectChannels -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData
-        $destinationChannels = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/channels" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+        $destinationChannels = Get-OctopusProjectChannelList -project $destinationProject -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
 
         Copy-OctopusProjectDeploymentProcess -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -sourceProject $project -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData 
 
@@ -116,8 +116,8 @@ function Copy-OctopusProjectReleaseVersioningSettings
     }
 
     Write-OctopusSuccess "Cloning release versioning settings for project $($project.Name)"
-    $sourceDeploymentProcess = Get-OctopusApi -EndPoint $sourceProject.Links.DeploymentProcess -ApiKey $SourceData.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $null
-    $destinationDeploymentProcess = Get-OctopusApi -EndPoint $destinationProject.Links.DeploymentProcess -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $null
+    $sourceDeploymentProcess = Get-OctopusProjectDeploymentProcess -project $sourceProject -ApiKey $SourceData.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl
+    $destinationDeploymentProcess = Get-OctopusProjectDeploymentProcess -project $destinationProject -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl 
 
     if ($null -eq $sourceProject.VersioningStrategy.DonorPackage.Template)
     {

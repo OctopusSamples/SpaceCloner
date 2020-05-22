@@ -282,3 +282,60 @@ function Get-OctopusSpaceId
         return $null
     }
 }
+
+function Get-OctopusProjectChannelList
+{
+    param(
+        $project,
+        $octopusUrl,
+        $ApiKey,
+        $spaceId
+    )
+
+    return Get-OctopusApiItemList -EndPoint "projects/$($project.Id)/channels" -ApiKey $ApiKey -OctopusUrl $OctopusUrl -SpaceId $SpaceId
+}
+
+function Get-OctopusProjectDeploymentProcess
+{
+    param(
+        $project,
+        $octopusUrl,
+        $ApiKey
+    )
+
+    return Get-OctopusApi -EndPoint $project.Links.DeploymentProcess -ApiKey $ApiKey -OctopusUrl $OctopusUrl -SpaceId $null
+}
+
+function Get-OctopusProjectRunbookList
+{
+    param(
+        $project,
+        $octopusUrl,
+        $ApiKey,
+        $spaceId
+    )
+
+    return Get-OctopusApiItemList -EndPoint "projects/$($project.Id)/runbooks" -ApiKey $ApiKey -OctopusUrl $OctopusUrl -SpaceId $SpaceId
+}
+
+function Get-OctopusRunbookProcess
+{
+    param(
+        $runbook,
+        $octopusUrl,
+        $ApiKey
+    )
+
+    return Get-OctopusApi -EndPoint $runbook.Links.RunbookProcesses -ApiKey $ApiKey -OctopusUrl $OctopusUrl -SpaceId $null
+}
+
+function Get-OctopusTeamScopedUserRoleList
+{
+    param(
+        $team,
+        $octopusUrl,
+        $ApiKey        
+    )
+
+    return Get-OctopusApiItemList -EndPoint "teams/$($team.Id)/scopeduserroles?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusUrl
+}

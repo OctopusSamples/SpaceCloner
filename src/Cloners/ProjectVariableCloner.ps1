@@ -24,7 +24,7 @@ function Copy-OctopusProjectVariables
 
         if ($sourceData.HasRunBooks -eq $true)
         {
-            $SourceProjectData.RunbookList = Get-OctopusApiItemList -EndPoint "projects/$($sourceProject.Id)/runbooks" -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $sourceData.SpaceId;
+            $SourceProjectData.RunbookList = Get-OctopusProjectRunbookList $project $sourceProject -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $sourceData.SpaceId;
         }
 
         $DestinationProjectData = @{
@@ -35,7 +35,7 @@ function Copy-OctopusProjectVariables
 
         if ($destinationData.HasRunBooks -eq $true)
         {
-            $DestinationProjectData.RunbookList = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId;
+            $DestinationProjectData.RunbookList = Get-OctopusProjectRunbookList $project $destinationProject -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId;
         }
 
         Write-OctopusPostCloneCleanUp "*****************Starting variable clone for $($destinationProject.Name)*******************"

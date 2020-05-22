@@ -46,8 +46,8 @@ function Copy-OctopusSpaceTeamUserRoles
 
         Write-OctopusVerbose "Team $($team.Name) was found in the destination, updating the scoping"                    
 
-        $sourceUserRoleScoping = Get-OctopusApiItemList -endPoint "teams/$($team.Id)/scopeduserroles?skip=0&take=1000" -apiKey $sourceData.OctopusApiKey -spaceId $null -OctopusUrl $sourceData.OctopusUrl
-        $destinationUserRoleScoping = Get-OctopusApiItemList -endPoint "teams/$($matchingItem.Id)/scopeduserroles?skip=0&take=1000" -apiKey $destinationData.OctopusApiKey -spaceId $null -OctopusUrl $destinationData.OctopusUrl
+        $sourceUserRoleScoping = Get-OctopusTeamScopedUserRoleList -team $team -apiKey $sourceData.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl
+        $destinationUserRoleScoping = Get-OctopusTeamScopedUserRoleList -team $matchingItem -apiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl
         
         if ($destinationUserRoleScoping.Length -gt 0)
         {
