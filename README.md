@@ -82,3 +82,11 @@ Yes!  It is a PowerShell script.  It calls the APIs, so you should be fine in us
 Honestly, it's a security concern.  There are two built-in roles which provide space create permission, `System Manager` and `System Administrator`.  The [service account user](https://octopus.com/docs/security/users-and-teams/service-accounts) would either need to be added to `Octopus Managers` or `Octopus Administrators` teams.  That user would also have permissions to create users and update other settings on your instance.  We want you to feel comfortable using the script as is.  Requiring elevated permissions is concern and it isn't something we felt good about asking our users to do.
 
 Yes, you can create a custom role and assign the service account user to that role.  The goal of this script is it should "just work" with a minimal amount of configuration on your end.  Once you start diving into permissions and custom roles, it is going to be much harder to get working.  
+
+### Does the script clone users, teams and roles?
+
+This script does _**NOT**_ clone users or roles.  You can tell it to clone teams.  It will only clone space specific teams.  It will not clone system teams.  It will _**NOT**_ create roles either.  When it attempts to set up scoping for a team it will see if the role exists on the destination, if it does not exist it will skip it.  
+
+Teams which are created have the external groups cleared.  
+
+The cloning team functionality will only assign existing users and roles to space teams.  It will not attempt to create anything new which might compromise your security.  

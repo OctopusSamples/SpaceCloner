@@ -51,5 +51,5 @@ function Copy-OctopusTenants
     }
 
     Write-OctopusSuccess "Tenants successfully cloned, reloading destination list"
-    $destinationData.TenantList = Get-OctopusTenants -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+    $destinationData.TenantList = Get-OctopusTenantList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
 }

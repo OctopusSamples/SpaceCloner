@@ -31,7 +31,8 @@ If you wish to skip an item you can exclude it from the parameter list OR set th
 - `MachinePoliciesToClone` - The list of machine policies to clone.  
 - `ProjectGroupsToClone` - The list of project groups to clone.  
 - `ProjectsToClone` - The list of projects to clone.  
-- `ScriptModulesToClone` - The list of script modules to clone.  
+- `ScriptModulesToClone` - The list of script modules to clone. 
+- `SpaceTeamsToClone` - The list of teams specific to the space to clone.  Will not clone system teams.  Version 2019 or higher required. 
 - `StepTemplatesToClone` - The list of step templates to clone.  
 - `TargetsToClone` - The list of targets to clone.  Please note, this won't clone any polling tentacles.
 - `TenantsToClone` - The list of tenants to clone.  Please note, this will not clone tenant variables.
@@ -44,11 +45,15 @@ If you wish to skip an item you can exclude it from the parameter list OR set th
 - `ChildProjectsToSync` - The list of projects to sync the deployment process with.   Uses the same wild card matching as the other filters.  Can match to 1 to N number of projects.
 
 ## Options
-- OverwriteExistingCustomStepTemplates` - Indicates if existing custom step templates (not community step templates) should be overwritten.  Useful when you make a change to a step template you want to move over to another instance.  Possible values are `true` or `false`.  Defaults to `false`.
-- OverwriteExistingLifecyclesPhases` - Indicates you want to overwrite the phases on existing lifecycles.  This is useful when you have an updated lifecycle you want applied to applied to another space/instance.  You would want to leave this to false if the destination lifecycle has different phases.  Possible values are `true` or `false`.  Defaults to `false`.
-- OverwriteExistingVariables` - Indicates if all existing variables (except sensitive variables) should be overwritten.  Possible values are `true` or `false`.  Defaults to `false`.
-- CloneProjectRunbooks` - Indicates if project runbooks should be cloned or should be skipped.  This is useful when you just want a quick copy of a project and the variables, but not the runbooks.  Possible values are `true` or `false`.  Defaults to `true`.
-- AddAdditionalVariableValuesOnExistingVariableSets` - Indicates a variable on the destination should only have one value.  You would have multiple values if you were scoping variables.  Possible values are `true` or `false`.  Defaults to `false`.
+
+The values for these options are either `True`, `False` or `null`.  Null will cause the default parameter to be used.
+
+- OverwriteExistingCustomStepTemplates` - Indicates if existing custom step templates (not community step templates) should be overwritten.  Useful when you make a change to a step template you want to move over to another instance.  Defaults to `false`.
+- OverwriteExistingLifecyclesPhases` - Indicates you want to overwrite the phases on existing lifecycles.  This is useful when you have an updated lifecycle you want applied to applied to another space/instance.  You would want to leave this to false if the destination lifecycle has different phases.  Defaults to `false`.
+- OverwriteExistingVariables` - Indicates if all existing variables (except sensitive variables) should be overwritten.  Defaults to `false`.
+- CloneProjectRunbooks` - Indicates if project runbooks should be cloned or should be skipped.  This is useful when you just want a quick copy of a project and the variables, but not the runbooks.  Defaults to `true`.
+- CloneTeamUserRoleScoping - Indicates if the space teams should have their scoping cloned.  Will use the same teams based on parameter `SpaceTeamsToClone`.  Defaults to `false`.
+- AddAdditionalVariableValuesOnExistingVariableSets` - Indicates a variable on the destination should only have one value.  You would have multiple values if you were scoping variables.  Defaults to `false`.
 
 ## AddAdditionalVariableValuesOnExistingVariableSets further detail
 

@@ -36,26 +36,26 @@ function Get-OctopusData
     $octopusData.WorkerPoolList = Get-OctopusWorkerPoolList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId -HasWorkers $octopusData.HasWorkers
 
     Write-OctopusSuccess "Getting Tenant Tags for $spaceName in $octopusUrl"
-    $octopusData.TenantTagList = Get-OctopusTenantTagSet -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+    $octopusData.TenantTagList = Get-OctopusTenantTagSetList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
 
     Write-OctopusSuccess "Getting Step Templates for $spaceName in $octopusUrl"
     $octopusData.StepTemplates = Get-OctopusStepTemplateList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
-    $octopusData.CommunityActionTemplates = Get-OctopusCommunityActionTemplates -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl 
+    $octopusData.CommunityActionTemplates = Get-OctopusCommunityActionTemplateList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl 
 
     Write-OctopusSuccess "Getting Infrastructure Accounts for $spaceName in $octopusUrl"
-    $octopusData.InfrastructureAccounts = Get-OctopusInfrastructureAccounts -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+    $octopusData.InfrastructureAccounts = Get-OctopusInfrastructureAccountList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
 
     Write-OctopusSuccess "Getting Library Variable Sets for $spaceName in $octopusUrl"
     $octopusData.VariableSetList = Get-OctopusLibrarySetList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
 
     Write-OctopusSuccess "Getting Tenants for $spaceName in $octopusUrl"
-    $octopusData.TenantList = Get-OctopusTenants -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+    $octopusData.TenantList = Get-OctopusTenantList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
 
     Write-OctopusSuccess "Getting Lifecycles for $spaceName in $octopusUrl"
-    $octopusData.LifeCycleList = Get-OctopusLifeCycles -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+    $octopusData.LifeCycleList = Get-OctopusLifeCycleList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
 
     Write-OctopusSuccess "Getting Project Groups for $spaceName in $octopusUrl"
-    $octopusData.ProjectGroupList = Get-ProjectGroups -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+    $octopusData.ProjectGroupList = Get-ProjectGroupList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
     
     Write-OctopusSuccess "Getting Projects for $spaceName in $octopusUrl"
     $octopusData.ProjectList = Get-OctopusProjectList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
@@ -64,16 +64,25 @@ function Get-OctopusData
     $octopusData.FeedList = Get-OctopusFeedList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
 
     Write-OctopusSuccess "Getting Script Modules for $spaceName in $OctopusUrl"
-    $octopusData.ScriptModuleList = Get-OctopusScriptModules -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+    $octopusData.ScriptModuleList = Get-OctopusScriptModuleList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
 
     Write-OctopusSuccess "Getting Machine Policies for $spaceName in $OctopusUrl"
-    $octopusData.MachinePolicyList = Get-OctopusMachinePolicies -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+    $octopusData.MachinePolicyList = Get-OctopusMachinePolicyList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
 
     Write-OctopusSuccess "Getting Workers for $spaceName in $OctopusUrl"
-    $octopusData.WorkerList = Get-OctopusWorkers -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+    $octopusData.WorkerList = Get-OctopusWorkerList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
 
     Write-OctopusSuccess "Getting Targets for $spaceName in $OctopusUrl"
-    $octopusData.TargetList = Get-OctopusTargets -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+    $octopusData.TargetList = Get-OctopusTargetList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+
+    Write-OctopusSuccess "Getting Teams for $spaceName in $OctopusUrl"
+    $octopusData.TeamList = Get-OctopusTeamList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl -SpaceId $octopusData.SpaceId
+
+    Write-OctopusSuccess "Getting Users for $spaceName in $OctopusUrl"
+    $octopusData.UserList = Get-OctopusUserList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl
+
+    Write-OctopusSuccess "Getting User Roles for $spaceName in $OctopusUrl"
+    $octopusData.UserRoleList = Get-OctopusUserList -ApiKey $octopusApiKey -OctopusServerUrl $octopusUrl
 
     return $octopusData
 }

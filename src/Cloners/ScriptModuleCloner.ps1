@@ -48,5 +48,5 @@ function Copy-OctopusScriptModules
     }
 
     Write-OctopusSuccess "Script Modules successfully cloned, reloading destination list"    
-    $destinationData.ScriptModuleList = Get-OctopusScriptModules -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.ScriptModuleList = Get-OctopusScriptModuleList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
 }

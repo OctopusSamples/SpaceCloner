@@ -62,7 +62,7 @@ function Write-OctopusPostCloneCleanUp
 {
     param($message)
     
-    Add-Content -Value "             $message" -Path $cleanupLogPath
+    Add-Content -Value "   $message" -Path $cleanupLogPath
 }
 
 function Write-OctopusPostCloneCleanUpHeader

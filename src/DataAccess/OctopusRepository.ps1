@@ -41,7 +41,7 @@ Function Get-OctopusLibrarySetList
     return Get-OctopusApiItemList -EndPoint "libraryvariablesets?skip=0&take=1000&contentType=Variables" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
-Function Get-OctopusScriptModules
+Function Get-OctopusScriptModuleList
 {
     param (
         $SpaceId,
@@ -75,7 +75,7 @@ Function Get-OctopusStepTemplateList
     return Get-OctopusApiItemList -EndPoint "actiontemplates?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
-Function Get-OctopusProjectRunBooks
+Function Get-OctopusProjectRunBookList
 {
     param(
         $ProjectId,
@@ -127,7 +127,7 @@ Function Get-OctopusFeedList
     return Get-OctopusApiItemList -EndPoint "feeds?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
-Function Get-OctopusInfrastructureAccounts
+Function Get-OctopusInfrastructureAccountList
 {
     param(
         $SpaceId,
@@ -138,7 +138,7 @@ Function Get-OctopusInfrastructureAccounts
     return Get-OctopusApiItemList -EndPoint "accounts?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
-function Get-OctopusCommunityActionTemplates
+function Get-OctopusCommunityActionTemplateList
 {
     param(
         $OctopusServerUrl,
@@ -148,7 +148,7 @@ function Get-OctopusCommunityActionTemplates
     return Get-OctopusApiItemList -EndPoint "communityactiontemplates?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $null
 }
 
-Function Get-OctopusTenantTagSet
+Function Get-OctopusTenantTagSetList
 {
     param(
         $SpaceId,
@@ -159,7 +159,7 @@ Function Get-OctopusTenantTagSet
     return Get-OctopusApiItemList -EndPoint "tagsets?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
-Function Get-OctopusLifeCycles
+Function Get-OctopusLifeCycleList
 {
     param(
         $SpaceId,
@@ -170,7 +170,7 @@ Function Get-OctopusLifeCycles
     return Get-OctopusApiItemList -EndPoint "lifecycles?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
-Function Get-ProjectGroups
+Function Get-ProjectGroupList
 {
     param(
         $SpaceId,
@@ -181,7 +181,7 @@ Function Get-ProjectGroups
     return Get-OctopusApiItemList -EndPoint "projectgroups?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
-Function Get-OctopusTenants
+Function Get-OctopusTenantList
 {
     param(
         $SpaceId,
@@ -192,7 +192,7 @@ Function Get-OctopusTenants
     return Get-OctopusApiItemList -EndPoint "tenants?skip=0&take=10000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
-Function Get-OctopusMachinePolicies
+Function Get-OctopusMachinePolicyList
 {
     param(
         $SpaceId,
@@ -203,7 +203,7 @@ Function Get-OctopusMachinePolicies
     return Get-OctopusApiItemList -EndPoint "machinepolicies?skip=0&take=10000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
-Function Get-OctopusWorkers
+Function Get-OctopusWorkerList
 {
     param(
         $SpaceId,
@@ -214,7 +214,7 @@ Function Get-OctopusWorkers
     return Get-OctopusApiItemList -EndPoint "workers?skip=0&take=10000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
 }
 
-Function Get-OctopusTargets
+Function Get-OctopusTargetList
 {
     param(
         $SpaceId,
@@ -223,6 +223,37 @@ Function Get-OctopusTargets
     )
 
     return Get-OctopusApiItemList -EndPoint "machines?skip=0&take=10000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $SpaceId
+}
+
+Function Get-OctopusTeamList
+{
+    param(
+        $SpaceId,
+        $OctopusServerUrl,
+        $ApiKey
+    )
+
+    return Get-OctopusApiItemList -EndPoint "teams?spaces=$spaceId&includeSystem=true" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $null
+}
+
+Function Get-OctopusUserList
+{
+    param(        
+        $OctopusServerUrl,
+        $ApiKey
+    )
+
+    return Get-OctopusApiItemList -EndPoint "users?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $null
+}
+
+Function Get-OctopusUserRoleList
+{
+    param(        
+        $OctopusServerUrl,
+        $ApiKey
+    )
+
+    return Get-OctopusApiItemList -EndPoint "usersroles?skip=0&take=1000" -ApiKey $ApiKey -OctopusUrl $OctopusServerUrl -SpaceId $null
 }
 
 function Get-OctopusSpaceId

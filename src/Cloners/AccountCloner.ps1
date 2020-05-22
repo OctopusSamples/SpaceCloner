@@ -44,7 +44,7 @@ function Copy-OctopusInfrastructureAccounts
     Write-OctopusPostCloneCleanUpHeader "*************End Infrastructure Accounts*************"
 
     Write-OctopusSuccess "Infrastructure Accounts successfully cloned, reloading destination list"    
-    $destinationData.InfrastructureAccounts = Get-OctopusInfrastructureAccounts -OctopusServerUrl $($destinationData.OctopusUrl) -ApiKey $($destinationData.OctopusApiKey) -SpaceId $($destinationData.SpaceId)
+    $destinationData.InfrastructureAccounts = Get-OctopusInfrastructureAccountList -OctopusServerUrl $($destinationData.OctopusUrl) -ApiKey $($destinationData.OctopusApiKey) -SpaceId $($destinationData.SpaceId)
 }
 
 function Convert-OctopusAWSAccountInformation

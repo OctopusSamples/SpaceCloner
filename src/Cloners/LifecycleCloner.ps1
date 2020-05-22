@@ -46,5 +46,5 @@ function Copy-OctopusLifecycles
     }    
 
     Write-OctopusSuccess "Lifecycles successfully cloned, reloading destination list"    
-    $destinationData.LifeCycleList = Get-OctopusLifeCycles -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
+    $destinationData.LifeCycleList = Get-OctopusLifeCycleList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
 }

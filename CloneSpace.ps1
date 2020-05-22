@@ -22,12 +22,14 @@ param (
     $ProjectsToClone,
     $ParentProjectName,
     $ChildProjectsToSync,
-    $TenantsToClone,    
+    $TenantsToClone,
+    $SpaceTeamsToClone,    
     $OverwriteExistingVariables,
     $AddAdditionalVariableValuesOnExistingVariableSets,
     $OverwriteExistingCustomStepTemplates,
     $OverwriteExistingLifecyclesPhases,
-    $CloneProjectRunbooks   
+    $CloneProjectRunbooks,
+    $CloneTeamUserRoleScoping   
 )
 
 . ($PSScriptRoot + ".\src\Core\Logging.ps1")
@@ -55,6 +57,8 @@ param (
 . ($PSScriptRoot + ".\src\Cloners\ScriptModuleCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\StepTemplateCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\TargetCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\TeamCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\TeamUserRoleCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\TenantCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\TenantTagSetCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\VariableSetValuesCloner.ps1")
@@ -89,6 +93,11 @@ if ($null -eq $CloneProjectRunbooks)
     $CloneProjectRunbooks = $true
 }
 
+if ($null -eq $CloneTeamUserRoleScoping)
+{
+    $CloneTeamUserRoleScoping = $false
+}
+
 $CloneScriptOptions = @{
     EnvironmentsToClone = $EnvironmentsToClone; 
     WorkerPoolsToClone = $WorkerPoolsToClone; 
@@ -112,6 +121,8 @@ $CloneScriptOptions = @{
     CloneProjectRunbooks = $CloneProjectRunbooks;
     ChildProjectsToSync = $ChildProjectsToSync;
     ParentProjectName = $ParentProjectName;
+    SpaceTeamsToClone = $SpaceTeamsToClone;
+    CloneTeamUserRoleScoping = $CloneTeamUserRoleScoping;
 }
 
 $sourceData = Get-OctopusData -octopusUrl $SourceOctopusUrl -octopusApiKey $SourceOctopusApiKey -spaceName $SourceSpaceName
@@ -147,6 +158,7 @@ Copy-OctopusWorkerPools -sourceData $sourceData -destinationData $destinationDat
 Copy-OctopusProjectGroups -sourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusExternalFeeds -sourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusTenantTags -sourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
+Copy-OctopusSpaceTeams -sourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusStepTemplates -sourceData $sourceData -destinationData $destinationData -cloneScriptOptions $CloneScriptOptions
 Copy-OctopusInfrastructureAccounts -SourceData $sourceData -DestinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 Copy-OctopusLibraryVariableSets -SourceData $sourceData -DestinationData $destinationData  -cloneScriptOptions $CloneScriptOptions
@@ -158,6 +170,7 @@ Copy-OctopusTenants -sourceData $sourceData -destinationData $destinationData -C
 Copy-OctopusWorkers -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 Copy-OctopusTargets -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 Sync-OctopusMasterOctopusProjectWithChildProjects -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
+Copy-OctopusSpaceTeamUserRoles -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 
 $logPath = Get-OctopusLogPath
 $cleanupLogPath = Get-OctopusCleanUpLogPath

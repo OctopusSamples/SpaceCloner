@@ -115,4 +115,15 @@ Secondly, the clone script only supports a subset of all targets.  The targets s
 - Cloud Regions
 - Azure Web Apps
 
-Due to how polling tentacles work, the script cannot clone polling tentacles from one instance to another.  The polling tentacles won't know about the switch.  You will need to set up a new polling tentacle instance on the server.  
+Due to how polling tentacles work, the script cannot clone polling tentacles from one instance to another.  The polling tentacles won't know about the switch.  You will need to set up a new polling tentacle instance on the server. 
+
+## Teams and role scoping
+
+The script provides an option to clone teams.  It follows the following rules:
+
+- Only the space specific teams will be cloned.  Any system teams, such as `Everyone`, `Octopus Administrators`, etc. will _**NOT**_ be cloned. 
+- It will only assign users which already exist in the destination instance.  It will _**NOT**_ create new users.
+- The clone will only create the team.  After that it will leave the team as is.  
+- Teams which are created have the external groups cleared.  
+- For user scoping the roles must exist on both the destination and the source.  This script will _**NOT**_ create new roles.  It only leverages existing roles.  
+- If the destination team already has roles scoped to it, the script will skip it.

@@ -39,20 +39,41 @@ function Convert-SourceIdToDestinationId
         $IdValue
     )
 
+    $idValueSplit = $IdValue -split "-"
+    if (($idValueSplit[1] -match "^[\d\.]+$") -eq $false)
+    {
+        Write-OctopusVerbose "The id value $idValue is a built in id, no need to convert, returning it."
+        return $IdValue
+    }
+
     Write-OctopusVerbose "Getting Name of $IdValue"
     $sourceItem = Get-OctopusItemById -ItemList $SourceList -ItemId $IdValue
-    Write-OctopusVerbose "The name of $IdValue is $($sourceItem.Name)"
 
-    Write-OctopusVerbose "Attempting to find $($sourceItem.Name) in Destination List"
-    $destinationItem = Get-OctopusItemByName -ItemName $sourceItem.Name -ItemList $DestinationList
-    Write-OctopusVerbose "The destination id for $($sourceItem.Name) is $($destinationItem.Id)"
+    $nameToUse = $sourceItem.Name
+    if ([string]::IsNullOrWhiteSpace($nameToUse))
+    {
+        Write-OctopusVerbose "The name property is null attempting the username property"
+        $nameToUse = $sourceItem.UserName
+    }
+
+    if ([string]::IsNullOrWhiteSpace($nameToUse))
+    {
+        Write-OctopusVerbose "Unable to find a name property for $IdValue"
+        return $null
+    }
+
+    Write-OctopusVerbose "The name of $IdValue is $nameToUse, attempting to find in destination list"    
+
+    $destinationItem = Get-OctopusItemByName -ItemName $nameToUse -ItemList $DestinationList    
 
     if ($null -eq $destinationItem)
     {
+        Write-OctopusVerbose "Unable to find $nameToUse in the destination list"
         return $null
     }
     else
     {
+        Write-OctopusVerbose "The destination id for $nameToUse is $($destinationItem.Id)"
         return $destinationItem.Id
     }
 }
