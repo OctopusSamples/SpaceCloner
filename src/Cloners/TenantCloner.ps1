@@ -27,7 +27,8 @@ function Copy-OctopusTenants
             $tenantToAdd.SpaceId = $destinationData.SpaceId
             $tenantToAdd.ProjectEnvironments = @{}            
 
-            $tenant.ProjectEnvironments.PSObject.Properties | ForEach-Object {
+            $tenant.ProjectEnvironments.PSObject.Properties | ForEach-Object 
+            {
                 Write-OctopusVerbose "Attempting to matching $($_.Name) with source"
                 $matchingProjectId = Convert-SourceIdToDestinationId -SourceList $sourceData.ProjectList -DestinationList $destinationData.ProjectList -IdValue $_.Name
 

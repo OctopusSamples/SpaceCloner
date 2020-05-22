@@ -126,82 +126,14 @@ if ($sourceData.OctopusUrl -eq $destinationData.OctopusUrl -and $SourceSpaceName
 {
     $canProceed = $true
 
-    if ([string]::IsNullOrWhiteSpace($EnvironmentsToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified environments to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
+    $CloneScriptOptions.PSObject.Properties | ForEach-Object {
+        $optionName = $_.Name
 
-    if ([string]::IsNullOrWhiteSpace($WorkerPoolsToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified worker pools to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($ProjectGroupsToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified project groups to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($TenantTagsToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified tenant tags to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($ExternalFeedsToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified external feeds to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($StepTemplatesToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified step templates to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($InfrastructureAccountsToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified infrastructure accounts to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($LibraryVariableSetsToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified variable sets to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($LifeCyclesToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified lifecycles to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($ScriptModulesToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified script modules to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($MachinePoliciesToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have machine policeis sets to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($WorkersToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified workers sets to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
-    }
-
-    if ([string]::IsNullOrWhiteSpace($TargetsToClone) -eq $false)
-    {
-        Write-OctopusCritical "You are cloning to the same space, but have specified variable sets to clone.  This is not allowed.  Please remove that parameter."
-        $canProceed = $false
+        if ($optionName -like "*ToClone" -and [string]::IsNullOrWhiteSpace($_.Value) -eq $false)
+        {
+            Write-OctopusCritical "You are cloning to the same space on the same instance, but have a value for $optionName.  This is not allowed.  Please remove that parameter."
+            $canProceed = $false
+        }
     }
 
     if ($canProceed -eq $false)
