@@ -63,7 +63,10 @@ function Convert-OctopusProcessActionStepTemplate
                 
                 if ($controlType -eq "Package")
                 {
-                    $action.Properties.$($parameter.Name) = ""
+                    $feedInformation = $action.Properties.$($parameter.Name) | ConvertFrom-Json
+                    $feedInformation.FeedId = Convert-SourceIdToDestinationId -SourceList $sourceData.FeedList -DestinationList $destinationData.FeedList -IdValue $feedInformation.FeedId
+
+                    $action.Properties.$($parameter.Name) = $feedInformation | ConvertTo-Json
                 }    
                 elseif ($controlType -eq "Sensitive")            
                 {
@@ -85,8 +88,18 @@ function Convert-OctopusProcessActionManualIntervention
 
     if (Test-OctopusObjectHasProperty -objectToTest $action.Properties -propertyName "Octopus.Action.Manual.ResponsibleTeamIds")
     {
-        Write-OctopusPostCloneCleanUp "$($action.Name) is a manual intervention, converting responsible team to built in team 'team-managers'"                                        
-        $action.Properties.'Octopus.Action.Manual.ResponsibleTeamIds' = "team-managers"
+        $manualInterventionSourceTeamIds = @($action.Properties.'Octopus.Action.Manual.ResponsibleTeamIds' -split ",")
+        $manualInterventionDestinationTeamIds = @(Convert-SourceIdListToDestinationIdList -SourceList $SourceData.TeamList -DestinationList $DestinationData.TeamList -IdList $manualInterventionSourceTeamIds)
+
+        if ($manualInterventionDestinationTeamIds.Length -eq 0)
+        {
+            Write-OctopusPostCloneCleanUp "Unable to find matching teams for $($action.Name), converting responsible team to built in team 'team-managers'"                                        
+            $action.Properties.'Octopus.Action.Manual.ResponsibleTeamIds' = "team-managers"
+        }
+        else
+        {
+            $action.Properties.'Octopus.Action.Manual.ResponsibleTeamIds' = ($manualInterventionDestinationTeamIds -join ",")
+        }        
     }
 }
 
@@ -108,9 +121,9 @@ function Convert-OctopusProcessActionPackageList
 {
     param ($action)
 
-    if ($action.Packages.Length -gt 0)
-    {        
-        Write-OctopusPostCloneCleanUp "Removed package references from $($action.Name)"
-        $action.Packages = @()
-    }
+    foreach ($package in $action.Packages)
+    {
+        $package.FeedId = Convert-SourceIdToDestinationId -SourceList $sourceData.FeedList -DestinationList $destinationData.FeedList -IdValue $package.FeedId
+        $package.Id = $null
+    }    
 }

@@ -4,42 +4,44 @@ You provide the a source Octopus instance space and a destination Octopus instan
 ## What will it clone
 The script `CloneSpace.ps1` will clone the following:
 
-- Environments
-- Worker Pools (not workers, just the pools)
-- Project Groups
-- External Feeds
-- Tenant Tags
-- Step Templates (both community and custom step templates)
 - Accounts
+- Environments
+- External Feeds
 - Library Variable Sets
 - Lifecycles
-- Script Modules
 - Machine Policies
+- Project Groups
 - Projects
     - Settings
     - Deployment Process
     - Runbooks
     - Variables
+- Script Modules
+- Step Templates (both community and custom step templates)
 - Teams
 - Tenants (no tenant variables)
+- Tenant Tags
 - Targets (no polling tentacles)
+- Worker Pools
 - Workers (no polling tentacles)
 
 ## What won't it clone
 The script `CloneSpace.ps1` will not clone the following items:
-- Tenant Variables
 - Deployments
-- Releases
-- Packages
-- Users
-- Roles
 - External Auth Providers (or groups)
-- Server settings like folders
-- Spaces
+- Packages
 - Project Versioning Strategy (clears out package references)
 - Project Automatic Release Creation (clears out package references)
+- Releases
+- Roles
+- Tenant Variables
+- Server settings like folders
+- Spaces
+- Users
 
-The assumption is you are using this script to clone a process to another instance for testing purposes.  You don't need the headache of deployments, releases and everything associated with it.
+This script assumes the user for the destination instance has `Space manager` rights.  Some of those items, users, roles, spaces, cannot be copied over because space manager does not have permissions to do so.
+
+Several of those items cannot be copied because the space cloner uses Octopus API.  It doesn't hit the database directly.  Creating a release would create a snapshot and doing a deployment would do an actual deployment.  Those items would occur when you ran the script, not when the did on the source instance.
 
 Tenant variables were excluded mostly due to how they are returned from the API.  Honestly it looked like a bit of a maintenance nightmare.
 
@@ -50,6 +52,7 @@ The space on the source and destination must exist prior to running the script. 
 This script was designed to be run multiple times with the same parameters.  It isn't useful if the script is constantly overwriting / removing values each time you run it.  It will not overwrite the following:
 
 - Community Step Templates (match by name)
+- Environments (match by name)
 - Feeds (match by name)
 - Infrastructure Accounts (match by name)
 - Library Variable Set Sensitive variables (match by name)

@@ -6,9 +6,15 @@ function Copy-OctopusSpaceTeamUserRoles
         $cloneScriptOptions
     )
 
+    if ($destinationData.HasSpaces -eq $false)
+    {
+        Write-OctopusWarning "The destination does not support spaces, therefore it does not support the new team structure, exiting team cloning"
+        return
+    }
+
     if ($cloneScriptOptions.CloneTeamUserRoleScoping -eq $false)
     {
-        Write-Warning "The option CloneTeamUserRoleScoping was set to false, skipping cloning the team user roles"
+        Write-OctopusWarning "The option CloneTeamUserRoleScoping was set to false, skipping cloning the team user roles"
         return
     }
     
