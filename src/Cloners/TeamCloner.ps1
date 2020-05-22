@@ -5,6 +5,12 @@ function Copy-OctopusSpaceTeams
         $destinationData,
         $cloneScriptOptions
     )
+
+    if ($destinationData.HasSpaces -eq $false)
+    {
+        Write-OctopusWarning "The destination does not support spaces, therefore it does not support the new team structure, exiting team cloning"
+        return
+    }
     
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.TeamList -itemType "Space Teams" -filters $cloneScriptOptions.SpaceTeamsToClone        
     
