@@ -30,6 +30,7 @@ The other options are:
 - `OverwriteExistingLifecyclesPhases` - Set to `true` to keep the lifecycles in sync.
 - `CloneProjectChannelRules` - set to `true` as you'll want to include the channel rules with the project.
 - `CloneTeamUserRoleScoping` - set to `true` as you'll want to include all the scoped permissions with the teams.
+- `CloneProjectVersioningReleaseCreationSettings` - set to `true` as you'll want to include the release creation settings.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
@@ -58,7 +59,8 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -OverwriteExistingCustomStepTemplates "true" `
     -OverwriteExistingLifecyclesPhases "true" `
     -CloneProjectChannelRules "true" `
-    -CloneTeamUserRoleScoping "true"   
+    -CloneTeamUserRoleScoping "true" `
+    -CloneProjectVersioningReleaseCreationSettings "true"
 ```
 
 ## Clone Everything But Environments, Workers, and Targets
@@ -74,6 +76,7 @@ The other options are:
 - `OverwriteExistingLifecyclesPhases` - Set to `true` to keep the lifecycles in sync.
 - `CloneProjectChannelRules` - set to `true` as you'll want to include the channel rules with the project.
 - `CloneTeamUserRoleScoping` - set to `true` as you'll want to include all the scoped permissions with the teams.
+- `CloneProjectVersioningReleaseCreationSettings` - set to `true` as you'll want to include the release creation settings.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
@@ -98,5 +101,6 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -OverwriteExistingCustomStepTemplates "true" `
     -OverwriteExistingLifecyclesPhases "true" `
     -CloneProjectChannelRules "true" `
-    -CloneTeamUserRoleScoping "true"
+    -CloneTeamUserRoleScoping "true" `
+    -CloneProjectVersioningReleaseCreationSettings "true"
 ``` 

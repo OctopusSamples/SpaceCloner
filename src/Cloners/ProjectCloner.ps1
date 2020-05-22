@@ -45,6 +45,7 @@ function Copy-OctopusProjects
 
         Copy-OctopusProjectVariables -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceProject $project -destinationData $DestinationData -sourceData $SourceData -cloneScriptOptions $CloneScriptOptions -createdNewProject $createdNewProject        
         Copy-OctopusProjectChannelRules -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData -cloneScriptOptions $CloneScriptOptions
+        Copy-OctopusProjectReleaseVersioningSettings -sourceData $sourceData -sourceProject $project -sourceChannels $sourceChannels -destinationData $destinationData -destinationProject $destinationProject -destinationChannels $destinationChannels -CloneScriptOptions $CloneScriptOptions
     }
 
     Write-OctopusPostCloneCleanUp "*****************Ending Clone for all projects***************"
@@ -96,3 +97,58 @@ function Copy-OctopusProjectSettings
     }    
 }
 
+function Copy-OctopusProjectReleaseVersioningSettings
+{
+    param(
+        $sourceData,
+        $sourceProject,
+        $sourceChannels,
+        $destinationData,
+        $destinationProject,
+        $destinationChannels,
+        $CloneScriptOptions
+    )
+
+    if ($CloneScriptOptions.CloneProjectVersioningReleaseCreationSettings -eq $false)
+    {
+        Write-OctopusWarning "The option CloneProjectVersioningReleaseCreationSettings was set to false, skipping the release versioning settings clone."
+        return
+    }
+
+    Write-OctopusSuccess "Cloning release versioning settings for project $($project.Name)"
+    $sourceDeploymentProcess = Get-OctopusApi -EndPoint $sourceProject.Links.DeploymentProcess -ApiKey $SourceData.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $null
+    $destinationDeploymentProcess = Get-OctopusApi -EndPoint $destinationProject.Links.DeploymentProcess -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $null
+
+    if ($null -eq $sourceProject.VersioningStrategy.DonorPackage.Template)
+    {
+        Write-OctopusVerbose "The project $($project.Name) has the release versioning based on a package."
+        $destinationProject.VersioningStrategy = Copy-OctopusObject -ItemToCopy $sourceProject.VersioningStrategy -ClearIdValue $false -SpaceId $null
+        $destinationProject.VersioningStrategy.DonorPackageStepId = Convert-OctopusProcessDeploymentStepId -sourceProcess $sourceDeploymentProcess -destinationProcess $destinationDeploymentProcess -sourceId $sourceProject.VersioningStrategy.DonorPackageStepId
+    }
+    else
+    {
+        $destinationProject.VersioningStrategy.Template = "#{Octopus.Version.LastMajor}.#{Octopus.Version.LastMinor}.#{Octopus.Version.NextPatch}"
+        $destinationProject.VersioningStrategy.DonorPackage = $null
+        $destinationProject.VersioningStrategy.DonorPackageStepId = $null
+    }
+
+    if ($null -ne $sourceProject.ReleaseCreationStrategy.ChannelId)
+    {
+        Write-OctopusVerbose "The project $($project.Name) has automatic release creation set."
+        $destinationProject.ReleaseCreationStrategy = Copy-OctopusObject -ItemToCopy $sourceProject.ReleaseCreationStrategy -ClearIdValue $false -SpaceId $null
+        $destinationProject.ReleaseCreationStrategy.ChannelId = Convert-SourceIdToDestinationId -SourceList $sourceChannels -DestinationList $destinationChannels -IdValue $sourceProject.ReleaseCreationStrategy.ChannelId
+        $destinationProject.ReleaseCreationStrategy.ReleaseCreationPackageStepId = Convert-OctopusProcessDeploymentStepId -sourceProcess $sourceDeploymentProcess -destinationProcess $destinationDeploymentProcess -sourceId $sourceProject.ReleaseCreationStrategy.ReleaseCreationPackageStepId
+        $destinationProject.AutoCreateRelease = $true
+    }
+    else 
+    {
+        $destinationProject.ReleaseCreationStrategy.ChannelId = $null
+        $destinationProject.ReleaseCreationStrategy.ReleaseCreationPackage = $null
+        $destinationProject.ReleaseCreationStrategy.ReleaseCreationPackageStepId = $null
+        $destinationProject.AutoCreateRelease = $false    
+    }
+
+    Save-OctopusApiItem -Item $destinationProject -Endpoint "projects" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
+
+    Write-OctopusSuccess "Finished cloning release versioning settings for project $($project.Name)"
+}

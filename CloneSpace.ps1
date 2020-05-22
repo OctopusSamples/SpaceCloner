@@ -30,7 +30,8 @@ param (
     $OverwriteExistingLifecyclesPhases,
     $CloneProjectRunbooks,
     $CloneTeamUserRoleScoping,
-    $CloneProjectChannelRules  
+    $CloneProjectChannelRules,
+    $CloneProjectVersioningReleaseCreationSettings  
 )
 
 . ($PSScriptRoot + ".\src\Core\Logging.ps1")
@@ -105,6 +106,11 @@ if ($null -eq $CloneProjectChannelRules)
     $CloneProjectChannelRules = $false
 }
 
+if ($null -eq $CloneProjectVersioningReleaseCreationSettings)
+{
+    $CloneProjectVersioningReleaseCreationSettings = $false
+}
+
 $CloneScriptOptions = @{
     EnvironmentsToClone = $EnvironmentsToClone; 
     WorkerPoolsToClone = $WorkerPoolsToClone; 
@@ -130,7 +136,8 @@ $CloneScriptOptions = @{
     ParentProjectName = $ParentProjectName;
     SpaceTeamsToClone = $SpaceTeamsToClone;
     CloneTeamUserRoleScoping = $CloneTeamUserRoleScoping;
-    CloneProjectChannelRules = $CloneProjectChannelRules
+    CloneProjectChannelRules = $CloneProjectChannelRules;
+    CloneProjectVersioningReleaseCreationSettings = $CloneProjectVersioningReleaseCreationSettings
 }
 
 $sourceData = Get-OctopusData -octopusUrl $SourceOctopusUrl -octopusApiKey $SourceOctopusApiKey -spaceName $SourceSpaceName

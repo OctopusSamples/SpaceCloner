@@ -53,6 +53,7 @@ The values for these options are either `True`, `False` or `null`.  Null will ca
 - `OverwriteExistingVariables` - Indicates if all existing variables (except sensitive variables) should be overwritten.  Defaults to `false`.
 - `CloneProjectChannelRules` - Indicates if the project channel rules should be cloned and overwrite existing channel rules.  Defaults to `false`.
 - `CloneProjectRunbooks` - Indicates if project runbooks should be cloned or should be skipped.  This is useful when you just want a quick copy of a project and the variables, but not the runbooks.  Defaults to `true`.
+- `CloneProjectVersioningReleaseCreationSettings` - Indicates if the release versioning strategy and release creation strategy should be cloned.  Defaults to `false`.
 - `CloneTeamUserRoleScoping` - Indicates if the space teams should have their scoping cloned.  Will use the same teams based on parameter `SpaceTeamsToClone`.  Defaults to `false`.
 - `AddAdditionalVariableValuesOnExistingVariableSets` - Indicates a variable on the destination should only have one value.  You would have multiple values if you were scoping variables.  Defaults to `false`.
 

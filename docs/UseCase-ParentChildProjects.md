@@ -20,6 +20,7 @@ Options:
 - `OverwriteExistingLifecyclesPhases` - Set to `false` as its the same space on the same instance and this makes no sense to run.
 - `CloneProjectChannelRules` - set to `false` as its the same space on the same instance and this makes no sense to rune.
 - `CloneTeamUserRoleScoping` - set to `false` as its the same space on the same instance and this makes no sense to run.
+- `CloneProjectVersioningReleaseCreationSettings` - set to `false` as you'll want to exclude the release creation settings.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
@@ -33,5 +34,8 @@ CloneSpace.ps1 -SourceOctopusUrl "https://instance1.yoursite.com" `
     -OverwriteExistingVariables "false" `
     -AddAdditionalVariableValuesOnExistingVariableSets "true" `
     -OverwriteExistingCustomStepTemplates "false" `
-    -OverwriteExistingLifecyclesPhases "false"
+    -OverwriteExistingLifecyclesPhases "false" `
+    -CloneProjectChannelRules "false" `
+    -CloneTeamUserRoleScoping "false" `
+    -CloneProjectVersioningReleaseCreationSettings "false"
 ```

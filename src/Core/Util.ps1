@@ -217,3 +217,47 @@ function Get-OctopusFilteredList
 
     return $filteredList
 }
+
+function Convert-OctopusProcessDeploymentStepId
+{
+    param(
+        $sourceProcess,
+        $destinationProcess,
+        $sourceId
+    )
+
+    $sourceStepName = $null
+    $sourceActionName = $null
+
+    foreach ($step in $sourceProcess.Steps)
+    {
+        foreach ($action in $step.Actions)
+        {
+            if ($action.Id -eq $sourceId)
+            {
+                break
+            }
+        }
+
+        if ($null -ne $sourceStepName)
+        {
+            break
+        }
+    }
+    
+    foreach ($step in $destinationProcess.Steps)
+    {
+        if ($step.name -eq $sourceStepName)
+        {
+            foreach($action in $step.Actions)
+            {
+                if ($action.Name -eq $sourceActionName)
+                {
+                    return $action.Id
+                }
+            }
+        }
+    }
+
+    return $null
+}

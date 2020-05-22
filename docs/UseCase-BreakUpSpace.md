@@ -28,6 +28,7 @@ Please refer to the [Parameter reference page](ParameterReference.md) for more d
 - `OverwriteExistingLifecyclesPhases` - Set to `false` as the two spaces will have different phases.
 - `CloneProjectChannelRules` - set to `true` as you'll want to include the channel rules with the project.
 - `CloneTeamUserRoleScoping` - set to `true` as you'll want to include all the scoped permissions with the teams.
+- `CloneProjectVersioningReleaseCreationSettings` - set to `true` as you'll want to include the release creation settings.
 
 ```PowerShell
 CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" `
@@ -57,5 +58,6 @@ CloneSpace.ps1 -SourceOctopusUrl "https://samples.octopus.app" `
     -OverwriteExistingCustomStepTemplates "false" `
     -OverwriteExistingLifecyclesPhases "false" `
     -CloneProjectChannelRules "true" `
-    -CloneTeamUserRoleScoping "true"
+    -CloneTeamUserRoleScoping "true" `
+    -CloneProjectVersioningReleaseCreationSettings "true"
 ```
