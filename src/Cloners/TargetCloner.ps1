@@ -8,14 +8,19 @@ function Copy-OctopusTargets
     
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.TargetList -itemType "target List" -filters $cloneScriptOptions.WorkersToClone
 
-    if ($sourceData.OctopusUrl -ne $destinationData.OctopusUrl -and $filteredList.length -gt 0)
+    if ($filteredList.length -eq 0)
     {
-        Write-RedOutput "You are cloning workers from one instance to another, the server thumbprints will not be accepted by the workers until you run Tentacle.exe configure --trust='your server thumbprint'"
+        return
     }
+
+    if ($sourceData.OctopusUrl -ne $destinationData.OctopusUrl)
+    {
+        Write-OctopusCritical "You are cloning workers from one instance to another, the server thumbprints will not be accepted by the workers until you run Tentacle.exe configure --trust='your server thumbprint'"
+    }    
 
     foreach ($target in $filteredList)
     {                              
-        Write-VerboseOutput "Starting Clone of target $($target.Name)"
+        Write-OctopusVerbose "Starting Clone of target $($target.Name)"
 
         if ((Get-OctopusTargetCanBeCloned -target $target) -eq $false)
         {
@@ -26,7 +31,7 @@ function Copy-OctopusTargets
                 
         If ($null -eq $matchingItem)
         {            
-            Write-GreenOutput "Target $($target.Name) was not found in destination, creating new record."                                        
+            Write-OctopusVerbose "Target $($target.Name) was not found in destination, creating new record."                                        
 
             $copyOfItemToClone = Copy-OctopusObject -ItemToCopy $target -SpaceId $destinationData.SpaceId -ClearIdValue $true    
 
@@ -51,11 +56,11 @@ function Copy-OctopusTargets
         }
         else 
         {
-            Write-GreenOutput "Target $($target.Name) already exists in destination, skipping"    
+            Write-OctopusVerbose "Target $($target.Name) already exists in destination, skipping"    
         }
     }    
 
-    Write-GreenOutput "Reloading destination target list"
+    Write-OctopusSuccess "Targets successfully cloned, reloading destination list"
     $destinationData.TargetList = Get-OctopusTargets -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
 }
 
@@ -65,13 +70,13 @@ function Get-OctopusTargetCanBeCloned
     
     if ($target.Endpoint.CommunicationStyle -eq "TentacleActive")
     {
-        Write-YellowOutput "The Target $($target.Name) is a polling tentacle, this script cannot clone polling tentacles, skipping."
+        Write-OctopusWarning "The Target $($target.Name) is a polling tentacle, this script cannot clone polling tentacles, skipping."
         return $false
     }
 
     if ($target.EndPoint.CommunicationStyle -ne "None" -and $target.Endpoint.CommunicationStyle -ne "Kubernetes" -and $target.Endpoint.CommunicationStyle -ne "TentacleActive" -and $target.Endpoint.CommunicationStyle -ne "AzureWebApp")
     {
-        Write-YellowOutput "$($target.Name) is not going to be cloned, at this time this script supports cloud regions, K8s targets, listentin tentacles, and Azure Web Apps."
+        Write-OctopusWarning "$($target.Name) is not going to be cloned, at this time this script supports cloud regions, K8s targets, listentin tentacles, and Azure Web Apps."
         return $false
     }
 
@@ -79,7 +84,7 @@ function Get-OctopusTargetCanBeCloned
     {
         if ($target.Endpoint.Authentication.AuthenticationType -eq "KubernetesStandard")
         {
-            Write-YellowOutput "Target $($target.Name) is a K8s cluster authentication using a certification, at this time this script cannot clone that."
+            Write-OctopusWarning "Target $($target.Name) is a K8s cluster authentication using a certification, at this time this script cannot clone that."
             return $false
         }
     }

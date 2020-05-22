@@ -13,25 +13,35 @@ The script accepts the following parameters.
 - `DestinationSpaceName` - the name of the space you wish to copy to.
 
 ## Items To Clone
-- `EnvironmentsToClone` - Comma separated list of environments to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all environments.  Examples: "test,staging,production" or "all" or "prod*".  Default value is `null` indicating nothing will be cloned.
-- `ExternalFeedsToClone` - Comma separated list of external feeds to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all external feeds.  Examples: "AWS*,docker hub" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
-- `InfrastructureAccountsToClone` - Comma separated list of accounts feeds to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all accounts.  Examples: "AWS*,Azure*" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
-- `LibraryVariableSetsToClone` - Comma separated list of library variable sets to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all variable sets.  Examples: "AWS*,Global" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
-- `LifeCyclesToClone` - Comma separated list of lifecycles to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all lifecycles.  Examples: "AWS*,Default" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
-- `MachinePoliciesToClone` - Comma separated list of machine policies to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all machine policies.  Examples: "AWS*,Default" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
-- `ProjectGroupsToClone` - Comma separated list of project groups to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all project groups.  Examples: "AWS*,default project group" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
-- `ProjectsToClone` - Comma separated list of projects to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all projects.  Examples: "AWS*,SQL Server" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.  This will not clone releases or deployments.
-- `ScriptModulesToClone` - Comma separated list of script modules to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all script modules.  Examples: "get*" or "all".  Default value is `null` indicating nothing will be cloned.
-- `StepTemplatesToClone` - Comma separated list of step templates to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all step templates.  Examples: "AWS*,SQL Server*" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
-- `TargetsToClone` - Comma separated list of targets to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all targets.  Examples: "AWS*,development worker pool" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.  Please note, this won't clone any polling tentacles.
-- `TenantsToClone` - Comma separated list of tenants to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all tenants.  Examples: "AWS*,internal" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
-- `TenantTagsToClone` - Comma separated list of tenant tags to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all tenant tags.  Examples: "AWS*,my tag" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
-- `WorkerPoolsToClone` - Comma separated list of worker pools to clone.  It will not clone workers.  Uses wildcard matching.  If you supply the word "all" it will clone all worker pools.  Examples: "AWS*,development worker pool" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.
-- `WorkersToClone` - Comma separated list of worker to clone.  Uses wildcard matching.  If you supply the word "all" it will clone all workers.  Examples: "AWS*,development worker pool" or "all" or "AWS*".  Default value is `null` indicating nothing will be cloned.  Please note, this won't clone any polling tentacles.         
+
+All the items to clone parameters allow for the following filters:
+- `all` -> special keyword which will clone everything
+- Wildcards -> use AWS* to pull in all items starting with AWS
+- Specific item names -> pass in specific item names to clone that item and only that item
+
+You can provide a comma separated list of items.  For example setting the `VariableSetsToClone` to "AWS*,Global,Notification" will clone all variable sets which start with AWS, along with the global and notification variable sets.  
+
+If you wish to skip an item you can exclude it from the parameter list OR set the value to an empty string "".  You must specify items to clone.  
+
+- `EnvironmentsToClone` - The list of environments to clone.
+- `ExternalFeedsToClone` - The list of external feeds to clone.  
+- `InfrastructureAccountsToClone` - The list of accounts feeds to clone.  
+- `LibraryVariableSetsToClone` - The list of library variable sets to clone. 
+- `LifeCyclesToClone` - The list of lifecycles to clone.  
+- `MachinePoliciesToClone` - The list of machine policies to clone.  
+- `ProjectGroupsToClone` - The list of project groups to clone.  
+- `ProjectsToClone` - The list of projects to clone.  
+- `ScriptModulesToClone` - The list of script modules to clone.  
+- `StepTemplatesToClone` - The list of step templates to clone.  
+- `TargetsToClone` - The list of targets to clone.  Please note, this won't clone any polling tentacles.
+- `TenantsToClone` - The list of tenants to clone.  Please note, this will not clone tenant variables.
+- `TenantTagsToClone` - The list of tenant tags to clone.  
+- `WorkerPoolsToClone` - The list of worker pools to clone.  
+- `WorkersToClone` - The list of worker to clone.  Please note, this won't clone any polling tentacles.         
 
 ## Parent / Child Projects
 - `ParentProjectName` - The name of the project to clone.  This has to match to exactly one project in the source information.  If this is specified the regular project cloner process is skipped.
-- `ChildProjectsToSync` - The list of projects to sync the deployment process with.   Uses wildcard matching.  If you supply the word "all" it will clone all lifecycles.  Examples: "AWS*,Default" or "all" or "AWS*".  Default value is `null` indicating nothing will be synced.
+- `ChildProjectsToSync` - The list of projects to sync the deployment process with.   Uses the same wild card matching as the other filters.  Can match to 1 to N number of projects.
 
 ## Options
 - OverwriteExistingCustomStepTemplates` - Indicates if existing custom step templates (not community step templates) should be overwritten.  Useful when you make a change to a step template you want to move over to another instance.  Possible values are `true` or `false`.  Defaults to `false`.

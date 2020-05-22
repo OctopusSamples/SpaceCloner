@@ -59,7 +59,7 @@ function Convert-OctopusProcessActionStepTemplate
             if ((Test-OctopusObjectHasProperty -objectToTest $action.Properties -propertyName $parameter.Name))
             {
                 $controlType = $parameter.DisplaySettings.'Octopus.ControlType'
-                Write-VerboseOutput "$($parameter.Name) is control type is $controlType"
+                Write-OctopusVerbose "$($parameter.Name) is control type is $controlType"
                 
                 if ($controlType -eq "Package")
                 {
@@ -67,7 +67,7 @@ function Convert-OctopusProcessActionStepTemplate
                 }    
                 elseif ($controlType -eq "Sensitive")            
                 {
-                    Write-CleanUpOutput "Set $($parameter.Name) in $($action.Name) to Dummy Value"
+                    Write-OctopusPostCloneCleanUp "Set $($parameter.Name) in $($action.Name) to Dummy Value"
                     $action.Properties.$($parameter.Name) = "DUMMY VALUE"
                 }
             }            
@@ -85,7 +85,7 @@ function Convert-OctopusProcessActionManualIntervention
 
     if (Test-OctopusObjectHasProperty -objectToTest $action.Properties -propertyName "Octopus.Action.Manual.ResponsibleTeamIds")
     {
-        Write-CleanUpOutput "$($action.Name) is a manual intervention, converting responsible team to built in team 'team-managers'"                                        
+        Write-OctopusPostCloneCleanUp "$($action.Name) is a manual intervention, converting responsible team to built in team 'team-managers'"                                        
         $action.Properties.'Octopus.Action.Manual.ResponsibleTeamIds' = "team-managers"
     }
 }
@@ -110,7 +110,7 @@ function Convert-OctopusProcessActionPackageList
 
     if ($action.Packages.Length -gt 0)
     {        
-        Write-CleanUpOutput "Removed package references from $($action.Name)"
+        Write-OctopusPostCloneCleanUp "Removed package references from $($action.Name)"
         $action.Packages = @()
     }
 }

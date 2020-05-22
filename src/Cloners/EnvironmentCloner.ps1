@@ -8,15 +8,20 @@ function Copy-OctopusEnvironments
     
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.EnvironmentList -itemType "Environment" -filters $cloneScriptOptions.EnvironmentsToClone        
     
+    if ($filteredList.length -eq 0)
+    {
+        return
+    }
+
     foreach ($environment in $filteredList)
     {
-        Write-VerboseOutput "Starting clone of Environment $($environment.Name)"
+        Write-OctopusVerbose "Starting clone of Environment $($environment.Name)"
         
         $matchingItem = Get-OctopusItemByName -ItemName $environment.Name -ItemList $destinationData.EnvironmentList                
 
         If ($null -eq $matchingItem)
         {
-            Write-GreenOutput "Environment $($environment.Name) was not found in destination, creating new record."                    
+            Write-OctopusVerbose "Environment $($environment.Name) was not found in destination, creating new record."                    
 
             $copyOfItemToClone = Copy-OctopusObject -ItemToCopy $environment -SpaceId $destinationData.SpaceId -ClearIdValue $true    
 
@@ -28,10 +33,10 @@ function Copy-OctopusEnvironments
         }
         else 
         {
-            Write-GreenOutput "Environment $($environment.Name) already exists in destination, skipping"    
+            Write-OctopusVerbose "Environment $($environment.Name) already exists in destination, skipping"    
         }
     }    
 
-    Write-GreenOutput "Reloading destination environment list"    
+    Write-OctopusSuccess "Environments successfully cloned, reloading destination list"    
     $destinationData.EnvironmentList = Get-OctopusEnvironmentList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
 }

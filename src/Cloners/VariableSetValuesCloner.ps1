@@ -19,14 +19,14 @@ function Copy-OctopusVariableSetValues
         
         if (Get-Member -InputObject $octopusVariable.Scope -Name "Environment" -MemberType Properties)
         {
-            Write-VerboseOutput "$variableName has environment scoping, converting to destination values"
+            Write-OctopusVerbose "$variableName has environment scoping, converting to destination values"
             $NewEnvironmentIds = @(Convert-SourceIdListToDestinationIdList -SourceList $sourcedata.EnvironmentList -DestinationList $DestinationData.EnvironmentList -IdList $octopusVariable.Scope.Environment)
             $octopusVariable.Scope.Environment = @($NewEnvironmentIds)            
         }
 
         if (Get-Member -InputObject $octopusVariable.Scope -Name "Channel" -MemberType Properties)
         {
-            Write-VerboseOutput "$variableName has channel scoping, converting to destination values"
+            Write-OctopusVerbose "$variableName has channel scoping, converting to destination values"
             $NewChannelIds = @(Convert-SourceIdListToDestinationIdList -SourceList $sourceProjectData.ChannelList -DestinationList $DestinationProjectData.ChannelList -IdList $octopusVariable.Scope.Channel)
             $octopusVariable.Scope.Channel = @($NewChannelIds)            
         }
@@ -35,7 +35,7 @@ function Copy-OctopusVariableSetValues
         {
             if ($destinationData.HasRunbooks)
             {
-                Write-VerboseOutput "$variableName has process owner scoping, converting to destination values"
+                Write-OctopusVerbose "$variableName has process owner scoping, converting to destination values"
                 $NewOwnerIds = @()
                 foreach($value in $octopusVariable.Scope.ProcessOwner)
                 {
@@ -59,7 +59,7 @@ function Copy-OctopusVariableSetValues
 
         if ($octopusVariable.Type -match ".*Account")
         {
-            Write-VerboseOutput "$variableName is an account value, converting to destination account"
+            Write-OctopusVerbose "$variableName is an account value, converting to destination account"
             $octopusVariable.Value = Convert-SourceIdToDestinationId -SourceList $sourceData.InfrastructureAccounts -DestinationList $destinationData.InfrastructureAccounts -IdValue $octopusVariable.Value
         }
 
@@ -70,16 +70,16 @@ function Copy-OctopusVariableSetValues
 
         $trackingName = $variableName -replace "\.", ""        
         
-        Write-VerboseOutput "Cloning $variableName"
+        Write-OctopusVerbose "Cloning $variableName"
         if ($null -eq $variableTracker[$trackingName])
         {
-            Write-VerboseOutput "This is the first time we've seen $variableName"
+            Write-OctopusVerbose "This is the first time we've seen $variableName"
             $variableTracker[$trackingName] = 1
         }
         else
         {
             $variableTracker.$trackingName += 1
-            Write-VerboseOutput "We've now seen $variableName $($variableTracker[$trackingName]) times"
+            Write-OctopusVerbose "We've now seen $variableName $($variableTracker[$trackingName]) times"
         }
 
         $foundCounter = 0
@@ -100,31 +100,30 @@ function Copy-OctopusVariableSetValues
         
         if ($foundCounter -gt 1 -and $variableExistsOnDestination -eq $true -and $CloneScriptOptions.AddAdditionalVariableValuesOnExistingVariableSets -eq $true)
         {
-            Write-YellowOutput "The variable $variableName already exists on destination. You selected to skip duplicate instances, skipping."
+            Write-OctopusVerbose "The variable $variableName already exists on destination. You selected to skip duplicate instances, skipping."
         }       
         elseif ($foundIndex -eq -1)
         {
-            Write-GreenOutput "New variable $variableName value found.  This variable has appeared so far $($variableTracker[$trackingName]) time(s) in the source variable set.  Adding to list."
+            Write-OctopusVerbose "New variable $variableName value found.  This variable has appeared so far $($variableTracker[$trackingName]) time(s) in the source variable set.  Adding to list."
             $DestinationVariableSetVariables.Variables += $octopusVariable
         }
         elseif ($CloneScriptOptions.OverwriteExistingVariables -eq $false)
         {
-            Write-VerboseOutput "The variable $variableName already exists on the host and you elected to only copy over new items, skipping this one."
+            Write-OctopusVerbose "The variable $variableName already exists on the host and you elected to only copy over new items, skipping this one."
         }                                         
         elseif ($foundIndex -gt -1 -and $DestinationVariableSetVariables.Variables[$foundIndex].IsSensitive -eq $true)
         {
-            Write-GreenOutput "The variable $variableName at value index $($variableTracker[$trackingName]) is sensitive, leaving as is on the destination."
+            Write-OctopusVerbose "The variable $variableName at value index $($variableTracker[$trackingName]) is sensitive, leaving as is on the destination."
         }
         elseif ($foundIndex -gt -1)
         {
             $DestinationVariableSetVariables.Variables[$foundIndex].Value = $octopusVariable.Value
             if ($octopusVariable.Value -eq "Dummy Value")         
             {                
-                Write-CleanUpOutput "The variable $variableName is a sensitive variable, value set to 'Dummy Value'"
+                Write-OctopusPostCloneCleanUp "The variable $variableName is a sensitive variable, value set to 'Dummy Value'"
             }
         }        
     }
 
-    Save-OctopusApi -OctopusUrl $DestinationData.OctopusUrl -SpaceId $null -EndPoint $DestinationVariableSetVariables.Links.Self -ApiKey $DestinationData.OctopusApiKey -Method "PUT" -Item $DestinationVariableSetVariables
-    Write-GreenOutput "Variables successfully cloned."
+    Save-OctopusApi -OctopusUrl $DestinationData.OctopusUrl -SpaceId $null -EndPoint $DestinationVariableSetVariables.Links.Self -ApiKey $DestinationData.OctopusApiKey -Method "PUT" -Item $DestinationVariableSetVariables    
 }

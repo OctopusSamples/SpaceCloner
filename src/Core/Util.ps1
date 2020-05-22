@@ -15,19 +15,19 @@ function Get-OctopusItemById
         $ItemId
         ) 
         
-    Write-VerboseOutput "Attempting to find $ItemId in the item list of $($ItemList.Length) item(s)"
+    Write-OctopusVerbose "Attempting to find $ItemId in the item list of $($ItemList.Length) item(s)"
 
     foreach($item in $ItemList)
     {
-        Write-VerboseOutput "Checking to see if $($item.Id) matches with $ItemId"
+        Write-OctopusVerbose "Checking to see if $($item.Id) matches with $ItemId"
         if ($item.Id -eq $ItemId)
         {
-            Write-VerboseOutput "The Ids match, return the item $($item.Name)"
+            Write-OctopusVerbose "The Ids match, return the item $($item.Name)"
             return $item
         }
     }
 
-    Write-VerboseOutput "No match found returning null"
+    Write-OctopusVerbose "No match found returning null"
     return $null    
 }
 
@@ -39,13 +39,13 @@ function Convert-SourceIdToDestinationId
         $IdValue
     )
 
-    Write-VerboseOutput "Getting Name of $IdValue"
+    Write-OctopusVerbose "Getting Name of $IdValue"
     $sourceItem = Get-OctopusItemById -ItemList $SourceList -ItemId $IdValue
-    Write-VerboseOutput "The name of $IdValue is $($sourceItem.Name)"
+    Write-OctopusVerbose "The name of $IdValue is $($sourceItem.Name)"
 
-    Write-VerboseOutput "Attempting to find $($sourceItem.Name) in Destination List"
+    Write-OctopusVerbose "Attempting to find $($sourceItem.Name) in Destination List"
     $destinationItem = Get-OctopusItemByName -ItemName $sourceItem.Name -ItemList $DestinationList
-    Write-VerboseOutput "The destination id for $($sourceItem.Name) is $($destinationItem.Id)"
+    Write-OctopusVerbose "The destination id for $($sourceItem.Name) is $($destinationItem.Id)"
 
     if ($null -eq $destinationItem)
     {
@@ -66,7 +66,7 @@ function Convert-SourceIdListToDestinationIdList
     )
 
     $NewIdList = @()
-    Write-VerboseOutput "Converting id list with $($IdList.Length) item(s) over to destination space"     
+    Write-OctopusVerbose "Converting id list with $($IdList.Length) item(s) over to destination space"     
     foreach ($idValue in $idList)
     {
         $ConvertedId = Convert-SourceIdToDestinationId -SourceList $SourceList -DestinationList $DestinationList -IdValue $IdValue
@@ -91,12 +91,12 @@ function Test-OctopusObjectHasProperty
 
     if ($hasProperty)
     {
-        Write-VerboseOutput "$propertyName property found."
+        Write-OctopusVerbose "$propertyName property found."
         return $true
     }
     else
     {
-        Write-VerboseOutput "$propertyName property missing."
+        Write-OctopusVerbose "$propertyName property missing."
         return $false
     }    
 }
@@ -148,7 +148,7 @@ function Get-OctopusFilteredList
 
     $filteredList = @()  
     
-    Write-GreenOutput "Creating filter list for $itemType"
+    Write-OctopusSuccess "Creating filter list for $itemType"
 
     if ([string]::IsNullOrWhiteSpace($filters) -eq $false)
     {
@@ -158,40 +158,40 @@ function Get-OctopusFilteredList
         {
             foreach ($filter in $splitFilters)
             {
-                Write-VerboseOutput "Checking to see if $filter matches $($item.Name)"
+                Write-OctopusVerbose "Checking to see if $filter matches $($item.Name)"
                 if ([string]::IsNullOrWhiteSpace($filter))
                 {
                     continue
                 }
                 if (($filter).ToLower() -eq "all")
                 {
-                    Write-VerboseOutput "The filter is 'all' -> adding $($item.Name) to $itemType filtered list"
+                    Write-OctopusVerbose "The filter is 'all' -> adding $($item.Name) to $itemType filtered list"
                     $filteredList += $item
                 }
                 elseif ($item.Name -like $filter)
                 {
-                    Write-VerboseOutput "The filter $filter matches $($item.Name), adding $($item.Name) to $itemType filtered list"
+                    Write-OctopusVerbose "The filter $filter matches $($item.Name), adding $($item.Name) to $itemType filtered list"
                     $filteredList += $item
                 }
                 else
                 {
-                    Write-VerboseOutput "The item $($item.Name) does not match filter $filter"
+                    Write-OctopusVerbose "The item $($item.Name) does not match filter $filter"
                 }
             }
         }
 
         if ($filteredList.Length -eq 0)
         {
-            Write-YellowOutput "No $itemType items were found to clone, skipping"
+            Write-OctopusWarning "No $itemType items were found to clone, skipping"
         }
         else
         {
-            Write-GreenOutput "$itemType items were found to clone, starting clone for $itemType"
+            Write-OctopusSuccess "$itemType items were found to clone, starting clone for $itemType"
         }
     }
     else
     {
-        Write-YellowOutput "The filter for $itemType was not set.  No $itemType will be cloned.  If you wish to clone all $itemType use 'all' or use a comma seperated list (wild cards supported), IE 'AWS*,Space Infrastructure."
+        Write-OctopusWarning "The filter for $itemType was not set.  No $itemType will be cloned.  If you wish to clone all $itemType use 'all' or use a comma seperated list (wild cards supported), IE 'AWS*,Space Infrastructure."
     }
 
     return $filteredList

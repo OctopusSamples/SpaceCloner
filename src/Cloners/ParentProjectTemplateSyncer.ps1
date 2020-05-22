@@ -8,7 +8,7 @@ function Sync-OctopusMasterOctopusProjectWithChildProjects
 
     if ([string]::IsNullOrWhiteSpace($CloneScriptOptions.ParentProjectName) -eq $true -or [string]::IsNullOrWhiteSpace($CloneScriptOptions.ChildProjectsToSync) -eq $true)
     {
-        Write-YellowOutput "The template project parameter or the clone project parameter wasn't specified skipping the sync child projects process"
+        Write-OctopusWarning "The template project parameter or the clone project parameter wasn't specified skipping the sync child projects process"
         return
     }
 

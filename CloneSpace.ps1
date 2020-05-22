@@ -128,79 +128,79 @@ if ($sourceData.OctopusUrl -eq $destinationData.OctopusUrl -and $SourceSpaceName
 
     if ([string]::IsNullOrWhiteSpace($EnvironmentsToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified environments to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified environments to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($WorkerPoolsToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified worker pools to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified worker pools to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($ProjectGroupsToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified project groups to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified project groups to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($TenantTagsToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified tenant tags to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified tenant tags to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($ExternalFeedsToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified external feeds to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified external feeds to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($StepTemplatesToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified step templates to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified step templates to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($InfrastructureAccountsToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified infrastructure accounts to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified infrastructure accounts to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($LibraryVariableSetsToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified variable sets to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified variable sets to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($LifeCyclesToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified lifecycles to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified lifecycles to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($ScriptModulesToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified script modules to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified script modules to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($MachinePoliciesToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have machine policeis sets to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have machine policeis sets to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($WorkersToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified workers sets to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified workers sets to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
     if ([string]::IsNullOrWhiteSpace($TargetsToClone) -eq $false)
     {
-        Write-RedOutput "You are cloning to the same space, but have specified variable sets to clone.  This is not allowed.  Please remove that parameter."
+        Write-OctopusCritical "You are cloning to the same space, but have specified variable sets to clone.  This is not allowed.  Please remove that parameter."
         $canProceed = $false
     }
 
@@ -227,4 +227,8 @@ Copy-OctopusWorkers -sourceData $sourceData -destinationData $destinationData -C
 Copy-OctopusTargets -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 Sync-OctopusMasterOctopusProjectWithChildProjects -sourceData $sourceData -destinationData $destinationData -CloneScriptOptions $CloneScriptOptions
 
-Write-GreenOutput "The script to clone $SourceSpaceName from $SourceOctopusUrl to $DestinationSpaceName in $DestinationOctopusUrl has completed"
+$logPath = Get-OctopusLogPath
+$cleanupLogPath = Get-OctopusCleanUpLogPath
+
+Write-OctopusSuccess "The script to clone $SourceSpaceName from $SourceOctopusUrl to $DestinationSpaceName in $DestinationOctopusUrl has completed.  Please see $logPath for more details."
+Write-OctopusWarning "You have post clean-up tasks to finish.  Any sensitive variables or encrypted values were created with dummy values which you must replace.  Please see $cleanUpLogPath for a list of items to fix."

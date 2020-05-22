@@ -8,14 +8,19 @@ function Copy-OctopusInfrastructureAccounts
 
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.InfrastructureAccounts -itemType "Infrastructure Accounts" -filters $cloneScriptOptions.InfrastructureAccountsToClone
 
-    Write-CleanUpOutput "*************Starting Infrastructure Accounts*************"
+    if ($filteredList.length -eq 0)
+    {
+        return
+    }
+
+    Write-OctopusPostCloneCleanUpHeader "*************Starting Infrastructure Accounts*************"
     foreach($account in $filteredList)
     {             
         $matchingAccount = Get-OctopusItemByName -ItemName $account.Name -ItemList $DestinationData.InfrastructureAccounts
 
         if ($null -eq $matchingAccount)
         {
-            Write-GreenOutput "The account $($account.Name) does not exist.  Creating it."
+            Write-OctopusVerbose "The account $($account.Name) does not exist.  Creating it."
 
             $accountClone = Copy-OctopusObject -ItemToCopy $account -ClearIdValue $true -SpaceId $DestinationData.SpaceId
 
@@ -29,16 +34,16 @@ function Copy-OctopusInfrastructureAccounts
             Convert-OctopusSSHAccount -accountClone $accountClone                    
 
             Save-OctopusApiItem -Item $accountClone -Endpoint "accounts" -ApiKey $DestinationData.OctopusApiKey -OctopusUrl $DestinationData.OctopusUrl -SpaceId $DestinationData.SpaceId            
-            Write-CleanUpOutput "Account $($account.Name) was created with dummy values."
+            Write-OctopusPostCloneCleanUp "Account $($account.Name) was created with dummy values."
         }
         else
         {
-            Write-GreenOutput "The account $($account.Name) already exists.  Skipping it."
+            Write-OctopusVerbose "The account $($account.Name) already exists.  Skipping it."
         }
     }
-    Write-CleanUpOutput "*************End Infrastructure Accounts*************"
+    Write-OctopusPostCloneCleanUpHeader "*************End Infrastructure Accounts*************"
 
-    Write-GreenOutput "Reloading the destination accounts"    
+    Write-OctopusSuccess "Infrastructure Accounts successfully cloned, reloading destination list"    
     $destinationData.InfrastructureAccounts = Get-OctopusInfrastructureAccounts -OctopusServerUrl $($destinationData.OctopusUrl) -ApiKey $($destinationData.OctopusApiKey) -SpaceId $($destinationData.SpaceId)
 }
 

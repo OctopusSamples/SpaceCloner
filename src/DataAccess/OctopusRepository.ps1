@@ -235,7 +235,7 @@ function Get-OctopusSpaceId
 
     if ($hasSpaces -eq $true)
     {                
-        Write-GreenOutput "Getting Space Information from $octopusUrl"
+        Write-OctopusVerbose "Getting Space Information from $octopusUrl"
         $SpaceList = Get-OctopusSpaceList -OctopusServerUrl $octopusUrl -ApiKey $octopusApiKey
         $Space = Get-OctopusItemByName -ItemList $SpaceList -ItemName $spaceName
 

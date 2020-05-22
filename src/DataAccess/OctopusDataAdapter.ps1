@@ -31,25 +31,33 @@ function Invoke-OctopusApi
 
     try 
     {
-        Write-VerboseOutput "Invoking $method $url"
+        Write-OctopusVerbose "Invoking $method $url"        
 
         if ($null -eq $item)
-        {            
-            return Invoke-RestMethod -Method $method -Uri $url -Headers @{"X-Octopus-ApiKey"="$ApiKey"}
+        {       
+            return Invoke-RestMethod -Method $method -Uri $url -Headers @{"X-Octopus-ApiKey"="$ApiKey"}                            
         }
 
         $body = $item | ConvertTo-Json -Depth 10
-        Write-VerboseOutput $body
+        Write-OctopusVerbose $body    
+            
         return Invoke-RestMethod -Method $method -Uri $url -Headers @{"X-Octopus-ApiKey"="$ApiKey"} -Body $body
     }
     catch 
     {
-        $result = $_.Exception.Response.GetResponseStream()
-        $reader = New-Object System.IO.StreamReader($result)
-        $reader.BaseStream.Position = 0
-        $reader.DiscardBufferedData()
-        $responseBody = $reader.ReadToEnd();
-        Write-VerboseOutput -Message "Error calling $url $($_.Exception.Message) StatusCode: $($_.Exception.Response.StatusCode.value__ ) StatusDescription: $($_.Exception.Response.StatusDescription) $responseBody"        
+        if ($null -ne $_.Exception.Response)
+        {
+            $result = $_.Exception.Response.GetResponseStream()
+            $reader = New-Object System.IO.StreamReader($result)
+            $reader.BaseStream.Position = 0
+            $reader.DiscardBufferedData()
+            $responseBody = $reader.ReadToEnd();
+            Write-OctopusVerbose -Message "Error calling $url $($_.Exception.Message) StatusCode: $($_.Exception.Response.StatusCode.value__ ) StatusDescription: $($_.Exception.Response.StatusDescription) $responseBody"        
+        }
+        else 
+        {
+            Write-OctopusVerbose $_.Exception    
+        }
     }
 
     Throw "There was an error calling the Octopus API please check the log for more details"
@@ -68,7 +76,7 @@ Function Get-OctopusApiItemList
 
     $results = Invoke-OctopusApi -Method "Get" -Url $url -apiKey $ApiKey
     
-    Write-VerboseOutput "$url returned a list with $($results.Items.Length) item(s)" 
+    Write-OctopusVerbose "$url returned a list with $($results.Items.Length) item(s)" 
 
     return $results.Items
 }
@@ -121,14 +129,14 @@ function Save-OctopusApiItem
 
     if ($null -ne $Item.Id)    
     {
-        Write-VerboseOutput "Item has id, updating method call to PUT"
+        Write-OctopusVerbose "Item has id, updating method call to PUT"
         $method = "Put"
         $endPoint = "$endPoint/$($Item.Id)"
     }
     
     $results = Save-OctopusApi -EndPoint $Endpoint $method $method -Item $Item -ApiKey $ApiKey -OctopusUrl $OctopusUrl -SpaceId $SpaceId
 
-    Write-VerboseOutput $results
+    Write-OctopusVerbose $results
 
     return $results
 }

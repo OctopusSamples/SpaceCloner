@@ -11,7 +11,7 @@ function Copy-OctopusProjectRunbooks
 
     if ($sourceData.HasRunbooks -eq $false -or $destinationData.HasRunbooks -eq $false)
     {
-        Write-YellowOutput "The source or destination do not have runbooks, skipping the runbook clone process"
+        Write-OctopusWarning "The source or destination do not have runbooks, skipping the runbook clone process"
         return
     }
 
@@ -30,16 +30,16 @@ function Copy-OctopusProjectRunbooks
             $runbookToClone.PublishedRunbookSnapshotId = $null
             $runbookToClone.RunbookProcessId = $null            
 
-            Write-GreenOutput "The runbook $($runbook.Name) for $($destinationProject.Name) doesn't exist, creating it now"
+            Write-OctopusVerbose "The runbook $($runbook.Name) for $($destinationProject.Name) doesn't exist, creating it now"
             $destinationRunbook = Save-OctopusApiItem -Item $runbookToClone -Endpoint "runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId            
         }
         
         $sourceRunbookProcess = Get-OctopusApi -EndPoint $runbook.Links.RunbookProcesses -ApiKey $sourcedata.OctopusApiKey -OctopusUrl $sourceData.OctopusUrl -SpaceId $null
         $destinationRunbookProcess = Get-OctopusApi -EndPoint $destinationRunbook.Links.RunbookProcesses -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $null
 
-        Write-CleanUpOutput "*****************Starting Sync for runbook process $($runbook.Name)***************"        
+        Write-OctopusPostCloneCleanUp "*****************Starting Sync for runbook process $($runbook.Name)***************"        
         $destinationRunbookProcess.Steps = @(Copy-OctopusDeploymentProcess -sourceChannelList $sourceChannelList -destinationChannelList $destinationChannelList -sourceData $sourceData -destinationData $destinationData -sourceDeploymentProcessSteps $sourceRunbookProcess.Steps -destinationDeploymentProcessSteps $destinationRunbookProcess.Steps)
-        Write-CleanUpOutput "*****************End Sync for runbook process $($runbook.Name)********************"        
+        Write-OctopusPostCloneCleanUp "*****************End Sync for runbook process $($runbook.Name)********************"        
             
         Save-OctopusApiItem -Item $destinationRunbookProcess -Endpoint "runbookProcesses" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId
     }

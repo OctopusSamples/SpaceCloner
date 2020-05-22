@@ -8,18 +8,23 @@ function Copy-OctopusProjects
     
     if ([string]::IsNullOrWhiteSpace($CloneScriptOptions.ParentProjectName) -eq $false -or [string]::IsNullOrWhiteSpace($CloneScriptOptions.ChildProjectsToSync) -eq $false)
     {
-        Write-YellowOutput "You have elected to sync child projects with a parent project, skipping the normal project cloner"
+        Write-OctopusWarning "You have elected to sync child projects with a parent project, skipping the normal project cloner"
         return
     }
 
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.ProjectList -itemType "Projects" -filters $cloneScriptOptions.ProjectsToClone
 
-    Write-CleanUpOutput "*****************Starting clone for all projects***************"
+    if ($filteredList.length -eq 0)
+    {
+        return
+    }
+    
+    Write-OctopusPostCloneCleanUp "*****************Starting clone for all projects***************"
     foreach($project in $filteredList)
     {
         $createdNewProject = Copy-OctopusProjectSettings -sourceData $SourceData -destinationData $DestinationData -sourceProject $project               
         
-        Write-GreenOutput "Reloading destination projects"        
+        Write-OctopusSuccess "Reloading destination projects"        
         
         $destinationData.ProjectList = Get-OctopusProjectList -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId       
 
@@ -38,7 +43,7 @@ function Copy-OctopusProjects
 
         Copy-OctopusProjectVariables -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceProject $project -destinationData $DestinationData -sourceData $SourceData -cloneScriptOptions $CloneScriptOptions -createdNewProject $createdNewProject        
     }
-    Write-CleanUpOutput "*****************Ending Clone for all projects***************"
+    Write-OctopusPostCloneCleanUp "*****************Ending Clone for all projects***************"
 }
 
 function Copy-OctopusProjectSettings
@@ -64,7 +69,7 @@ function Copy-OctopusProjectSettings
         $copyOfProject.ProjectGroupId = Convert-SourceIdToDestinationId -SourceList $SourceData.ProjectGroupList -DestinationList $DestinationData.ProjectGroupList -IdValue $copyOfProject.ProjectGroupId
         $copyOfProject.LifeCycleId = Convert-SourceIdToDestinationId -SourceList $SourceData.LifeCycleList -DestinationList $DestinationData.LifeCycleList -IdValue $copyOfProject.LifeCycleId        
 
-        Write-CleanUpOutput "New project $($sourceProject.Name), resetting the versioning template to the default, removing the automatic release creation"
+        Write-OctopusPostCloneCleanUp "New project $($sourceProject.Name), resetting the versioning template to the default, removing the automatic release creation"
         $copyOfProject.VersioningStrategy.Template = "#{Octopus.Version.LastMajor}.#{Octopus.Version.LastMinor}.#{Octopus.Version.NextPatch}"
         $copyOfProject.VersioningStrategy.DonorPackage = $null
         $copyOfProject.VersioningStrategy.DonorPackageStepId = $null

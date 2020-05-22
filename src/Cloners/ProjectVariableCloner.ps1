@@ -38,10 +38,10 @@ function Copy-OctopusProjectVariables
             $DestinationProjectData.RunbookList = Get-OctopusApiItemList -EndPoint "projects/$($destinationProject.Id)/runbooks" -ApiKey $destinationData.OctopusApiKey -OctopusUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId;
         }
 
-        Write-CleanUpOutput "*****************Starting variable clone for $($destinationProject.Name)*******************"
+        Write-OctopusPostCloneCleanUp "*****************Starting variable clone for $($destinationProject.Name)*******************"
 
         Copy-OctopusVariableSetValues -SourceVariableSetVariables $sourceVariableSetVariables -DestinationVariableSetVariables $destinationVariableSetVariables -SourceData $SourceData -DestinationData $DestinationData -SourceProjectData $SourceProjectData -DestinationProjectData $DestinationProjectData -CloneScriptOptions $cloneScriptOptions
 
-        Write-CleanUpOutput "*****************Ended variable clone for $($destinationProject.Name)**********************"
+        Write-OctopusPostCloneCleanUp "*****************Ended variable clone for $($destinationProject.Name)**********************"
     }
 }

@@ -8,15 +8,20 @@ function Copy-OctopusLifecycles
 
     $filteredList = Get-OctopusFilteredList -itemList $sourceData.LifeCycleList -itemType "Lifecycles" -filters $cloneScriptOptions.LifeCyclesToClone
 
+    if ($filteredList.length -eq 0)
+    {
+        return
+    }
+    
     foreach ($lifecycle in $filteredList)
     {
-        Write-GreenOutput "Starting clone of Lifecycle $($lifecycle.Name)"
+        Write-OctopusVerbose "Starting clone of Lifecycle $($lifecycle.Name)"
 
         $matchingItem = Get-OctopusItemByName -ItemName $lifecycle.Name -ItemList $destinationData.LifeCycleList   
 
         if ($null -ne $matchingItem -and $CloneScriptOptions.OverwriteExistingLifecyclesPhases -eq $false)             
         {
-            Write-GreenOutput "Lifecycle already exists and you selected not to overwrite phases, skipping"
+            Write-OctopusVerbose "Lifecycle already exists and you selected not to overwrite phases, skipping"
             continue
         }        
 
@@ -40,7 +45,6 @@ function Copy-OctopusLifecycles
                 -OctopusUrl $destinationData.OctopusUrl
     }    
 
-    Write-GreenOutput "Reloading destination lifecycles"
-    
+    Write-OctopusSuccess "Lifecycles successfully cloned, reloading destination list"    
     $destinationData.LifeCycleList = Get-OctopusLifeCycles -ApiKey $destinationData.OctopusApiKey -OctopusServerUrl $destinationData.OctopusUrl -SpaceId $destinationData.SpaceId 
 }

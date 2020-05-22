@@ -10,42 +10,64 @@ if ((Test-Path -Path $logFolder) -eq $false)
 
 $logPath = "$logFolder\Log.txt"
 $cleanupLogPath = "$logFolder\CleanUp.txt"
+$apiResponsesLogPath = "$logFolder\ApiResponses.txt"
 
-function Write-VerboseOutput
+function Get-OctopusCleanUpLogPath
+{
+    return $cleanupLogPath
+}
+
+function Get-OctopusLogPath
+{
+    return $logPath
+}
+
+function Get-OctopusApiResponseLogPath
+{
+    return $apiResponsesLogPath
+}
+
+function Write-OctopusVerbose
 {
     param($message)
     
     Add-Content -Value $message -Path $logPath    
 }
 
-function Write-GreenOutput
+function Write-OctopusSuccess
 {
     param($message)
 
     Write-Host $message -ForegroundColor Green
-    Write-VerboseOutput $message    
+    Write-OctopusVerbose $message    
 }
 
-function Write-YellowOutput
+function Write-OctopusWarning
 {
     param($message)
 
     Write-Host $message -ForegroundColor Yellow    
-    Write-VerboseOutput $message
+    Write-OctopusVerbose $message
 }
 
-function Write-RedOutput
+function Write-OctopusCritical
 {
     param ($message)
 
     Write-Host $message -ForegroundColor Red
-    Write-VerboseOutput $message
+    Write-OctopusVerbose $message
 }
 
-function Write-CleanUpOutput
+function Write-OctopusPostCloneCleanUp
+{
+    param($message)
+    
+    Add-Content -Value "             $message" -Path $cleanupLogPath
+}
+
+function Write-OctopusPostCloneCleanUpHeader
 {
     param($message)
 
-    Write-YellowOutput $message
     Add-Content -Value $message -Path $cleanupLogPath
 }
