@@ -29,14 +29,16 @@ The script `CloneSpace.ps1` will clone the following:
 
 ## What won't it clone
 The script `CloneSpace.ps1` will not clone the following items:
-- Deployments
-- External Auth Providers (or groups)
-- Packages
 - Releases
+- Deployments
 - Roles
-- Tenant Variables
-- Server settings (folders, SMTP, Jira integration, proxy settings)
 - Users
+- External Auth Providers
+- Tenant Variables
+- Server Settings (folders, SMTP, JIRA, etc)
+- Packages
+- Build Information
+- Certificates
 
 This script assumes the user for the destination has `Space manager` rights.  Some of those items, users, roles, and creating spaces, cannot be copied over because the space manager does not have permissions to do so.
 
