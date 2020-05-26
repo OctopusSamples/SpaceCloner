@@ -47,6 +47,7 @@ param (
 . ($PSScriptRoot + ".\src\Cloners\ExternalFeedCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\LibraryVariableSetCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\LifecycleCloner.ps1")
+. ($PSScriptRoot + ".\src\Cloners\LogoCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\MachinePolicyCloner.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ParentProjectTemplateSyncer.ps1")
 . ($PSScriptRoot + ".\src\Cloners\ProcessCloner.ps1")

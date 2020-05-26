@@ -46,6 +46,7 @@ function Copy-OctopusProjects
         Copy-OctopusProjectVariables -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceProject $project -destinationData $DestinationData -sourceData $SourceData -cloneScriptOptions $CloneScriptOptions -createdNewProject $createdNewProject        
         Copy-OctopusProjectChannelRules -sourceChannelList $sourceChannels -destinationChannelList $destinationChannels -destinationProject $destinationProject -sourceData $SourceData -destinationData $DestinationData -cloneScriptOptions $CloneScriptOptions
         Copy-OctopusProjectReleaseVersioningSettings -sourceData $sourceData -sourceProject $project -sourceChannels $sourceChannels -destinationData $destinationData -destinationProject $destinationProject -destinationChannels $destinationChannels -CloneScriptOptions $CloneScriptOptions
+        Copy-OctopusItemLogo -sourceItem $project -destinationItem $destinationProject -sourceData $SourceData -destinationData $DestinationData -CloneScriptOptions $CloneScriptOptions
     }
 
     Write-OctopusPostCloneCleanUp "*****************Ending Clone for all projects***************"

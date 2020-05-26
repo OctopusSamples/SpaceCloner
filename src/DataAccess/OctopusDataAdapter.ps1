@@ -26,21 +26,28 @@ function Invoke-OctopusApi
         $url,
         $apiKey,
         $method,
-        $item
+        $item,
+        $filePath        
     )
 
     try 
-    {
-        Write-OctopusVerbose "Invoking $method $url"        
+    {                    
+        if ($null -ne $filePath)
+        {
+            Write-OctopusVerbose "Filepath $filePath parameter provided, saving output to the filepath from $url"
+            return Invoke-RestMethod -Method $method -Uri $url -Headers @{"X-Octopus-ApiKey"="$ApiKey"} -OutFile $filePath
+        }                     
 
         if ($null -eq $item)
         {       
+            Write-OctopusVerbose "No data to post or put, calling bog standard invoke-restmethod for $url"
             return Invoke-RestMethod -Method $method -Uri $url -Headers @{"X-Octopus-ApiKey"="$ApiKey"}                            
         }
 
         $body = $item | ConvertTo-Json -Depth 10
         Write-OctopusVerbose $body    
             
+        Write-OctopusVerbose "Invoking $method $url"  
         return Invoke-RestMethod -Method $method -Uri $url -Headers @{"X-Octopus-ApiKey"="$ApiKey"} -Body $body
     }
     catch 
@@ -139,4 +146,58 @@ function Save-OctopusApiItem
     Write-OctopusVerbose $results
 
     return $results
+}
+
+function Get-OctopusItemLogo
+{
+    param(
+        $item,
+        $octopusUrl,
+        $apiKey,
+        $filePath
+    )
+    
+    $url = Get-OctopusUrl -EndPoint $item.Links.Logo -SpaceId $null -OctopusUrl $OctopusUrl
+
+    return Invoke-OctopusApi -Method "Get" -Url $url -apiKey $ApiKey -filePath $filePath
+}
+
+function Save-OctopusItemLogo
+{
+    param(
+        $item,
+        $octopusUrl,
+        $apiKey,
+        $fileContentToUpload        
+    )
+    
+    $url = Get-OctopusUrl -EndPoint $item.Links.Logo -SpaceId $null -OctopusUrl $OctopusUrl
+
+    Write-OctopusVerbose "Uploading logo to $url"        
+    
+    Add-Type -AssemblyName System.Net.Http
+
+    $httpClientHandler = New-Object System.Net.Http.HttpClientHandler
+
+    $httpClient = New-Object System.Net.Http.HttpClient $httpClientHandler
+    $httpClient.DefaultRequestHeaders.Add("X-Octopus-ApiKey", $ApiKey)
+
+    $packageFileStream = New-Object System.IO.FileStream @($fileContentToUpload, [System.IO.FileMode]::Open)
+    
+    $contentDispositionHeaderValue = New-Object System.Net.Http.Headers.ContentDispositionHeaderValue "form-data"
+    $contentDispositionHeaderValue.Name = "fileData"
+    $contentDispositionHeaderValue.FileName = [System.IO.Path]::GetFileName($fileContentToUpload)
+
+    $streamContent = New-Object System.Net.Http.StreamContent $packageFileStream
+    $streamContent.Headers.ContentDisposition = $contentDispositionHeaderValue
+    $ContentType = "application/octet-stream"
+    $streamContent.Headers.ContentType = New-Object System.Net.Http.Headers.MediaTypeHeaderValue $ContentType
+    
+    $content = New-Object System.Net.Http.MultipartFormDataContent
+    $content.Add($streamContent)
+
+    $httpClient.PostAsync($url, $content).Result
+
+    return
+        
 }

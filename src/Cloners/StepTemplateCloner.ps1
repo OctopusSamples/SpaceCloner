@@ -40,7 +40,9 @@ function Copy-OctopusStepTemplates
                 $stepTemplateToClone.Id = $matchingItem.Id
             }
 
-            Save-OctopusStepTemplate -StepTemplate $stepTemplateToClone -DestinationData $destinationData            
+            $destinationStepTemplate = Save-OctopusStepTemplate -StepTemplate $stepTemplateToClone -DestinationData $destinationData            
+
+            Copy-OctopusItemLogo -sourceItem $stepTemplate -destinationItem $destinationStepTemplate -sourceData $SourceData -destinationData $DestinationData -CloneScriptOptions $CloneScriptOptions
         }        
     }
 

@@ -27,8 +27,8 @@ function Copy-OctopusTenants
             $tenantToAdd.SpaceId = $destinationData.SpaceId
             $tenantToAdd.ProjectEnvironments = @{}            
 
-            $tenant.ProjectEnvironments.PSObject.Properties | ForEach-Object 
-            {
+            Write-OctopusVerbose "Attempting to assign all the tenant projects"
+            $tenant.ProjectEnvironments.PSObject.Properties | ForEach-Object {
                 Write-OctopusVerbose "Attempting to matching $($_.Name) with source"
                 $matchingProjectId = Convert-SourceIdToDestinationId -SourceList $sourceData.ProjectList -DestinationList $destinationData.ProjectList -IdValue $_.Name
 
@@ -42,7 +42,9 @@ function Copy-OctopusTenants
                 }
             }            
 
-            Save-OctopusTenant -Tenant $tenantToAdd -destinationData $destinationData            
+            $destinationTenant = Save-OctopusTenant -Tenant $tenantToAdd -destinationData $destinationData           
+
+            Copy-OctopusItemLogo -sourceItem $tenant -destinationItem $destinationTenant -sourceData $SourceData -destinationData $DestinationData -CloneScriptOptions $CloneScriptOptions
         }
         else
         {

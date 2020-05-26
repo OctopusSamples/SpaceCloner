@@ -6,7 +6,7 @@ This script was developed internally for the Customer Success team at Octopus De
 
 Please test it on an empty space before attempting to use it for any kind of real-world use.  If you find something isn't working for your instance, fork this repo and modify the script to meet your needs.  
 
-# Use Cases
+# Use cases
 This script was written for the following use cases.
 
 - As a user, I want to split my one massive default space into [multiple spaces on the same instance](docs/UseCase-BreakUpSpace.md).
@@ -15,17 +15,17 @@ This script was written for the following use cases.
 - As a user, I have a set of "parent" projects.  I clone from that project when I need to create a new project.  However, when the process on the "parent" project is updated, I would like to [update the existing "child" projects](docs/UseCase-ParentChildProjects.md).
 - As a user, I would like to copy my projects from [self-hosted Octopus to Octopus Cloud](docs/UseCase-MigrateFromSelfHostedToCloud.md).
 
-## Possible but not recommended.
+## Possible but not recommended
 
 - As a user, I want to merge multiple Octopus Deploy instances into the same space on a new instance.  That scenario, merging multiple disparate instances into one massive space, is not recommended.  The chance of overwriting something meaningful is very high.  Just like steering a car with your knees, while possible, it is not recommended.
 
-# How It Works
+# How the space cloner workers
 Please see the [how it works page](docs/HowItWorks.md).
 
-# Sensitive Variables
+# Sensitive variables
 Please see the page [sensitive variables](docs/SensitiveVariables.md) to see how sensitive variables are handled.
 
-# Debugging and Logging
+# Debugging and logging
 Please see the [debugging and logging page](docs/Debugging.md).
 
 # Reference
