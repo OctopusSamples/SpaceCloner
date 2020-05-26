@@ -1,6 +1,6 @@
 # Logging
 
-This script will write to the host for you to keep track of what is going on.  It will also write to additional logs.  Each run will generate two new logs.
+All runs generate two fresh logs.  All information written to the host is written to the log.
 
 - CleanUpLog -> A log of items indicating what you will need to clean up
 - Log -> The verbose log of the clone
@@ -9,7 +9,7 @@ The logs will be placed in the logs\[date of run] folder.  The script will creat
 
 # Debugging
 
-This is a script manipulating data and then calling an API, it is possible it will send a bad JSON body up to the API.  
+This is a script manipulating data and then calling an API; it is possible it will send a bad JSON body up to the API.  
 
 All JSON requests are stored in the log.  For example:
 
@@ -40,4 +40,4 @@ Going to invoke POST https://code-aperture.octopus.app/api/Spaces-104/Environmen
 }
 ```
 
-You can copy that body and URL into Postman to manipulate until it works for you.  Once you know the cause you can update the script to make sure it doesn't happen again.
+You can copy that body and URL into Postman to manipulate until it works for you.  Once you know the cause, you can update the script to make sure it doesn't happen again.

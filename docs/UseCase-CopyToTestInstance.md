@@ -1,6 +1,6 @@
-# Copying to and from test instance
+# Use Case: copying to and from test instance
 
-A lot of customers like to stand up a test instance to verify upgrades.  They want a set of projects that mimic the common deployment processes as their production instance.  
+Many customers like to stand up a test instance to verify upgrades.  They want a set of projects that mimic the common deployment processes as their production instance.  
 
 This use case is supported in with the Space Cloner script.
 
@@ -8,12 +8,12 @@ Please refer to the [how it works page](HowItWorks.md#what-will-it-clone) to get
 
 # Example
 
-In this use case, you probably want to copy everything, but only include a handful of projects.  In the example script below it will copy all everything in a space plus a set of specific projects.  It will only copy targets and workers related to the projects you wish to clone.
+In this use case, you probably want to copy everything, but only include a handful of projects.  The example script below will copy everything in a space plus a set of specific projects.  It will only copy targets and workers related to the projects you wish to clone.
 
 Please refer to the [Parameter reference page](ParameterReference.md) for more details on the parameters.
 
 The other options are:
-- `OverwriteExistingVariables` - set to `True` so variables are always overwritten (except for sensitive variables).
+- `OverwriteExistingVariables` - set to `True`, so variables are always overwritten (except for sensitive variables).
 - `AddAdditionalVariableValuesOnExistingVariableSets` - set to `True` to add new variables values found for the same variable name.  
 - `OverwriteExistingCustomStepTemplates` - Set to `True` so the step templates are kept in sync. You might have made some recent changes to the step template.  It is important to keep them up to date.
 - `OverwriteExistingLifecyclesPhases` - Set to `True` since this is a full clone the overwrite existing lifecycle phases has been set to true as well.

@@ -1,6 +1,6 @@
 # Sensitive Variables
 
-The script accesses the Octopus API.  As such it cannot access your sensitive variables.  However, we need to save _something_ into that data.
+The script accesses the Octopus API.  As such, it cannot access your sensitive variables.  However, we need to save _something_ into that data.
 
 Here is a break down of all the areas where the script will insert dummy data.  Every one of these replacements is logged in `CleanUpLog.txt` to make them easier to find.
 
@@ -24,5 +24,5 @@ Here is a break down of all the areas where the script will insert dummy data.  
     - SSH Accounts:
         - PFX File: uploads a dummy file with the word "test" in it.
 
-These dummy values are only _inserted_ on POST or creation.  If the script detects the value already exists on the destination it will leave everything as is.
+These dummy values are only _inserted_ on POST or creation.  All existing items on the destination space are left as is.
     
