@@ -2,9 +2,11 @@
 Sample PowerShell script to help you clone a space using the Octopus Deploy Restful API.
 
 # This cloning process is provided as is
-This script was developed internally for the Customer Success team at Octopus Deploy to solve specific use cases we encounter each day.  We are sharing this script to help others.  Think of this script as a starting point for your process.
+This script was developed internally for the Customer Success team at Octopus Deploy to solve specific use cases we encounter each day.  We are sharing this script to help other users of Octopus Deploy.  To cover as many use cases as we run into as possible, the script has a set of generic comparisons in place.  It matches by name, order is tracked via a simple index, etc.  We work in Octopus all day every day.  As such, we are okay with a script that accomplishes 80-90% of a clone, and then spending a bit of time doing some manual work.  
 
-Please test it on an empty space before attempting to use it for any kind of real-world use.  If you find something isn't working for your instance, fork this repo and modify the script to meet your needs.  
+It would be impossible for us to write a script such as this to match your hyper-specific use.  For example, you might store a number of your variables in a key store, with Octopus storing the credentials.  You could update the script so when it comes across a specific variable name the credentials are inserted into the variable value instead of pulling from the source instance.
+
+ This repository is [licensed](license) under the MIT license.  You are free to fork the repo and add whatever feature you wish.  Think of this script as a starting point in your process.  We encourage you to fork it, test it out on an empty space or empty instance, look at the results and modify the script to meet your needs.  It is possible for the script to work for your use cases without modification.
 
 # Use cases
 This script was written for the following use cases.
@@ -41,17 +43,10 @@ Below are questions and answers to common questions we've gotten about this proj
 The Customer Success at Octopus Deploy team developed this script.  We use it to clone items for our [samples instance](https://samples.octopus.app).
 
 ### Will you fix my bug?  
-Maybe.  As this is a sample script, we may or may not fix it.  You can submit an issue.  We have a triage process.  While we can't promise every bug will be fixed, we can promise every bug will get a response.  You are free to fork this repo and fix the issue yourself.
-
-### What issues won't be fixed?
-The following issues we know about, and we have no intention of ever fixing.
-- Inability to clone different [major].[minor] versions.  For example, `3.17.14` to `2020.2.6`.  The script has a guard clause to prevent this from happening.  `2020.2.3` to `2020.2.7` is okay, but not `2019.1.2` to `2020.1.3`.
-- Missing sensitive variables, the API cannot access those values; therefore, the script cannot clone them.
-- Certain Excluded Object Types (sensitive variables, teams, users, etc.).  They were excluded for a specific reason.  
-- Bugs from versions `3.x`, or `2018.x`.  If the script happens to work for those versions, yay, but it is unsupported.
+Sorry, but no.  This repository is under the Octopus Samples organization instead of Octopus Deploy.  Issues are not monitored.  This script is meant as a starting point for your process.  This repository is [licensed](license) under the MIT license.  You are free to fork the repo and fix your specific issue.  
 
 ### What about feature requests?
-Unless it is something we (Customer Success) needs, we probably won't add it ourselves.  We encourage you to fork the repo, add your desired functionality.  If you think others will benefit, submit a PR.
+No.  We won't accept feature requests for the script.  This repository is [licensed](license) under the MIT license.  You are free to fork the repo and add whatever feature you wish.  The Customer Success team plans on keeping this script up to date with the latest version of Octopus Deploy.  If you do fork this repo, you might want to keep up to date on the latest changes.
 
 ### Do you accept pull requests?
 Yes!  If you want to improve this script, please submit a pull request!
@@ -63,13 +58,12 @@ Yes.  However, this script is not a full migration.  It will jump-start your mig
 No.  It was designed for specific use cases, and the limits placed on it were intentional.  For example, it can't access your Master Key, and without that, it cannot decrypt your sensitive data.  It should get you 80-90% of the way there.  You are free to fork this repo to modify the scripts to help get you another 5% of the way there.  
 
 ### What version of Octopus Deploy does this script support?
-It _should_ work with any Octopus version `3.4` or higher.  It was developed by testing against a version running `2020.x`.  Take from that what you will. 
+It _should_ work with any Octopus version `3.4` or higher.  It was developed by testing against a version running `2020.x`.  You will notice some version checks being run in the script.  This is to prevent the script from calling specific API endpoints when it shouldn't.
 
-The script compares the major and minor versions of the source and destination.  
+### Can I use this script to migrate from 2018.10 to 2020.2?
+No.  The script compares the major and minor versions of the source and destination.  
 
 **Unless the source and destination [major].[minor] versions are the same; the script will not proceed.**
-
-You will notice some version checks being run in the script.  This is to prevent the script from calling specific API endpoints when it shouldn't.
 
 ### What permissions should the users tied to the API keys have?
 For the source instance, a user with read-only permissions to all objects copied is required.  It will never write anything back to the source.
