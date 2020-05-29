@@ -1,3 +1,7 @@
+# Migration to new Org!
+
+This repository has been migrated to a new organization: https://github.com/OctopusDeployLabs/SpaceCloner.  All future work will be done there.  This repo is being kept for archival purposes only.
+
 # Space Cloner
 Sample PowerShell script to help you clone a space using the Octopus Deploy Restful API.
 
